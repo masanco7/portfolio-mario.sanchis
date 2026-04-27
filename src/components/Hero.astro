@@ -1,0 +1,33 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+
+const { lang = 'es' } = Astro.props as { lang?: Lang };
+const t = getTranslations(lang);
+---
+<section class="section hero" aria-labelledby="hero-name">
+  <div class="container">
+    <p class="hero-eyebrow reveal">{t.hero.eyebrow}</p>
+    <h1 id="hero-name" class="hero-name reveal" set:html={t.hero.name}></h1>
+    <p class="hero-title reveal" set:html={t.hero.title}></p>
+    <p class="hero-tagline reveal">{t.hero.tagline}</p>
+
+    <div class="hero-meta reveal" role="presentation">
+      <span><span class="dot" aria-hidden="true"></span>{t.hero.metaBadges}</span>
+      <span>{t.hero.metaPoints}</span>
+      <span>{t.hero.metaTrails}</span>
+    </div>
+
+    <div class="hero-ctas reveal">
+      <a class="btn btn-primary" href="#salesforce">
+        {t.hero.ctaSalesforce}
+        <svg class="arrow" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13L13 3M6 3h7v7"/></svg>
+      </a>
+      <a class="btn btn-secondary" href="#proyectos">
+        {t.hero.ctaProjects}
+      </a>
+      <a class="btn btn-ghost" href="#contacto">
+        {t.hero.ctaContact}
+      </a>
+    </div>
+  </div>
+</section>

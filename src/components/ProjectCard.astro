@@ -1,0 +1,137 @@
+---
+import type { Project } from '../types';
+
+const { project } = Astro.props as { project: Project };
+const badgeClass = project.badge.variant === 'live' ? 'project-badge live' : 'project-badge';
+const hasImage = Boolean(project.thumbImage);
+---
+<article class="project reveal">
+  <div class="project-thumb" aria-hidden={hasImage ? undefined : 'true'}>
+    <span class={badgeClass}>{project.badge.label}</span>
+
+    {hasImage && (
+      <img src={project.thumbImage} alt={project.thumbAlt ?? ''} loading="lazy" decoding="async" width="640" height="360" />
+    )}
+
+    {!hasImage && project.thumbKind === 'tallerapp' && (
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <pattern id={`p-${project.id}`} width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="14" stroke="currentColor" stroke-width="1" stroke-opacity="0.08"/>
+          </pattern>
+        </defs>
+        <rect width="320" height="180" fill="var(--bg-subtle)"/>
+        <rect width="320" height="180" fill={`url(#p-${project.id})`} style="color: var(--fg)"/>
+        <rect x="22" y="22" width="120" height="10" rx="2" fill="var(--border-strong)"/>
+        <rect x="22" y="40" width="76" height="6" rx="2" fill="var(--border)"/>
+        <rect x="22" y="68" width="276" height="56" rx="6" fill="var(--bg-elev)" stroke="var(--border)"/>
+        <rect x="34" y="80" width="80" height="6" rx="2" fill="var(--border-strong)"/>
+        <rect x="34" y="92" width="160" height="4" rx="2" fill="var(--border)"/>
+        <rect x="34" y="102" width="120" height="4" rx="2" fill="var(--border)"/>
+        <circle cx="280" cy="96" r="10" fill="var(--accent)" fill-opacity="0.85"/>
+        <rect x="22" y="138" width="64" height="22" rx="4" fill="var(--accent)" fill-opacity="0.9"/>
+        <rect x="92" y="138" width="64" height="22" rx="4" fill="var(--bg-elev)" stroke="var(--border)"/>
+      </svg>
+    )}
+
+    {!hasImage && project.thumbKind === 'gym' && (
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+        <rect width="320" height="180" fill="var(--bg-subtle)"/>
+        <g transform="translate(20,22)">
+          <rect width="280" height="138" rx="10" fill="var(--bg-elev)" stroke="var(--border)"/>
+          <rect x="14" y="14" width="92" height="8" rx="2" fill="var(--border-strong)"/>
+          <rect x="14" y="28" width="60" height="5" rx="2" fill="var(--border)"/>
+          <polyline points="14,108 50,90 86,98 122,72 158,80 194,52 230,62 266,38" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <g fill="var(--accent)">
+            <circle cx="50" cy="90" r="2.5"/>
+            <circle cx="122" cy="72" r="2.5"/>
+            <circle cx="194" cy="52" r="2.5"/>
+            <circle cx="266" cy="38" r="2.5"/>
+          </g>
+          <line x1="14" y1="120" x2="266" y2="120" stroke="var(--border)" stroke-dasharray="2 3"/>
+        </g>
+      </svg>
+    )}
+
+    {!hasImage && project.thumbKind === 'jasb' && (
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+        <rect width="320" height="180" fill="var(--bg-subtle)"/>
+        <g transform="translate(20,22)">
+          <rect width="280" height="138" rx="10" fill="var(--bg-elev)" stroke="var(--border)"/>
+          <rect x="14" y="14" width="252" height="14" rx="2" fill="var(--border)"/>
+          <rect x="14" y="36" width="120" height="14" rx="2" fill="var(--border-strong)"/>
+          <rect x="14" y="60" width="120" height="60" rx="6" fill="var(--accent)" fill-opacity="0.18"/>
+          <rect x="146" y="60" width="120" height="60" rx="6" fill="var(--bg-subtle)" stroke="var(--border)"/>
+          <rect x="156" y="74" width="60" height="6" rx="2" fill="var(--border-strong)"/>
+          <rect x="156" y="86" width="90" height="4" rx="2" fill="var(--border)"/>
+          <rect x="156" y="94" width="80" height="4" rx="2" fill="var(--border)"/>
+        </g>
+      </svg>
+    )}
+
+    {!hasImage && project.thumbKind === 'trading' && (
+      <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
+        <rect width="320" height="180" fill="var(--bg-subtle)"/>
+        <g transform="translate(20,22)">
+          <rect width="280" height="138" rx="10" fill="var(--bg-elev)" stroke="var(--border)"/>
+          <g>
+            <rect x="20" y="60" width="6" height="40" fill="var(--border-strong)"/>
+            <rect x="36" y="50" width="6" height="34" fill="var(--accent)"/>
+            <rect x="52" y="40" width="6" height="48" fill="var(--accent)"/>
+            <rect x="68" y="56" width="6" height="36" fill="var(--border-strong)"/>
+            <rect x="84" y="46" width="6" height="40" fill="var(--accent)"/>
+            <rect x="100" y="60" width="6" height="44" fill="var(--border-strong)"/>
+            <rect x="116" y="38" width="6" height="50" fill="var(--accent)"/>
+            <rect x="132" y="48" width="6" height="36" fill="var(--accent)"/>
+          </g>
+          <g transform="translate(160,30)">
+            <rect width="100" height="22" rx="4" fill="var(--bg-subtle)" stroke="var(--border)"/>
+            <circle cx="14" cy="11" r="4" fill="var(--accent)"/>
+            <rect x="26" y="6" width="60" height="4" rx="2" fill="var(--border-strong)"/>
+            <rect x="26" y="13" width="40" height="3" rx="2" fill="var(--border)"/>
+          </g>
+          <g transform="translate(160,58)">
+            <rect width="100" height="22" rx="4" fill="var(--bg-subtle)" stroke="var(--border)"/>
+            <circle cx="14" cy="11" r="4" fill="var(--accent)" fill-opacity="0.5"/>
+            <rect x="26" y="6" width="60" height="4" rx="2" fill="var(--border-strong)"/>
+            <rect x="26" y="13" width="40" height="3" rx="2" fill="var(--border)"/>
+          </g>
+          <g transform="translate(160,86)">
+            <rect width="100" height="22" rx="4" fill="var(--bg-subtle)" stroke="var(--border)"/>
+            <circle cx="14" cy="11" r="4" fill="var(--accent)" fill-opacity="0.3"/>
+            <rect x="26" y="6" width="60" height="4" rx="2" fill="var(--border-strong)"/>
+            <rect x="26" y="13" width="40" height="3" rx="2" fill="var(--border)"/>
+          </g>
+        </g>
+      </svg>
+    )}
+  </div>
+
+  <div class="project-body">
+    <h3 class="project-title">
+      {project.title}
+      {project.host && <span class="project-host">{project.host}</span>}
+    </h3>
+    {project.descriptionHtml
+      ? <p class="project-desc" set:html={project.descriptionHtml} />
+      : <p class="project-desc">{project.description}</p>}
+    <ul class="project-stack" role="list">
+      {project.stack.map((s) => <li>{s}</li>)}
+    </ul>
+    <div class="project-links">
+      {project.links.map((link) => (
+        link.kind === 'disabled'
+          ? <span class="project-link" aria-disabled="true">{link.label}</span>
+          : <a class="project-link" href={link.href} target="_blank" rel="noopener">
+              {link.kind === 'repo' && (
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.81.06 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.15 0 3.08-1.87 3.76-3.65 3.95.29.25.54.74.54 1.49v2.21c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+              )}
+              {link.kind === 'demo' && (
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13L13 3M6 3h7v7"/></svg>
+              )}
+              {link.label}
+            </a>
+      ))}
+    </div>
+  </div>
+</article>

@@ -1,0 +1,22 @@
+---
+import projectsEs from '../data/projects.es.json';
+import projectsEn from '../data/projects.en.json';
+import ProjectCard from './ProjectCard.astro';
+import { getTranslations, type Lang } from '../i18n';
+import type { Project } from '../types';
+
+const { lang = 'es' } = Astro.props as { lang?: Lang };
+const t = getTranslations(lang);
+
+const projects = (lang === 'es' ? projectsEs : projectsEn) as Project[];
+---
+<section id="proyectos" class="section" aria-labelledby="projects-title">
+  <div class="container">
+    <p class="section-label reveal">{t.projects.sectionLabel}</p>
+    <h2 id="projects-title" class="section-title reveal">{t.projects.title}</h2>
+    <p class="section-intro reveal">{t.projects.intro}</p>
+    <div class="projects-grid">
+      {projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </div>
+</section>

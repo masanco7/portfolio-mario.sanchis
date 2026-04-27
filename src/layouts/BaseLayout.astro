@@ -1,0 +1,104 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+
+export interface Props {
+  lang?: Lang;
+  title?: string;
+  description?: string;
+}
+
+const { lang = 'es', title, description } = Astro.props;
+const t = getTranslations(lang);
+
+const finalTitle = title ?? t.meta.title;
+const finalDescription = description ?? t.meta.description;
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const canonical = `${siteUrl}${lang === 'es' ? '/' : '/en/'}`;
+const altEs = `${siteUrl}/`;
+const altEn = `${siteUrl}/en/`;
+
+import '../styles/global.css';
+---
+<!doctype html>
+<html lang={t.meta.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{finalTitle}</title>
+
+    <meta name="description" content={finalDescription} />
+    <meta name="author" content="Mario Sanchis Colomer" />
+    <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d0f12" media="(prefers-color-scheme: dark)" />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="alternate" hreflang="es" href={altEs} />
+    <link rel="alternate" hreflang="en" href={altEn} />
+    <link rel="alternate" hreflang="x-default" href={altEs} />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:locale" content={t.meta.locale} />
+    <meta property="og:locale:alternate" content={lang === 'es' ? 'en_US' : 'es_ES'} />
+    <meta property="og:title" content={finalTitle} />
+    <meta property="og:description" content={t.meta.ogDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="profile:first_name" content="Mario" />
+    <meta property="profile:last_name" content="Sanchis Colomer" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={finalTitle} />
+    <meta name="twitter:description" content={t.meta.ogDescription} />
+
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Mario Sanchis Colomer",
+      "givenName": "Mario",
+      "familyName": "Sanchis Colomer",
+      "jobTitle": lang === 'es' ? "Salesforce Core Developer Junior" : "Junior Salesforce Core Developer",
+      "address": { "@type": "PostalAddress", "addressLocality": "Valencia", "addressCountry": "ES" },
+      "email": "mailto:msanchiscolomer@gmail.com",
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": lang === 'es' ? "Universidad de Valencia — ETSE" : "University of Valencia — ETSE",
+        "department": lang === 'es' ? "Grado en Ingeniería Informática" : "BSc in Computer Engineering"
+      },
+      "knowsAbout": [
+        "Salesforce Administration","Apex","Lightning Web Components","Flow Builder",
+        "SOQL","CRM Analytics","Service Cloud","Data Security","Angular","TypeScript",
+        "NestJS","FastAPI","PostgreSQL"
+      ],
+      "knowsLanguage": ["es", "en"],
+      "sameAs": [
+        "https://www.linkedin.com/in/mario-sanchis-colomer/?skipRedirect=true",
+        "https://github.com/masanco7",
+        "https://www.salesforce.com/trailblazer/mariosanchiscolomer"
+      ]
+    })} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('msc-theme');
+          if (stored === 'light' || stored === 'dark') {
+            document.documentElement.setAttribute('data-theme', stored);
+          }
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script>
+      import '../scripts/main.js';
+    </script>
+  </body>
+</html>

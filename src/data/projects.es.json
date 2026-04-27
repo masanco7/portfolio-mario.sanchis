@@ -1,0 +1,60 @@
+[
+  {
+    "id": "tallerapp",
+    "title": "TallerApp",
+    "host": null,
+    "badge": { "label": "TFG", "variant": "default" },
+    "description": "Aplicación web full-stack para gestión integral de taller mecánico — clientes, vehículos, órdenes de reparación, inventario, citas y facturación PDF. Trabajo de Fin de Grado.",
+    "stack": ["Angular 21", "PrimeNG", "NestJS 11", "TypeORM", "PostgreSQL 16", "JWT"],
+    "links": [
+      { "kind": "disabled", "label": "repo privado" },
+      { "kind": "disabled", "label": "demo privada" }
+    ],
+    "thumbKind": "tallerapp"
+  },
+  {
+    "id": "gym-tracker",
+    "title": "Gym Tracker",
+    "host": "gym.masanco-hub.com",
+    "badge": { "label": "Live", "variant": "live" },
+    "description": "PWA offline-first para registrar entrenamientos: rutinas semanales, detección automática de PRs, rest timer SVG y gráfica de progreso custom. Backend FastAPI con SSO compartido. Uso personal real, en producción.",
+    "stack": ["Angular 21 zoneless", "Signals", "FastAPI", "PWA", "SVG charts"],
+    "links": [
+      { "kind": "disabled", "label": "demo privada" },
+      { "kind": "disabled", "label": "repo privado" }
+    ],
+    "thumbKind": "gym",
+    "thumbImage": "/projects/gym.png",
+    "thumbAlt": "Capturas de Gym Tracker — pestañas Hoy, Historial, Progreso, Rutinas y Perfil de la PWA"
+  },
+  {
+    "id": "web-jasb",
+    "title": "Web JASB",
+    "host": "jasbct.com",
+    "badge": { "label": "En producción", "variant": "live" },
+    "description": "Web corporativa para JASB Energía & Telco con i18n custom, Schema.org y SEO optimizado. Accesible, multi-idioma y sin dependencias pesadas.",
+    "stack": ["HTML5", "Bootstrap 5.3", "JS vanilla", "i18n custom", "Schema.org"],
+    "links": [
+      { "kind": "demo", "label": "visitar", "href": "https://jasbct.com" },
+      { "kind": "disabled", "label": "repo privado" }
+    ],
+    "thumbKind": "jasb",
+    "thumbImage": "/projects/jasb.png",
+    "thumbAlt": "Hero de jasbct.com — JASB Energía & Telco · conectando las ciudades del futuro"
+  },
+  {
+    "id": "trading-bot",
+    "title": "Trading Bot · IA multi-agente",
+    "host": null,
+    "badge": { "label": "Experimental", "variant": "default" },
+    "descriptionHtml": "Sistema multi-mercado de trading automatizado en <strong>Polymarket</strong>: 24 mercados crypto (BTC, ETH, SOL…) con Latency Arbitrage Selectivo + Kelly Criterion. 3 agentes LLM (Risk Manager, Market Context, Sentinel) supervisan vía Ollama, datos en tiempo real Binance WebSocket. Live en VPS.",
+    "stack": ["Python 3.12", "FastAPI", "Angular 21", "Ollama", "Polymarket CLOB", "Binance WS", "Telegram"],
+    "links": [
+      { "kind": "disabled", "label": "repo privado" },
+      { "kind": "disabled", "label": "sin métricas públicas" }
+    ],
+    "thumbKind": "trading",
+    "thumbImage": "/projects/trading.png",
+    "thumbAlt": "Dashboard del bot — KPIs globales, gráfica P&L y grid de 24 mercados con stats individuales"
+  }
+]

@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Salesforce from '../components/Salesforce.astro';
+import Projects from '../components/Projects.astro';
+import Stack from '../components/Stack.astro';
+import About from '../components/About.astro';
+import Contact from '../components/Contact.astro';
+import { getTranslations } from '../i18n';
+
+const lang = 'es' as const;
+const t = getTranslations(lang);
+const year = new Date().getFullYear();
+---
+<BaseLayout lang={lang}>
+  <Nav lang={lang} />
+  <main id="main">
+    <a id="top" tabindex="-1" aria-hidden="true"></a>
+    <Hero lang={lang} />
+    <Salesforce lang={lang} />
+    <Projects lang={lang} />
+    <Stack lang={lang} />
+    <About lang={lang} />
+    <Contact lang={lang} />
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="container footer-inner">
+      <span>© <span data-year>{year}</span> {t.footer.copyright}</span>
+      <div class="footer-links">
+        <a href="https://github.com/masanco7" target="_blank" rel="noopener">{t.footer.githubLabel}</a>
+        <a href="https://www.linkedin.com/in/mario-sanchis-colomer/?skipRedirect=true" target="_blank" rel="noopener">{t.footer.linkedinLabel}</a>
+        <a href="mailto:msanchiscolomer@gmail.com">{t.footer.emailLabel}</a>
+        <a href="#top">{t.footer.topLabel}</a>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>
