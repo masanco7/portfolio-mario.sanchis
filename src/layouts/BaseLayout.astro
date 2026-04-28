@@ -17,6 +17,7 @@ const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const canonical = `${siteUrl}${lang === 'es' ? '/' : '/en/'}`;
 const altEs = `${siteUrl}/`;
 const altEn = `${siteUrl}/en/`;
+const ogImage = `${siteUrl}/og-image.png`;
 
 import '../styles/global.css';
 ---
@@ -43,12 +44,19 @@ import '../styles/global.css';
     <meta property="og:title" content={finalTitle} />
     <meta property="og:description" content={t.meta.ogDescription} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content={finalTitle} />
     <meta property="profile:first_name" content="Mario" />
     <meta property="profile:last_name" content="Sanchis Colomer" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={finalTitle} />
     <meta name="twitter:description" content={t.meta.ogDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={finalTitle} />
 
     <script type="application/ld+json" set:html={JSON.stringify({
       "@context": "https://schema.org",
