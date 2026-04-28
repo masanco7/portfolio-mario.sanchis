@@ -78,7 +78,7 @@ export const ui: UiStrings = {
   },
   projects: {
     sectionLabel: '02 — Other projects',
-    title: 'What I build off the clock.',
+    title: 'Personal projects in production.',
     intro: 'Web and full-stack. They keep my hands in code, let me try different stacks, and ship things people use.',
     linkLabels: {
       visit: 'visit',
@@ -97,7 +97,7 @@ export const ui: UiStrings = {
   about: {
     sectionLabel: '04 — About me',
     title: "Who's behind the CV.",
-    p1Html: "I'm <strong>Mario</strong>, a final-year Computer Engineering student in Valencia and, until a few days ago, <strong>Salesforce Junior Consultant</strong> at <strong>Capgemini DCX</strong>, where I completed seven months of internship within the Digital Customer Experience team. I came to Salesforce because it offered something I was looking for: a platform with a defined domain, real automations, and verifiable learning via Trailhead.",
+    p1Html: "I'm <strong>Mario</strong>, a final-year Computer Engineering student in Valencia and, until April 2026, <strong>Salesforce Junior Consultant</strong> at <strong>Capgemini DCX</strong>, where I completed seven months of internship within the Digital Customer Experience team. I came to Salesforce because it offered something I was looking for: a platform with a defined domain, real automations, and verifiable learning via Trailhead.",
     p2Html: 'I work in an <strong>iterative and methodical</strong> way: I read before I write, prototype small, and only then scale. I use AI <strong>as a tool, not as a shortcut</strong> — to review code, contrast approaches and speed up reading documentation, never to replace understanding what I am building.',
     p3Html: "I'm looking for my <strong>first full-time job</strong> within the Salesforce ecosystem in Spain. Teams where code review is taken seriously, there's room to certify as Administrator, and I can contribute to automation, integration and quality delivery.",
     cvDownload: 'Download full CV',

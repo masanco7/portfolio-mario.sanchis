@@ -76,7 +76,7 @@ export const ui = {
   },
   projects: {
     sectionLabel: '02 — Otros proyectos',
-    title: 'Lo que construyo fuera del horario.',
+    title: 'Proyectos personales en producción.',
     intro: 'Web y full-stack. Sirven para mantener manos en código, probar stacks distintos y entregar cosas que se usan.',
     linkLabels: {
       visit: 'visitar',
@@ -95,7 +95,7 @@ export const ui = {
   about: {
     sectionLabel: '04 — Sobre mí',
     title: 'Quién está detrás del CV.',
-    p1Html: 'Soy <strong>Mario</strong>, estudiante de último curso de Ingeniería Informática en Valencia y, hasta hace pocos días, <strong>Salesforce Junior Consultant</strong> en <strong>Capgemini DCX</strong>, donde completé siete meses de prácticas dentro del equipo de Digital Customer Experience. Llegué a Salesforce porque me ofrecía algo que buscaba: una plataforma con dominio acotado, automatizaciones reales y aprendizaje verificable vía Trailhead.',
+    p1Html: 'Soy <strong>Mario</strong>, estudiante de último curso de Ingeniería Informática en Valencia y, hasta abril de 2026, <strong>Salesforce Junior Consultant</strong> en <strong>Capgemini DCX</strong>, donde completé siete meses de prácticas dentro del equipo de Digital Customer Experience. Llegué a Salesforce porque me ofrecía algo que buscaba: una plataforma con dominio acotado, automatizaciones reales y aprendizaje verificable vía Trailhead.',
     p2Html: 'Trabajo de manera <strong>iterativa y ordenada</strong>: leo antes de escribir, prototipo en pequeño y solo entonces escalo. Uso IA <strong>como herramienta, no como atajo</strong> — para revisar código, contrastar enfoques y acelerar la lectura de documentación, nunca para reemplazar entender lo que estoy construyendo.',
     p3Html: 'Busco mi <strong>primer empleo full-time</strong> dentro del ecosistema Salesforce en España. Equipos donde se haga code review en serio, haya espacio para certificarme como Administrator y pueda aportar en automatización, integración y delivery con calidad.',
     cvDownload: 'Descargar CV completo',
