@@ -1,0 +1,99 @@
+/* Shared print stylesheet for Mario Sanchis Colomer's CVs.
+   Open the .html in a browser and use Ctrl+P -> "Save as PDF" (A4, no margins,
+   background graphics ON) to regenerate the matching public/cv-*.pdf. */
+
+:root {
+  --blue: #1f6aa5;
+  --blue-dark: #17527f;
+  --ink: #1a1a1a;
+  --muted: #666;
+  --rule: #1f6aa5;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+body {
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, "Segoe UI", sans-serif;
+  font-size: 10pt;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+/* A4 page geometry when printing */
+@page {
+  size: A4;
+  margin: 14mm 16mm;
+}
+
+.page { max-width: 190mm; margin: 0 auto; padding: 16mm; }
+@media print { .page { max-width: none; margin: 0; padding: 0; } }
+
+/* ---- Header ---- */
+.cv-header { text-align: center; margin-bottom: 6px; }
+.cv-name {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22pt;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  margin: 0;
+  color: var(--ink);
+}
+.cv-role {
+  font-size: 10.5pt;
+  color: var(--muted);
+  margin: 2px 0 6px;
+}
+.cv-contact {
+  font-size: 9.2pt;
+  color: var(--ink);
+}
+.cv-contact a { color: var(--blue); text-decoration: none; }
+.cv-contact .sep { color: #bbb; margin: 0 6px; }
+
+/* ---- Section headings ---- */
+h2.section {
+  font-size: 11pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--blue);
+  border-bottom: 1.5px solid var(--rule);
+  padding-bottom: 3px;
+  margin: 15px 0 8px;
+}
+
+/* ---- Entries (job / project / education) ---- */
+.entry { margin-bottom: 9px; break-inside: avoid; }
+.entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.entry-title { font-size: 10.5pt; font-weight: 400; }
+.entry-title strong { font-weight: 700; }
+.entry-meta { font-size: 9pt; color: var(--muted); white-space: nowrap; }
+.entry-sub { font-size: 9.5pt; color: var(--muted); margin: 1px 0 3px; }
+
+p.lead { margin: 0 0 6px; }
+p.lead strong { font-weight: 700; }
+
+ul { margin: 4px 0 0; padding-left: 18px; }
+li { margin-bottom: 3px; }
+li strong { font-weight: 700; }
+
+p { margin: 0 0 6px; }
+
+/* ---- Skills / languages compact rows ---- */
+.kv { margin: 2px 0; }
+.kv b { color: var(--ink); }
+
+.two-col { display: flex; gap: 40px; flex-wrap: wrap; }
+
+/* Force the second page to start at Projects, matching the original layout */
+.page-break { break-before: page; }
+
+.muted { color: var(--muted); }
