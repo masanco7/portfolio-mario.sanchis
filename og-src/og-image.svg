@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0d0f12"/>
+
+  <g stroke="#23272e" stroke-width="1" opacity="0.55"><line x1="60" y1="0" x2="60" y2="630"/><line x1="150" y1="0" x2="150" y2="630"/><line x1="240" y1="0" x2="240" y2="630"/><line x1="330" y1="0" x2="330" y2="630"/><line x1="420" y1="0" x2="420" y2="630"/><line x1="510" y1="0" x2="510" y2="630"/><line x1="600" y1="0" x2="600" y2="630"/><line x1="690" y1="0" x2="690" y2="630"/><line x1="780" y1="0" x2="780" y2="630"/><line x1="870" y1="0" x2="870" y2="630"/><line x1="960" y1="0" x2="960" y2="630"/><line x1="1050" y1="0" x2="1050" y2="630"/><line x1="1140" y1="0" x2="1140" y2="630"/><line x1="0" y1="45" x2="1200" y2="45"/><line x1="0" y1="135" x2="1200" y2="135"/><line x1="0" y1="225" x2="1200" y2="225"/><line x1="0" y1="315" x2="1200" y2="315"/><line x1="0" y1="405" x2="1200" y2="405"/><line x1="0" y1="495" x2="1200" y2="495"/><line x1="0" y1="585" x2="1200" y2="585"/></g>
+
+  <!-- top bar -->
+  <rect x="96" y="82" width="11" height="11" fill="#53a3f2" transform="rotate(45 101.5 87.5)"/>
+  <text x="122" y="93" font-family="'JetBrains Mono', 'Cascadia Mono', Consolas, monospace" font-size="15" letter-spacing="1.6" fill="#6b7280">MASANCO · PORTFOLIO</text>
+
+  <circle cx="965" cy="88" r="5" fill="#3fb950"/>
+  <text x="1104" y="93" text-anchor="end" font-family="'JetBrains Mono', 'Cascadia Mono', Consolas, monospace" font-size="15" letter-spacing="1.2" fill="#6b7280">Valencia · ES</text>
+
+  <!-- eyebrow -->
+  <line x1="96" y1="133" x2="126" y2="133" stroke="#6b7280" stroke-width="1.5"/>
+  <text x="140" y="139" font-family="'JetBrains Mono', 'Cascadia Mono', Consolas, monospace" font-size="15" letter-spacing="1.6" fill="#53a3f2">PORTFOLIO · 2026</text>
+
+  <!-- name -->
+  <text x="96" y="245" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="-2.5" fill="#e6e7e9">Mario Sanchis</text>
+  <text x="96" y="336" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="86" font-weight="700" letter-spacing="-2.5" fill="#e6e7e9">Colomer.</text>
+
+  <!-- role -->
+  <text x="96" y="424" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="37" font-weight="400" fill="#e6e7e9">Full-Stack Developer<tspan fill="#6b7280" dx="16">·</tspan><tspan fill="#9aa1ab" dx="16">Salesforce</tspan></text>
+
+  <!-- tagline -->
+  <text x="96" y="482" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="27" font-style="italic" fill="#6b7280">“Construyo cosas reales mientras aprendo.”</text>
+
+  <!-- footer -->
+  <rect x="96" y="537" width="9" height="9" fill="#53a3f2"/>
+  <text x="118" y="546" font-family="'JetBrains Mono', 'Cascadia Mono', Consolas, monospace" font-size="16" letter-spacing="0.4" fill="#9aa1ab">portfolio.masanco-hub.com</text>
+  <text x="1104" y="546" text-anchor="end" font-family="'JetBrains Mono', 'Cascadia Mono', Consolas, monospace" font-size="14" letter-spacing="1.2" fill="#23272e">OPEN GRAPH · 1200 × 630</text>
+</svg>

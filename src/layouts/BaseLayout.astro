@@ -17,9 +17,9 @@ const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const canonical = `${siteUrl}${lang === 'es' ? '/' : '/en/'}`;
 const altEs = `${siteUrl}/`;
 const altEn = `${siteUrl}/en/`;
-// TODO: /public/og-image.png still has "Salesforce Core Developer · Junior" rendered
-// into the bitmap. The og:*/twitter:* text below is already updated, but the image
-// itself must be regenerated with "Full-Stack Developer · Salesforce" before sharing.
+// The role line and tagline are baked into this bitmap. It is generated from the
+// hero strings by `npm run og` (see og-src/) — rerun it whenever hero.title or
+// hero.tagline changes, or the social preview drifts from the site.
 const ogImage = `${siteUrl}/og-image.png`;
 
 import '../styles/global.css';
