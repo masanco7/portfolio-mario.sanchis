@@ -1110,26 +1110,31 @@ a { color: inherit; text-decoration: none; }
 .pmodal-shot-media > .pmodal-shot-figure { flex: 1 1 auto; min-width: 0; }
 .pmodal-shot-media.has-phone > .pmodal-shot-figure--phone {
   flex: 0 0 24%;
-  /* Portrait companion — its own crop, so the 2/1 rule never squashes it. */
+  /* Portrait companion — its own ratio, so the 2/1 rule never squashes it. */
   aspect-ratio: 37 / 80;
   border-radius: var(--r-md);
+  /* Thinner frame: on a narrow box the same 5px would letterbox noticeably. */
+  padding: 3px;
 }
-.pmodal-shot-figure--phone img { object-position: top center; }
-
+/* The figure is a frame, not a crop: the shot is fitted whole inside it. The
+   ratio only reserves the slot so rows stay aligned across projects, and the
+   inner padding keeps the rounded frame from clipping the shot's own corners. */
 .pmodal-shot-figure {
   margin: 0;
   aspect-ratio: var(--pmodal-shot-ratio);
   background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
+  padding: 5px;
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
 .pmodal-shot-figure img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 3px;
 }
 .pmodal-shot-text { min-width: 0; }
 .pmodal-shot-index {

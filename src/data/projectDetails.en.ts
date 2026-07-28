@@ -98,10 +98,9 @@ export const projectDetails: Record<string, ProjectDetail> = {
     title: 'Gym Tracker',
     subtitle: 'Personal training PWA · In production since April 2026',
     badges: ['Angular 21', 'FastAPI', 'WebAuthn'],
-    // Card cover: the Today screen, the one actually used every day.
     hero: {
-      shot: 'hoy',
-      alt: 'Gym Tracker Today screen with the day’s routine and the sets in progress',
+      shot: 'login',
+      alt: 'Gym Tracker sign-in screen with the Face ID entry button',
     },
     intro: [
       'Gym Tracker is my personal training log, a PWA I have used daily since April 2026. It comes from a concrete need: keeping track of my routines with full control over how progress and progressions are computed, without depending on a generic app.',

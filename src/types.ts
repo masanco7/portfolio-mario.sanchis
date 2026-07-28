@@ -49,6 +49,12 @@ export interface ProjectDetail {
   subtitle: string;
   /** Short stack chips shown in the sticky header. */
   badges: string[];
+  /**
+   * Cover shot for the card in the projects grid — NOT rendered inside the
+   * panel, which opens straight on the write-up. Convention: always the login
+   * screen in its desktop version, even for projects that also ship a PWA, so
+   * every card in the grid reads the same.
+   */
   hero: ProjectShotRef;
   intro: string[];
   sections: ProjectDetailSection[];
