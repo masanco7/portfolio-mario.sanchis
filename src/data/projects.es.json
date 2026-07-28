@@ -36,9 +36,7 @@
       { "kind": "disabled", "label": "demo privada" },
       { "kind": "disabled", "label": "repo privado" }
     ],
-    "thumbKind": "gym",
-    "thumbImage": "/projects/gym.png",
-    "thumbAlt": "Capturas de Gym Tracker — pestañas Hoy, Historial, Progreso, Rutinas y Perfil de la PWA"
+    "thumbKind": "gym"
   },
   {
     "id": "web-jasb",

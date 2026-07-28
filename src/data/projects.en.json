@@ -36,9 +36,7 @@
       { "kind": "disabled", "label": "private demo" },
       { "kind": "disabled", "label": "private repo" }
     ],
-    "thumbKind": "gym",
-    "thumbImage": "/projects/gym.png",
-    "thumbAlt": "Gym Tracker screenshots — Today, History, Progress, Routines and Profile tabs of the PWA"
+    "thumbKind": "gym"
   },
   {
     "id": "web-jasb",
