@@ -60,7 +60,7 @@
     "title": "POLYBOT · Algorithmic trading",
     "host": null,
     "badge": { "label": "In production", "variant": "live" },
-    "descriptionHtml": "Autonomous bot trading weather markets on <strong>Polymarket</strong> with real money: it pulls the Open-Meteo GFS ensemble (31 members), builds the empirical probability distribution, contrasts it against the order book and places on-chain orders sized by the <strong>Kelly criterion</strong>. 33 markets registered, 5 live. LLM decision agents, three layers of risk gates, on-chain fill reconciliation and a PWA dashboard with push notifications.",
+    "descriptionHtml": "Autonomous bot trading weather markets on <strong>Polymarket</strong> with real money: it pulls the Open-Meteo GFS ensemble (31 members), builds the empirical probability distribution, contrasts it against the order book and places on-chain orders sized by the <strong>Kelly criterion</strong>. 33 markets registered, 8 active. LLM decision agents, three layers of risk gates, on-chain fill reconciliation and a PWA dashboard with push notifications.",
     "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
     "links": [
       { "kind": "disabled", "label": "private repo" },
