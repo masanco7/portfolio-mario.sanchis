@@ -4,28 +4,15 @@ import { getTranslations, type Lang } from '../i18n';
 const { lang = 'es' } = Astro.props as { lang?: Lang };
 const t = getTranslations(lang);
 ---
-<section id="stack" class="section" style="padding-top: 0;" aria-labelledby="stack-title">
+<!-- Full .section padding on top: this now follows the Salesforce band, whose
+     border-bottom needs air. (It used to collapse its top padding because it
+     followed another plain .section.) -->
+<section id="stack" class="section" aria-labelledby="stack-title">
   <div class="container">
     <p class="section-label reveal">{t.stack.sectionLabel}</p>
     <h2 id="stack-title" class="section-title reveal">{t.stack.title}</h2>
 
     <div class="stack-grid">
-      <div class="stack-col reveal">
-        <h3 class="stack-col-title">
-          <svg class="stack-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M3 12c0-3 2.5-5 5-5 1.7 0 3 .8 4 2 1-1.5 2.7-3 5-3 3 0 5 2 5 5 0 .3 0 .7-.1 1 1.3.7 2.1 2 2.1 3.5 0 2.2-1.8 4-4 4H6c-2.2 0-4-1.8-4-4 0-1.5.8-2.8 2-3.5z" transform="translate(-1 0)"/>
-          </svg>
-          {t.stack.salesforce}
-        </h3>
-        <ul class="stack-list" role="list">
-          <li>Apex</li>
-          <li>Lightning Web Components</li>
-          <li>SOQL</li>
-          <li>Flow Builder</li>
-          <li>Service Cloud</li>
-        </ul>
-      </div>
-
       <div class="stack-col reveal">
         <h3 class="stack-col-title">
           <svg class="stack-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -36,6 +23,7 @@ const t = getTranslations(lang);
         </h3>
         <ul class="stack-list" role="list">
           <li>Angular 21</li>
+          <li>React 19</li>
           <li>TypeScript</li>
           <li>JavaScript</li>
           <li>HTML5 / CSS3</li>
@@ -52,6 +40,7 @@ const t = getTranslations(lang);
         </h3>
         <ul class="stack-list" role="list">
           <li>NestJS</li>
+          <li>Spring Boot</li>
           <li>FastAPI</li>
           <li>Node.js</li>
           <li>Python</li>
@@ -71,11 +60,27 @@ const t = getTranslations(lang);
         </h3>
         <ul class="stack-list" role="list">
           <li>Git</li>
+          <li>Docker</li>
           <li>GitHub Actions</li>
           <li>Linux / VPS</li>
           <li>nginx</li>
           <li>Postman</li>
-          <li>VirtualBox</li>
+        </ul>
+      </div>
+
+      <div class="stack-col reveal">
+        <h3 class="stack-col-title">
+          <svg class="stack-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12c0-3 2.5-5 5-5 1.7 0 3 .8 4 2 1-1.5 2.7-3 5-3 3 0 5 2 5 5 0 .3 0 .7-.1 1 1.3.7 2.1 2 2.1 3.5 0 2.2-1.8 4-4 4H6c-2.2 0-4-1.8-4-4 0-1.5.8-2.8 2-3.5z" transform="translate(-1 0)"/>
+          </svg>
+          {t.stack.salesforce}
+        </h3>
+        <ul class="stack-list" role="list">
+          <li>Apex</li>
+          <li>Lightning Web Components</li>
+          <li>SOQL</li>
+          <li>Flow Builder</li>
+          <li>Service Cloud</li>
         </ul>
       </div>
     </div>

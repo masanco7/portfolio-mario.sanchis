@@ -4,7 +4,7 @@
     "title": "Finance Manager",
     "host": null,
     "badge": { "label": "In progress", "variant": "default" },
-    "description": "Personal finance manager replacing two Excel spreadsheets: bank transactions with a verification queue, rule-based categorization, bucket-based investments and net worth. Backend with 15 tables already working end-to-end.",
+    "description": "Personal finance manager replacing two Excel spreadsheets: bank transactions with a verification queue, rule-based categorization, bucket-based investments, net worth, savings goal and debts. The transactions vertical already works end-to-end against the backend; the full 15-table schema is designed and applied.",
     "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
     "links": [
       { "kind": "disabled", "label": "private repo" },
@@ -16,9 +16,9 @@
     "id": "tallerapp",
     "title": "TallerApp",
     "host": null,
-    "badge": { "label": "Final project", "variant": "default" },
-    "description": "Full-stack web application for end-to-end auto repair shop management — clients, vehicles, repair orders, inventory, appointments and PDF invoicing. Final degree project (TFG).",
-    "stack": ["Angular 21", "PrimeNG", "NestJS 11", "TypeORM", "PostgreSQL 16", "JWT"],
+    "badge": { "label": "Final project · 9/10", "variant": "default" },
+    "descriptionHtml": "End-to-end management for a multi-brand auto repair shop: clients and vehicles, repair orders, invoicing with PDF and email delivery, inventory with traceable stock and a KPI dashboard. Its core is the <strong>scheduler</strong>: a sequential queue per mechanic that respects the shop's real working hours and chains availabilities to compute each job's start and end. State machines for orders and invoices, audited critical flow and 259 unit tests. Final degree project (TFG).",
+    "stack": ["Angular 21", "PrimeNG 21", "NestJS 11", "TypeORM", "PostgreSQL 16", "JWT + Passport"],
     "links": [
       { "kind": "disabled", "label": "private repo" },
       { "kind": "disabled", "label": "private demo" }
@@ -30,8 +30,8 @@
     "title": "Gym Tracker",
     "host": "gym.masanco-hub.com",
     "badge": { "label": "Live", "variant": "live" },
-    "description": "Offline-first PWA for workout tracking: weekly routines, automatic PR detection, SVG rest timer and custom progress chart. FastAPI backend with shared SSO. Real personal use, in production.",
-    "stack": ["Angular 21 zoneless", "Signals", "FastAPI", "PWA", "SVG charts"],
+    "description": "Installable PWA for workout tracking: routines with supersets, weekly schedule, active session with autosave and a rest timer that survives the phone locking via Web Push. History, progress charts and a Coach that suggests cyclic double progression. Own login with passkeys (Face ID). In production since April 2026.",
+    "stack": ["Angular 21 zoneless", "Signals", "PWA + Web Push", "WebAuthn", "FastAPI", "Ollama"],
     "links": [
       { "kind": "disabled", "label": "private demo" },
       { "kind": "disabled", "label": "private repo" }
@@ -57,17 +57,17 @@
   },
   {
     "id": "trading-bot",
-    "title": "Trading Bot · Multi-agent AI",
+    "title": "POLYBOT · Algorithmic trading",
     "host": null,
-    "badge": { "label": "Experimental", "variant": "default" },
-    "descriptionHtml": "Multi-market automated trading system on <strong>Polymarket</strong>: 24 crypto markets (BTC, ETH, SOL…) with Selective Latency Arbitrage + Kelly Criterion. 3 LLM agents (Risk Manager, Market Context, Sentinel) supervise via Ollama, real-time data through Binance WebSocket. Live on VPS.",
-    "stack": ["Python 3.12", "FastAPI", "Angular 21", "Ollama", "Polymarket CLOB", "Binance WS", "Telegram"],
+    "badge": { "label": "In production", "variant": "live" },
+    "descriptionHtml": "Autonomous bot trading weather markets on <strong>Polymarket</strong> with real money: it pulls the Open-Meteo GFS ensemble (31 members), builds the empirical probability distribution, contrasts it against the order book and places on-chain orders sized by the <strong>Kelly criterion</strong>. 33 markets registered, 5 live. LLM decision agents, three layers of risk gates, on-chain fill reconciliation and a PWA dashboard with push notifications.",
+    "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
     "links": [
       { "kind": "disabled", "label": "private repo" },
       { "kind": "disabled", "label": "no public metrics" }
     ],
     "thumbKind": "trading",
     "thumbImage": "/projects/trading.png",
-    "thumbAlt": "Bot dashboard — global KPIs, P&L chart and grid of 24 markets with individual stats"
+    "thumbAlt": "Bot dashboard — global KPIs, P&L chart and market grid with individual stats"
   }
 ]

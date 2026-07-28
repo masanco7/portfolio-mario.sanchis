@@ -4,7 +4,7 @@
     "title": "Finance Manager",
     "host": null,
     "badge": { "label": "En desarrollo", "variant": "default" },
-    "description": "Gestor de finanzas personales que sustituye dos hojas de Excel: transacciones bancarias con cola de verificación, categorización por reglas, inversiones por buckets y patrimonio neto. Backend con 15 tablas ya funcionando end-to-end.",
+    "description": "Gestor de finanzas personales que sustituye dos hojas de Excel: transacciones bancarias con cola de verificación, categorización por reglas, inversiones por buckets, patrimonio neto, objetivo de ahorro y deudas. La vertical de transacciones ya funciona end-to-end contra el backend; el esquema completo de 15 tablas está diseñado y aplicado.",
     "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
     "links": [
       { "kind": "disabled", "label": "repo privado" },
@@ -16,9 +16,9 @@
     "id": "tallerapp",
     "title": "TallerApp",
     "host": null,
-    "badge": { "label": "TFG", "variant": "default" },
-    "description": "Aplicación web full-stack para gestión integral de taller mecánico — clientes, vehículos, órdenes de reparación, inventario, citas y facturación PDF. Trabajo de Fin de Grado.",
-    "stack": ["Angular 21", "PrimeNG", "NestJS 11", "TypeORM", "PostgreSQL 16", "JWT"],
+    "badge": { "label": "TFG · 9/10", "variant": "default" },
+    "descriptionHtml": "Gestión integral de taller multimarca: clientes y vehículos, órdenes de reparación, facturación con PDF y envío por email, inventario con stock trazable y dashboard de KPIs. El núcleo es el <strong>planificador</strong>: cola secuencial por mecánico que respeta el horario real del taller y encadena disponibilidades para calcular inicio y fin de cada trabajo. Máquinas de estados para orden y factura, flujo crítico auditado y 259 tests unitarios. Trabajo de Fin de Grado.",
+    "stack": ["Angular 21", "PrimeNG 21", "NestJS 11", "TypeORM", "PostgreSQL 16", "JWT + Passport"],
     "links": [
       { "kind": "disabled", "label": "repo privado" },
       { "kind": "disabled", "label": "demo privada" }
@@ -30,8 +30,8 @@
     "title": "Gym Tracker",
     "host": "gym.masanco-hub.com",
     "badge": { "label": "Live", "variant": "live" },
-    "description": "PWA offline-first para registrar entrenamientos: rutinas semanales, detección automática de PRs, rest timer SVG y gráfica de progreso custom. Backend FastAPI con SSO compartido. Uso personal real, en producción.",
-    "stack": ["Angular 21 zoneless", "Signals", "FastAPI", "PWA", "SVG charts"],
+    "description": "PWA instalable para registrar entrenos: rutinas con superseries, schedule semanal, sesión activa con autosave y temporizador de descanso que sobrevive al bloqueo del móvil vía Web Push. Historial, gráficas de progreso y un Coach que propone progresión por doble progresión cíclica. Login propio con passkeys (Face ID). En producción desde abril de 2026.",
+    "stack": ["Angular 21 zoneless", "Signals", "PWA + Web Push", "WebAuthn", "FastAPI", "Ollama"],
     "links": [
       { "kind": "disabled", "label": "demo privada" },
       { "kind": "disabled", "label": "repo privado" }
@@ -57,17 +57,17 @@
   },
   {
     "id": "trading-bot",
-    "title": "Trading Bot · IA multi-agente",
+    "title": "POLYBOT · Trading algorítmico",
     "host": null,
-    "badge": { "label": "Experimental", "variant": "default" },
-    "descriptionHtml": "Sistema multi-mercado de trading automatizado en <strong>Polymarket</strong>: 24 mercados crypto (BTC, ETH, SOL…) con Latency Arbitrage Selectivo + Kelly Criterion. 3 agentes LLM (Risk Manager, Market Context, Sentinel) supervisan vía Ollama, datos en tiempo real Binance WebSocket. Live en VPS.",
-    "stack": ["Python 3.12", "FastAPI", "Angular 21", "Ollama", "Polymarket CLOB", "Binance WS", "Telegram"],
+    "badge": { "label": "En producción", "variant": "live" },
+    "descriptionHtml": "Bot autónomo que opera mercados meteorológicos en <strong>Polymarket</strong> con dinero real: descarga el ensemble GFS de Open-Meteo (31 miembros), construye la distribución empírica de probabilidad, la contrasta con el libro de órdenes y coloca órdenes on-chain con sizing por criterio de <strong>Kelly</strong>. 33 mercados registrados, 5 en live. Agentes LLM de decisión, tres capas de gates de riesgo, reconciliación de fills on-chain y dashboard PWA con notificaciones push.",
+    "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
     "links": [
       { "kind": "disabled", "label": "repo privado" },
       { "kind": "disabled", "label": "sin métricas públicas" }
     ],
     "thumbKind": "trading",
     "thumbImage": "/projects/trading.png",
-    "thumbAlt": "Dashboard del bot — KPIs globales, gráfica P&L y grid de 24 mercados con stats individuales"
+    "thumbAlt": "Dashboard del bot — KPIs globales, gráfica P&L y grid de mercados con stats individuales"
   }
 ]
