@@ -86,6 +86,17 @@ export const ui: UiStrings = {
       repo: 'repo',
     },
   },
+  projectDetail: {
+    /** Query param that makes the overlay linkable: ?project=tallerapp */
+    urlParam: 'project',
+    openLabel: 'View detail',
+    openAria: 'View the project detail',
+    dialogAria: 'Project detail',
+    closeLabel: 'Close',
+    closeAria: 'Close the project detail',
+    galleryAria: 'Project screens',
+    stackLabel: 'Full stack',
+  },
   stack: {
     sectionLabel: '03 — Tech stack',
     title: 'The tools I work with.',

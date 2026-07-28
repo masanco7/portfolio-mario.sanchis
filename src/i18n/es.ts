@@ -84,6 +84,17 @@ export const ui = {
       repo: 'repo',
     },
   },
+  projectDetail: {
+    /** Query param que hace enlazable el overlay: ?proyecto=tallerapp */
+    urlParam: 'proyecto',
+    openLabel: 'Ver detalle',
+    openAria: 'Ver el detalle del proyecto',
+    dialogAria: 'Detalle del proyecto',
+    closeLabel: 'Cerrar',
+    closeAria: 'Cerrar el detalle del proyecto',
+    galleryAria: 'Pantallas del proyecto',
+    stackLabel: 'Stack completo',
+  },
   stack: {
     sectionLabel: '03 — Stack técnico',
     title: 'Las herramientas con las que trabajo.',

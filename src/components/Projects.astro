@@ -1,7 +1,10 @@
 ---
 import projectsEs from '../data/projects.es.json';
 import projectsEn from '../data/projects.en.json';
+import { projectDetails as detailsEs } from '../data/projectDetails.es';
+import { projectDetails as detailsEn } from '../data/projectDetails.en';
 import ProjectCard from './ProjectCard.astro';
+import ProjectModal from './ProjectModal.astro';
 import { getTranslations, type Lang } from '../i18n';
 import type { Project } from '../types';
 
@@ -9,6 +12,9 @@ const { lang = 'es' } = Astro.props as { lang?: Lang };
 const t = getTranslations(lang);
 
 const projects = (lang === 'es' ? projectsEs : projectsEn) as Project[];
+const details = lang === 'es' ? detailsEs : detailsEn;
+// Only projects with an entry in projectDetails.<lang>.ts get an overlay.
+const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefined);
 ---
 <section id="proyectos" class="section" aria-labelledby="projects-title">
   <div class="container">
@@ -16,7 +22,16 @@ const projects = (lang === 'es' ? projectsEs : projectsEn) as Project[];
     <h2 id="projects-title" class="section-title reveal">{t.projects.title}</h2>
     <p class="section-intro reveal">{t.projects.intro}</p>
     <div class="projects-grid">
-      {projects.map((p) => <ProjectCard project={p} />)}
+      {projects.map((p) => (
+        <ProjectCard
+          project={p}
+          detailId={details[p.id] ? p.id : undefined}
+          openLabel={t.projectDetail.openLabel}
+          openAria={t.projectDetail.openAria}
+        />
+      ))}
     </div>
   </div>
 </section>
+
+{withDetail.map((detail) => <ProjectModal detail={detail} lang={lang} />)}

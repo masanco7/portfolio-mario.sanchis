@@ -1,0 +1,141 @@
+---
+import { Image } from 'astro:assets';
+import { getShot } from '../data/projectShots';
+import { getTranslations, type Lang } from '../i18n';
+import type { ProjectDetail } from '../types';
+
+interface Props {
+  detail: ProjectDetail;
+  lang?: Lang;
+}
+
+const { detail, lang = 'es' } = Astro.props as Props;
+const t = getTranslations(lang).projectDetail;
+
+const heroImage = getShot(detail.id, detail.hero.shot);
+const sections = detail.sections.map((section) => ({
+  ...section,
+  image: getShot(detail.id, section.shot),
+  phoneImage: section.phoneShot ? getShot(detail.id, section.phoneShot.shot) : undefined,
+}));
+
+const dialogId = `pmodal-${detail.id}`;
+// Every shot shares the same crop so the layout stays identical when the next
+// project (Gym Tracker) is dropped in — see --pmodal-shot-ratio in global.css.
+const HERO_SIZES = '(min-width: 1100px) 1040px, 94vw';
+// The panel is capped at 1040px, so past that the column stops growing.
+const SHOT_SIZES = '(min-width: 1100px) 480px, (min-width: 900px) 46vw, 92vw';
+const SHOT_WIDTHS = [640, 960, 1280];
+// A section with a phone companion splits its column ~2:1, so both images ask
+// the browser for less than a full-width shot.
+const PAIR_SIZES = '(min-width: 1100px) 320px, (min-width: 900px) 31vw, 61vw';
+const PHONE_SIZES = '(min-width: 1100px) 140px, (min-width: 900px) 14vw, 27vw';
+const PHONE_WIDTHS = [280, 420, 560];
+---
+<dialog
+  class="pmodal"
+  id={dialogId}
+  role="dialog"
+  aria-modal="true"
+  aria-label={`${detail.title} — ${t.dialogAria}`}
+  data-pmodal={detail.id}
+  data-pmodal-param={t.urlParam}
+>
+  {/* div, not <header>/<footer>: inside a <dialog> those still map to the
+      banner/contentinfo landmarks and would duplicate the page's own. */}
+  <div class="pmodal-head">
+    <div class="pmodal-head-main">
+      <h2 class="pmodal-title">{detail.title}</h2>
+      <p class="pmodal-subtitle">{detail.subtitle}</p>
+      <ul class="pmodal-badges" role="list">
+        {detail.badges.map((badge) => <li>{badge}</li>)}
+      </ul>
+    </div>
+    <button type="button" class="pmodal-close" data-pmodal-close aria-label={t.closeAria}>
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 4l8 8M12 4l-8 8" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="pmodal-body" tabindex="0" data-pmodal-scroll>
+    {heroImage && (
+      <figure class="pmodal-hero" data-pmodal-hero>
+        <Image
+          src={heroImage}
+          alt={detail.hero.alt}
+          widths={[768, 1200, 1600]}
+          sizes={HERO_SIZES}
+          format="webp"
+          quality={70}
+          loading="lazy"
+          decoding="async"
+        />
+      </figure>
+    )}
+
+    <div class="pmodal-intro">
+      {detail.intro.map((paragraph) => <p set:html={paragraph} />)}
+    </div>
+
+    <ol class="pmodal-shots" role="list" aria-label={t.galleryAria}>
+      {sections.map((section, i) => (
+        <li class="pmodal-shot">
+          {section.image && (
+            /* The pair wrapper is inert for a single shot — it only splits the
+               column when the section carries a phone companion. */
+            <div class="pmodal-shot-media" class:list={[{ 'has-phone': Boolean(section.phoneImage) }]}>
+              <figure class="pmodal-shot-figure">
+                <Image
+                  src={section.image}
+                  alt={section.alt}
+                  widths={SHOT_WIDTHS}
+                  sizes={section.phoneImage ? PAIR_SIZES : SHOT_SIZES}
+                  format="webp"
+                  quality={70}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+              {section.phoneImage && section.phoneShot && (
+                <figure class="pmodal-shot-figure pmodal-shot-figure--phone">
+                  <Image
+                    src={section.phoneImage}
+                    alt={section.phoneShot.alt}
+                    widths={PHONE_WIDTHS}
+                    sizes={PHONE_SIZES}
+                    format="webp"
+                    quality={70}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </figure>
+              )}
+            </div>
+          )}
+          <div class="pmodal-shot-text">
+            <p class="pmodal-shot-index">{String(i + 1).padStart(2, '0')}</p>
+            <h3 class="pmodal-shot-title">{section.title}</h3>
+            {section.paragraphs.map((paragraph) => <p set:html={paragraph} />)}
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <div class="pmodal-foot">
+      <div class="pmodal-stack">
+        <p class="pmodal-stack-label">{t.stackLabel}</p>
+        <p class="pmodal-stack-value">{detail.stackFull}</p>
+      </div>
+      <div class="pmodal-foot-actions">
+        {detail.repo && (
+          <a class="btn btn-ghost" href={detail.repo.href} target="_blank" rel="noopener">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.05-.49.05-.49.81.06 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.65-.89-3.65-3.96 0-.87.31-1.59.83-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.52.56.83 1.28.83 2.15 0 3.08-1.87 3.76-3.65 3.95.29.25.54.74.54 1.49v2.21c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            {detail.repo.label}
+          </a>
+        )}
+        <button type="button" class="btn btn-secondary" data-pmodal-close>{t.closeLabel}</button>
+      </div>
+    </div>
+  </div>
+</dialog>

@@ -874,6 +874,370 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* =========================================================
+   Project detail overlay
+   Native <dialog> in the top layer. The card keeps its own markup;
+   .project-open stretches over it so the whole card is the trigger
+   while the real links stay clickable above it.
+   ========================================================= */
+.project.has-detail { position: relative; }
+
+/* The trigger covers the whole card; only the pill inside it is visible. */
+.project-open {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.project-open:focus-visible { outline-offset: -3px; border-radius: var(--r-lg); }
+
+.project-open-pill {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.3rem 0.55rem;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--fg-muted);
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.project-open-pill svg { width: 11px; height: 11px; }
+.project.has-detail:hover .project-open-pill,
+.project-open:focus-visible .project-open-pill {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-elev);
+}
+.project.has-detail:hover { cursor: pointer; }
+/* Links must sit above the stretched trigger to remain clickable. */
+.project.has-detail .project-links { position: relative; z-index: 3; }
+
+/* Page behind the overlay: frozen, without the sideways jump. */
+:root.pmodal-open { overflow: hidden; }
+:root.pmodal-open body { padding-right: var(--pmodal-scrollbar, 0px); }
+
+.pmodal {
+  /* One crop for every screenshot so the layout survives the next project. */
+  --pmodal-shot-ratio: 2 / 1;
+
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(1040px, 94vw);
+  max-width: 94vw;
+  height: min(880px, 90svh);
+  max-height: 90svh;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  flex-direction: column;
+}
+.pmodal[open] { display: flex; }
+
+.pmodal::backdrop {
+  /* Blurred + darkened: the page behind is unreadable but still not flat black. */
+  background: rgba(8, 10, 14, 0.62);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+}
+
+/* Fade + subtle scale, on entry and exit (discrete props need allow-discrete) */
+.pmodal,
+.pmodal::backdrop {
+  transition:
+    opacity 0.26s ease,
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    overlay 0.26s allow-discrete,
+    display 0.26s allow-discrete;
+}
+.pmodal { opacity: 0; transform: translateY(10px) scale(0.985); }
+.pmodal[open] { opacity: 1; transform: none; }
+.pmodal::backdrop { opacity: 0; }
+.pmodal[open]::backdrop { opacity: 1; }
+@starting-style {
+  .pmodal[open] { opacity: 0; transform: translateY(10px) scale(0.985); }
+  .pmodal[open]::backdrop { opacity: 0; }
+}
+
+/* --- Sticky header --- */
+.pmodal-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-elev);
+}
+@media (min-width: 768px) {
+  .pmodal-head { padding: var(--sp-5) var(--sp-6); }
+}
+.pmodal-head-main { min-width: 0; }
+.pmodal-title {
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: var(--lh-snug);
+  margin: 0 0 var(--sp-1) 0;
+}
+.pmodal-subtitle {
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+  margin: 0 0 var(--sp-3) 0;
+  line-height: var(--lh-snug);
+}
+.pmodal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pmodal-badges li {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--fg-muted);
+  padding: 0.2rem 0.5rem;
+  background: var(--bg-tag);
+  border-radius: var(--r-sm);
+}
+.pmodal-close {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg-muted);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.pmodal-close:hover {
+  color: var(--fg);
+  border-color: var(--border-strong);
+  background: var(--bg-subtle);
+}
+.pmodal-close svg { width: 16px; height: 16px; }
+
+/* --- Scrolling region --- */
+.pmodal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 0 0 var(--sp-6) 0;
+}
+.pmodal-body:focus { outline: none; }
+
+.pmodal-hero {
+  margin: 0;
+  aspect-ratio: var(--pmodal-shot-ratio);
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.pmodal-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.pmodal-intro {
+  padding: var(--sp-6) var(--sp-5) 0;
+  max-width: 68ch;
+}
+@media (min-width: 768px) {
+  .pmodal-intro { padding: var(--sp-7) var(--sp-6) 0; }
+}
+.pmodal-intro p {
+  font-size: var(--fs-base);
+  line-height: var(--lh-loose);
+  color: var(--fg);
+  margin: 0 0 var(--sp-4) 0;
+}
+.pmodal-intro p:first-child {
+  font-size: var(--fs-md);
+  color: var(--fg);
+}
+.pmodal-intro strong { font-weight: 500; }
+
+/* --- Zigzag gallery: image alternates sides, stacks on mobile --- */
+.pmodal-shots {
+  list-style: none;
+  margin: var(--sp-6) 0 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-7);
+}
+.pmodal-shot {
+  display: grid;
+  gap: var(--sp-4);
+  padding: 0 var(--sp-5);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .pmodal-shot { padding: 0 var(--sp-6); }
+}
+@media (min-width: 900px) {
+  .pmodal-shots { gap: var(--sp-8); }
+  .pmodal-shot {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: var(--sp-6);
+    align-items: center;
+  }
+  /* Odd rows keep the image first; even rows flip it to the right. */
+  .pmodal-shot:nth-child(even) .pmodal-shot-media { order: 2; }
+}
+/* Media slot: a plain wrapper for one shot, a device pair when a section also
+   carries a phone capture (bottom-aligned, the way the two screens sit together). */
+.pmodal-shot-media {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+.pmodal-shot-media > .pmodal-shot-figure { flex: 1 1 auto; min-width: 0; }
+.pmodal-shot-media.has-phone > .pmodal-shot-figure--phone {
+  flex: 0 0 24%;
+  /* Portrait companion — its own crop, so the 2/1 rule never squashes it. */
+  aspect-ratio: 37 / 80;
+  border-radius: var(--r-md);
+}
+.pmodal-shot-figure--phone img { object-position: top center; }
+
+.pmodal-shot-figure {
+  margin: 0;
+  aspect-ratio: var(--pmodal-shot-ratio);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.pmodal-shot-figure img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.pmodal-shot-text { min-width: 0; }
+.pmodal-shot-index {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin: 0 0 var(--sp-2) 0;
+}
+.pmodal-shot-title {
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: var(--lh-snug);
+  margin: 0 0 var(--sp-3) 0;
+}
+.pmodal-shot-text p {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-loose);
+  color: var(--fg-muted);
+  margin: 0 0 var(--sp-3) 0;
+}
+.pmodal-shot-text p:last-child { margin-bottom: 0; }
+.pmodal-shot-text strong { color: var(--fg); font-weight: 500; }
+
+/* --- Footer --- */
+.pmodal-foot {
+  margin: var(--sp-8) var(--sp-5) 0;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-5);
+}
+@media (min-width: 768px) {
+  .pmodal-foot { margin: var(--sp-8) var(--sp-6) 0; }
+}
+.pmodal-stack { min-width: 0; flex: 1 1 320px; }
+.pmodal-stack-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin: 0 0 var(--sp-2) 0;
+}
+.pmodal-stack-value {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-loose);
+  color: var(--fg);
+  margin: 0;
+  max-width: 70ch;
+}
+.pmodal-foot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+/* --- Mobile: full screen, no backdrop blur (it buys nothing here) --- */
+@media (max-width: 720px) {
+  .pmodal {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100svh;
+    max-height: 100svh;
+    border: 0;
+    border-radius: 0;
+  }
+  .pmodal::backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(8, 10, 14, 0.8);
+  }
+  .pmodal-title { font-size: var(--fs-lg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmodal,
+  .pmodal::backdrop {
+    transition:
+      overlay 0.001ms allow-discrete,
+      display 0.001ms allow-discrete;
+  }
+  .pmodal { opacity: 1; transform: none; }
+  .pmodal::backdrop { opacity: 1; }
+  @starting-style {
+    .pmodal[open] { opacity: 1; transform: none; }
+    .pmodal[open]::backdrop { opacity: 1; }
+  }
+}
+
+/* =========================================================
    Stack columns
    ========================================================= */
 .stack-grid {
