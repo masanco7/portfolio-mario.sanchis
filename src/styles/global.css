@@ -1052,26 +1052,13 @@ a { color: inherit; text-decoration: none; }
 }
 .pmodal-body:focus { outline: none; }
 
-.pmodal-hero {
-  margin: 0;
-  aspect-ratio: var(--pmodal-shot-ratio);
-  background: var(--bg-subtle);
-  border-bottom: 1px solid var(--border);
-  overflow: hidden;
-}
-.pmodal-hero img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: top center;
-}
-
+/* The panel opens on the write-up — the cover shot is on the card in the grid. */
 .pmodal-intro {
   padding: var(--sp-6) var(--sp-5) 0;
   max-width: 68ch;
 }
 @media (min-width: 768px) {
-  .pmodal-intro { padding: var(--sp-7) var(--sp-6) 0; }
+  .pmodal-intro { padding: var(--sp-6) var(--sp-6) 0; }
 }
 .pmodal-intro p {
   font-size: var(--fs-base);

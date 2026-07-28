@@ -12,7 +12,6 @@ interface Props {
 const { detail, lang = 'es' } = Astro.props as Props;
 const t = getTranslations(lang).projectDetail;
 
-const heroImage = getShot(detail.id, detail.hero.shot);
 const sections = detail.sections.map((section) => ({
   ...section,
   image: getShot(detail.id, section.shot),
@@ -21,8 +20,7 @@ const sections = detail.sections.map((section) => ({
 
 const dialogId = `pmodal-${detail.id}`;
 // Every shot shares the same crop so the layout stays identical when the next
-// project (Gym Tracker) is dropped in — see --pmodal-shot-ratio in global.css.
-const HERO_SIZES = '(min-width: 1100px) 1040px, 94vw';
+// project is dropped in — see --pmodal-shot-ratio in global.css.
 // The panel is capped at 1040px, so past that the column stops growing.
 const SHOT_SIZES = '(min-width: 1100px) 480px, (min-width: 900px) 46vw, 92vw';
 const SHOT_WIDTHS = [640, 960, 1280];
@@ -59,21 +57,9 @@ const PHONE_WIDTHS = [280, 420, 560];
   </div>
 
   <div class="pmodal-body" tabindex="0" data-pmodal-scroll>
-    {heroImage && (
-      <figure class="pmodal-hero" data-pmodal-hero>
-        <Image
-          src={heroImage}
-          alt={detail.hero.alt}
-          widths={[768, 1200, 1600]}
-          sizes={HERO_SIZES}
-          format="webp"
-          quality={70}
-          loading="lazy"
-          decoding="async"
-        />
-      </figure>
-    )}
-
+    {/* No hero here on purpose: the cover shot lives on the card in the grid,
+        so opening the panel goes straight to the write-up and then screen by
+        screen. See detail.hero, consumed by ProjectCard. */}
     <div class="pmodal-intro">
       {detail.intro.map((paragraph) => <p set:html={paragraph} />)}
     </div>
@@ -83,8 +69,14 @@ const PHONE_WIDTHS = [280, 420, 560];
         <li class="pmodal-shot">
           {section.image && (
             /* The pair wrapper is inert for a single shot — it only splits the
-               column when the section carries a phone companion. */
-            <div class="pmodal-shot-media" class:list={[{ 'has-phone': Boolean(section.phoneImage) }]}>
+               column when the section carries a phone companion.
+               data-pmodal-hero marks the first shot for the warm-up fetch: it is
+               the first image the visitor scrolls into. */
+            <div
+              class="pmodal-shot-media"
+              class:list={[{ 'has-phone': Boolean(section.phoneImage) }]}
+              data-pmodal-hero={i === 0 ? '' : undefined}
+            >
               <figure class="pmodal-shot-figure">
                 <Image
                   src={section.image}

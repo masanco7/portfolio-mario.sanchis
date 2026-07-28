@@ -3,6 +3,7 @@ import projectsEs from '../data/projects.es.json';
 import projectsEn from '../data/projects.en.json';
 import { projectDetails as detailsEs } from '../data/projectDetails.es';
 import { projectDetails as detailsEn } from '../data/projectDetails.en';
+import { getShot } from '../data/projectShots';
 import ProjectCard from './ProjectCard.astro';
 import ProjectModal from './ProjectModal.astro';
 import { getTranslations, type Lang } from '../i18n';
@@ -28,6 +29,8 @@ const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefi
           detailId={details[p.id] ? p.id : undefined}
           openLabel={t.projectDetail.openLabel}
           openAria={t.projectDetail.openAria}
+          coverImage={details[p.id] ? getShot(p.id, details[p.id]!.hero.shot) : undefined}
+          coverAlt={details[p.id]?.hero.alt}
         />
       ))}
     </div>

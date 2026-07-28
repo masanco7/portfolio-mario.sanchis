@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import type { Project } from '../types';
 
 interface Props {
@@ -7,11 +9,16 @@ interface Props {
   detailId?: string;
   openLabel?: string;
   openAria?: string;
+  /** Cover shot from the project detail (detail.hero), used when the card has no thumbImage of its own. */
+  coverImage?: ImageMetadata;
+  coverAlt?: string;
 }
 
-const { project, detailId, openLabel, openAria } = Astro.props as Props;
+const { project, detailId, openLabel, openAria, coverImage, coverAlt } = Astro.props as Props;
 const badgeClass = project.badge.variant === 'live' ? 'project-badge live' : 'project-badge';
-const hasImage = Boolean(project.thumbImage);
+// thumbImage (a file in /public) wins; otherwise the detail's cover shot, which
+// astro:assets optimises; the abstract SVG below is the last resort.
+const hasImage = Boolean(project.thumbImage) || Boolean(coverImage);
 ---
 <article class="project reveal" class:list={[{ 'has-detail': Boolean(detailId) }]}>
   {detailId && (
@@ -32,14 +39,25 @@ const hasImage = Boolean(project.thumbImage);
   <div class="project-thumb" aria-hidden={hasImage ? undefined : 'true'}>
     <span class={badgeClass}>{project.badge.label}</span>
 
-    {hasImage && (
+    {project.thumbImage && (
       <img src={project.thumbImage} alt={project.thumbAlt ?? ''} loading="lazy" decoding="async" width="640" height="360" />
     )}
 
-    {/* TODO: TallerApp has no real screenshot — it falls back to the abstract SVG below
-        while gym / jasb / trading all use a PNG. Missing asset: /public/projects/tallerapp.png
-        (640x360). Once generated and uploaded, add "thumbImage": "/projects/tallerapp.png"
-        plus a "thumbAlt" to the tallerapp entry in projects.es.json and projects.en.json. */}
+    {!project.thumbImage && coverImage && (
+      <Image
+        src={coverImage}
+        alt={coverAlt ?? ''}
+        widths={[480, 640, 960]}
+        sizes="(min-width: 720px) 520px, 92vw"
+        format="webp"
+        quality={70}
+        loading="lazy"
+        decoding="async"
+      />
+    )}
+
+    {/* The abstract SVGs below are the fallback for projects with neither a
+        thumbImage nor a detail cover shot (finance today). */}
     {!hasImage && project.thumbKind === 'tallerapp' && (
       <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice">
         <defs>
