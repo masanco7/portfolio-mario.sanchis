@@ -1,5 +1,18 @@
 [
   {
+    "id": "finance-manager",
+    "title": "Finance Manager",
+    "host": null,
+    "badge": { "label": "En desarrollo", "variant": "default" },
+    "description": "Gestor de finanzas personales que sustituye dos hojas de Excel: transacciones bancarias con cola de verificación, categorización por reglas, inversiones por buckets y patrimonio neto. Backend con 15 tablas ya funcionando end-to-end.",
+    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
+    "links": [
+      { "kind": "disabled", "label": "repo privado" },
+      { "kind": "disabled", "label": "demo privada" }
+    ],
+    "thumbKind": "finance"
+  },
+  {
     "id": "tallerapp",
     "title": "TallerApp",
     "host": null,

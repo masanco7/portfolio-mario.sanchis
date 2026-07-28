@@ -1,5 +1,18 @@
 [
   {
+    "id": "finance-manager",
+    "title": "Finance Manager",
+    "host": null,
+    "badge": { "label": "In progress", "variant": "default" },
+    "description": "Personal finance manager replacing two Excel spreadsheets: bank transactions with a verification queue, rule-based categorization, bucket-based investments and net worth. Backend with 15 tables already working end-to-end.",
+    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
+    "links": [
+      { "kind": "disabled", "label": "private repo" },
+      { "kind": "disabled", "label": "private demo" }
+    ],
+    "thumbKind": "finance"
+  },
+  {
     "id": "tallerapp",
     "title": "TallerApp",
     "host": null,

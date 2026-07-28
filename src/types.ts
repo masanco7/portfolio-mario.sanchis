@@ -13,7 +13,7 @@ export interface Project {
   descriptionHtml?: string;
   stack: string[];
   links: ProjectLink[];
-  thumbKind: 'tallerapp' | 'gym' | 'jasb' | 'trading';
+  thumbKind: 'tallerapp' | 'gym' | 'jasb' | 'trading' | 'finance';
   thumbImage?: string;
   thumbAlt?: string;
 }

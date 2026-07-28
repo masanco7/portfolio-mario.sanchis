@@ -2,15 +2,15 @@ import type { UiStrings } from './es';
 
 export const ui: UiStrings = {
   meta: {
-    title: 'Mario Sanchis Colomer · Junior Salesforce Core Developer',
-    description: 'Portfolio of Mario Sanchis Colomer, Junior Salesforce Core Developer in Valencia. 77 Trailhead badges, experience at Capgemini DCX, Apex, LWC, Flow Builder and full-stack projects.',
-    ogDescription: 'Junior Salesforce Core Developer in Valencia. I build real things while I learn.',
+    title: 'Mario Sanchis Colomer · Full-Stack Developer · Salesforce Ecosystem',
+    description: 'Portfolio of Mario Sanchis Colomer, Full-Stack Developer in Valencia. Real projects in Angular, NestJS, Spring Boot and experience in the Salesforce ecosystem (Capgemini DCX).',
+    ogDescription: 'Full-Stack Developer in Valencia. I build real things while I learn.',
     locale: 'en_US',
     htmlLang: 'en',
   },
   nav: {
-    salesforce: 'salesforce',
     projects: 'projects',
+    salesforce: 'salesforce',
     stack: 'stack',
     about: 'about',
     contact: 'contact',
@@ -25,7 +25,7 @@ export const ui: UiStrings = {
   hero: {
     eyebrow: 'Available for my first full-time · Valencia, ES',
     name: 'Mario Sanchis<br/>Colomer.',
-    title: '<strong>Salesforce Core Developer</strong> · Junior',
+    title: '<strong>Full-Stack Developer</strong> · Salesforce',
     tagline: 'I build real things while I learn.',
     metaBadges: '77 Trailhead badges',
     metaPoints: '66,200 points',
@@ -35,10 +35,10 @@ export const ui: UiStrings = {
     ctaContact: 'Get in touch',
   },
   salesforce: {
-    sectionLabel: '01 — Main rail',
-    title: 'I work with',
+    sectionLabel: '02 — Salesforce ecosystem',
+    title: 'I also work with',
     titleAccent: 'Salesforce',
-    lede: "It's where I invest most of my hours, where I build on real projects, and where my next certification is aimed. This section carries the visual weight of the portfolio because it also carries the weight of my time.",
+    lede: "Seven months of real Salesforce consulting experience during my internship at Capgemini DCX. I keep my Trailhead profile active and it's a path I haven't ruled out.",
     trailheadLabel: 'Trailhead · public profile',
     trailheadHeadline: 'Continuous, verifiable learning, day by day.',
     statBadges: 'Badges',
@@ -77,9 +77,9 @@ export const ui: UiStrings = {
     cvFile: '/cv-salesforce-en.pdf',
   },
   projects: {
-    sectionLabel: '02 — Other projects',
+    sectionLabel: '01 — Full-stack projects',
     title: 'Personal projects in production.',
-    intro: 'Web and full-stack. They keep my hands in code, let me try different stacks, and ship things people use.',
+    intro: 'Web and full-stack. This is where I build: different stacks, real decisions, and things that get used every day.',
     linkLabels: {
       visit: 'visit',
       demo: 'demo',
@@ -97,9 +97,10 @@ export const ui: UiStrings = {
   about: {
     sectionLabel: '04 — About me',
     title: "Who's behind the CV.",
-    p1Html: "I'm <strong>Mario</strong>, a <strong>Computer Engineering graduate</strong> from the University of Valencia (2026) and, until April 2026, <strong>Salesforce Junior Consultant</strong> at <strong>Capgemini DCX</strong>, where I completed seven months of internship within the Digital Customer Experience team. I came to Salesforce because it offered something I was looking for: a platform with a defined domain, real automations, and verifiable learning via Trailhead.",
-    p2Html: 'I work in an <strong>iterative and methodical</strong> way: I read before I write, prototype small, and only then scale. I use AI <strong>as a tool, not as a shortcut</strong> — to review code, contrast approaches and speed up reading documentation, never to replace understanding what I am building.',
-    p3Html: "I'm looking for my <strong>first full-time job</strong> within the Salesforce ecosystem in Spain. Teams where code review is taken seriously, there's room to certify as Administrator, and I can contribute to automation, integration and quality delivery.",
+    p1Html: "I'm <strong>Mario</strong>, a <strong>Computer Engineer</strong> from the University of Valencia (2026), and I've been building real software since before finishing my degree: <strong>TallerApp</strong> (my final degree project, graded 9 — Angular + NestJS + PostgreSQL), <strong>Gym Tracker</strong> (PWA in production) and, right now, a <strong>personal finance manager</strong> with React and Spring Boot.",
+    p2Html: 'I work in an <strong>iterative and methodical</strong> way: I read before I write, prototype small, and only then scale. I use AI <strong>as a tool, not as a shortcut</strong>.',
+    p3Html: 'Until April 2026 I was <strong>Salesforce Junior Consultant</strong> at <strong>Capgemini DCX</strong> (Apex, Flow Builder, Lightning Pages), seven months of internship where I learned to work in real consulting with agile methodology. I remain open to that path if the right opportunity comes along.',
+    p4Html: "I'm looking for my <strong>first full-time job</strong> as a <strong>Full-Stack Developer</strong> (or Salesforce Developer/Consultant), in Valencia or remote.",
     cvDownload: 'Download full CV',
     cvFile: '/cv-completo-en.pdf',
     factEducationLabel: 'Education',
