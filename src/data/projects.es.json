@@ -1,18 +1,5 @@
 [
   {
-    "id": "finance-manager",
-    "title": "Finance Manager",
-    "host": null,
-    "badge": { "label": "En desarrollo", "variant": "default" },
-    "description": "Gestor de finanzas personales que sustituye dos hojas de Excel: transacciones bancarias con cola de verificación, categorización por reglas, inversiones por buckets, patrimonio neto, objetivo de ahorro y deudas. La vertical de transacciones ya funciona end-to-end contra el backend; el esquema completo de 15 tablas está diseñado y aplicado.",
-    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
-    "links": [
-      { "kind": "disabled", "label": "repo privado" },
-      { "kind": "disabled", "label": "demo privada" }
-    ],
-    "thumbKind": "finance"
-  },
-  {
     "id": "tallerapp",
     "title": "TallerApp",
     "host": null,
@@ -24,6 +11,19 @@
       { "kind": "disabled", "label": "demo privada" }
     ],
     "thumbKind": "tallerapp"
+  },
+  {
+    "id": "polybot",
+    "title": "POLYBOT · Trading algorítmico",
+    "host": null,
+    "badge": { "label": "En producción", "variant": "live" },
+    "descriptionHtml": "Bot autónomo que opera mercados meteorológicos en <strong>Polymarket</strong> con dinero real: descarga el ensemble GFS de Open-Meteo (31 miembros), construye la distribución empírica de probabilidad, la contrasta con el libro de órdenes y coloca órdenes on-chain. 33 mercados registrados, 8 activos. Agentes LLM de decisión, tres capas de gates de riesgo, reconciliación de fills on-chain y dashboard PWA con notificaciones push.",
+    "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
+    "links": [
+      { "kind": "disabled", "label": "repo privado" },
+      { "kind": "disabled", "label": "sin métricas públicas" }
+    ],
+    "thumbKind": "trading"
   },
   {
     "id": "gym-tracker",
@@ -39,6 +39,19 @@
     "thumbKind": "gym"
   },
   {
+    "id": "finance-manager",
+    "title": "Finance Manager",
+    "host": null,
+    "badge": { "label": "En desarrollo", "variant": "default" },
+    "description": "Gestor de finanzas personales que sustituye dos hojas de Excel: transacciones bancarias con cola de verificación, categorización por reglas, inversiones por buckets, patrimonio neto, objetivo de ahorro y deudas. La vertical de transacciones ya funciona end-to-end contra el backend; el esquema completo de 15 tablas está diseñado y aplicado.",
+    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
+    "links": [
+      { "kind": "disabled", "label": "repo privado" },
+      { "kind": "disabled", "label": "demo privada" }
+    ],
+    "thumbKind": "finance"
+  },
+  {
     "id": "web-jasb",
     "title": "Web JASB",
     "host": "jasbct.com",
@@ -52,20 +65,5 @@
     "thumbKind": "jasb",
     "thumbImage": "/projects/jasb.png",
     "thumbAlt": "Hero de jasbct.com — JASB Energía & Telco · conectando las ciudades del futuro"
-  },
-  {
-    "id": "trading-bot",
-    "title": "POLYBOT · Trading algorítmico",
-    "host": null,
-    "badge": { "label": "En producción", "variant": "live" },
-    "descriptionHtml": "Bot autónomo que opera mercados meteorológicos en <strong>Polymarket</strong> con dinero real: descarga el ensemble GFS de Open-Meteo (31 miembros), construye la distribución empírica de probabilidad, la contrasta con el libro de órdenes y coloca órdenes on-chain con sizing por criterio de <strong>Kelly</strong>. 33 mercados registrados, 8 activos. Agentes LLM de decisión, tres capas de gates de riesgo, reconciliación de fills on-chain y dashboard PWA con notificaciones push.",
-    "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
-    "links": [
-      { "kind": "disabled", "label": "repo privado" },
-      { "kind": "disabled", "label": "sin métricas públicas" }
-    ],
-    "thumbKind": "trading",
-    "thumbImage": "/projects/trading.png",
-    "thumbAlt": "Dashboard del bot — KPIs globales, gráfica P&L y grid de mercados con stats individuales"
   }
 ]

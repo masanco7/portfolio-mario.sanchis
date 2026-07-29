@@ -17,6 +17,14 @@ import gymCoach from '../assets/projects/gym-tracker/Coach-Web.png';
 import gymProgreso from '../assets/projects/gym-tracker/Progreso-Web.png';
 import gymPerfil from '../assets/projects/gym-tracker/Perfil-Web.png';
 
+import polybotLogin from '../assets/projects/polybot/Login-Web.png';
+import polybotLoginPhone from '../assets/projects/polybot/Login-Movil.jpeg';
+import polybotDashboard from '../assets/projects/polybot/Dashboard-Web.png';
+import polybotRanking from '../assets/projects/polybot/Ranking-Web.png';
+import polybotSalud from '../assets/projects/polybot/Salud-Web.png';
+import polybotAvisos from '../assets/projects/polybot/Avisos-Web.png';
+import polybotSistema from '../assets/projects/polybot/Sistema-Web.png';
+
 /**
  * Screenshots per project, keyed by project id and then by shot name.
  * Language-independent on purpose: the alt text lives with the copy in
@@ -44,6 +52,21 @@ export const projectShots: Record<string, Record<string, ImageMetadata>> = {
     coach: gymCoach,
     progreso: gymProgreso,
     perfil: gymPerfil,
+  },
+  /**
+   * POLYBOT ships fewer shots than screens on purpose: it trades real money, so
+   * screens that would expose a strategy parameter get no capture and are
+   * documented in text instead (see `placeholder` in projectDetails).
+   * Every capture here was taken with the dashboard's privacy mode on.
+   */
+  polybot: {
+    login: polybotLogin,
+    'login-phone': polybotLoginPhone,
+    dashboard: polybotDashboard,
+    ranking: polybotRanking,
+    salud: polybotSalud,
+    avisos: polybotAvisos,
+    sistema: polybotSistema,
   },
 };
 

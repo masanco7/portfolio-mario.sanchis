@@ -1136,6 +1136,49 @@ a { color: inherit; text-decoration: none; }
   object-position: center;
   border-radius: 3px;
 }
+/* Screens documented without a capture. Same slot and same ratio as a figure so
+   the alternating rows keep their rhythm, but a different surface — tinted and
+   dashed — so it reads as a deliberate choice, never as a shot that failed to
+   load. Used by POLYBOT, where showing the screen would expose figures. */
+.pmodal-shot-plate {
+  flex: 1 1 auto;
+  min-width: 0;
+  aspect-ratio: var(--pmodal-shot-ratio);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 70%),
+    var(--bg-subtle);
+}
+.pmodal-shot-plate svg {
+  width: 30px;
+  height: 30px;
+  color: var(--accent);
+  opacity: 0.85;
+}
+.pmodal-shot-plate-name {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0;
+  max-width: 26ch;
+}
+.pmodal-shot-plate-note {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  margin: 0;
+}
+
 .pmodal-shot-text { min-width: 0; }
 .pmodal-shot-index {
   font-family: var(--font-mono);

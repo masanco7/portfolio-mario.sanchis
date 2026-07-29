@@ -191,4 +191,140 @@ export const projectDetails: Record<string, ProjectDetail> = {
     // Cuando esté publicado, descomentar y el enlace aparece solo en el pie del modal:
     // repo: { label: 'Ver repo showcase', href: 'https://github.com/masanco7/...' },
   },
+
+  /**
+   * POLYBOT opera con dinero real, así que este detalle se escribe bajo una
+   * regla estricta: ningún parámetro de estrategia y ningún contenido real de
+   * logs o timeline. Solo 6 de las 11 pantallas llevan captura, todas tomadas
+   * con el modo privacidad activado; las otras 5 usan `placeholder` y se
+   * describen en texto.
+   *
+   * OJO al añadir una captura nueva: el modo privacidad NO difumina los textos
+   * que mezclan etiqueta y cifra en el mismo nodo. La bandeja de avisos es el
+   * caso conocido — su captura muestra importes del resumen diario, publicada
+   * a petición expresa de Mario (2026-07-29).
+   */
+  polybot: {
+    id: 'polybot',
+    title: 'POLYBOT',
+    subtitle: 'Sistema de trading algorítmico multi-agente · En producción desde julio 2026',
+    badges: ['Python', 'FastAPI', 'Angular 21'],
+    hero: {
+      shot: 'login',
+      alt: 'Pantalla de acceso de POLYBOT con el botón de entrada por Face ID',
+    },
+    intro: [
+      'POLYBOT es un sistema de trading algorítmico multi-agente que opera con dinero real desde julio de 2026, sobre mercados de predicción meteorológicos. El sistema descarga el ensemble de 31 miembros del modelo GFS a través de Open-Meteo, construye con él una distribución de probabilidad propia para cada tramo de resultado posible del día, y decide si tomar posición comparándola contra el precio que ofrece el mercado en ese momento.',
+      'El proyecto gestiona 33 mercados registrados, con varios operando en producción activa de forma simultánea, cada uno con su propio proceso independiente que puede activarse o pausarse sin afectar al resto. Un gestor de riesgo puede pausar automáticamente un mercado si detecta una racha de pérdidas, con reanudación programada.',
+      'Todo el acceso pasa por autenticación con passkey (Face ID), en una sesión deliberadamente aislada del resto de mi ecosistema personal: ni la cookie ni la credencial biométrica se comparten con mis otros proyectos, aunque convivan en el mismo dominio.',
+      'El sistema de notificaciones fue rediseñado por completo tras detectar un fallo de diseño en su primera versión (basada en Telegram): una alerta de estado debe dispararse cuando el estado cambia, nunca por temporizador. El rediseño deduplica por contenido en vez de por fecha, y sustituyó un bot de mensajería con buena parte de sus comandos rotos por notificaciones push nativas sobre la propia PWA.',
+      'Construido con Python y FastAPI en el backend, Angular 21 como PWA en el frontend, y Ollama para la generación de resúmenes en lenguaje natural sobre datos que el propio sistema ya ha calculado de forma determinista.',
+    ],
+    sections: [
+      {
+        shot: 'login',
+        alt: 'Pantalla de acceso de POLYBOT en escritorio, con entrada por Face ID y formulario de usuario',
+        phoneShot: {
+          shot: 'login-phone',
+          alt: 'La misma pantalla de acceso de POLYBOT en la PWA instalada en el móvil',
+        },
+        title: 'Login y aislamiento de sesión',
+        paragraphs: [
+          'El acceso usa el mismo patrón que el resto de mi ecosistema: passkey (WebAuthn/Face ID) como vía principal, con usuario y contraseña como alternativa. La diferencia deliberada aquí es el aislamiento: la cookie de sesión es host-only y no viaja a ningún otro subdominio, y cada passkey queda ligado al dominio exacto de POLYBOT, así que una credencial registrada aquí no sirve en ningún otro proyecto, ni al revés.',
+          'No hay tabla de usuarios ni roles — es un sistema de un único operador — pero protege por igual el panel de consulta y cada endpoint de acción: arrancar o parar un bot, pausar un mercado, modificar cualquier parámetro.',
+        ],
+      },
+      {
+        shot: 'dashboard',
+        alt: 'Dashboard de POLYBOT con los indicadores globales difuminados por el modo privacidad, la curva de evolución y la rejilla de mercados',
+        title: 'Dashboard operativo',
+        paragraphs: [
+          'Vista financiera y operativa del conjunto: rendimiento acumulado, ratio de acierto, número de operaciones y balance on-chain, con una curva de evolución acumulada filtrable por periodo. Cada mercado activo muestra su propia tarjeta con estado en vivo —en marcha, pausado automáticamente por el gestor de riesgo, o desactivado— de forma que el estado real del sistema completo se entiende de un vistazo.',
+          'Incorpora un modo de privacidad que difumina cualquier cifra sensible mientras conserva la forma de la curva y el resto del layout, pensado para compartir pantalla o documentar el proyecto sin exponer datos económicos. Es el modo con el que están tomadas todas las capturas de este apartado.',
+        ],
+      },
+      {
+        shot: 'ranking',
+        alt: 'Ranking entre mercados de POLYBOT: filas por mercado con las métricas de rendimiento difuminadas por el modo privacidad',
+        title: 'Ranking entre mercados',
+        paragraphs: [
+          'Comparativa de todos los mercados activos, ordenada según distintas métricas de rendimiento, calculadas íntegramente en el servidor — el cliente solo formatea y muestra lo que ya llega ordenado.',
+          'El periodo de comparación es seleccionable, y cada cambio de ventana temporal recalcula contra los datos reales en vez de servir una vista precalculada. El orden de la tabla responde siempre a una pregunta concreta ("qué mercado va mejor según esta métrica"), no es una tabla exploratoria libre.',
+        ],
+      },
+      {
+        shot: 'salud',
+        alt: 'Panel de salud de POLYBOT con el estado de calibración, resolvers, capturador de pronóstico, agentes y servicios',
+        title: 'Salud del sistema',
+        paragraphs: [
+          'Panel de monitorización de los procesos críticos que mantienen el sistema funcionando: cuándo se completó con éxito por última vez cada tarea programada, no simplemente cuándo se intentó — una distinción importante, porque un proceso que falla repetidamente sigue "ejecutándose" aunque nunca tenga éxito. Cada tipo de tarea tiene su propio umbral de normalidad según su naturaleza.',
+          'La detección de anomalías y el envío de alertas ocurren de forma completamente independiente a esta pantalla, en un proceso aparte: así, si la parte visible del sistema fallara, las alertas seguirían llegando igualmente.',
+        ],
+      },
+      {
+        shot: 'avisos',
+        alt: 'Bandeja de avisos de POLYBOT con el resumen diario, bots parados y hallazgos de reconciliación',
+        title: 'Sistema de avisos',
+        paragraphs: [
+          'Una bandeja centralizada de notificaciones, resultado de un rediseño completo del sistema de alertas. La versión anterior enviaba el mismo aviso varias veces por un fallo de diseño temporal; la versión actual identifica cada alerta por su contenido real, no por cuándo se generó, evitando así duplicados.',
+          'Solo los eventos verdaderamente accionables llegan como notificación push al móvil — el resto queda disponible en la bandeja para consulta cuando se necesite, sin interrumpir.',
+        ],
+      },
+      {
+        shot: 'sistema',
+        alt: 'Ajustes del sistema de POLYBOT con el control de servicios, las notificaciones, la seguridad y los modos de apariencia',
+        title: 'Ajustes del sistema',
+        paragraphs: [
+          'Panel de configuración general: gestión de notificaciones push, registro de la credencial de acceso biométrico, apariencia y cierre de sesión — con dos añadidos propios de un sistema que opera con dinero real.',
+          'El primero es un control manual de los procesos del sistema (API, agentes programados, conjunto de bots por mercado), pensado como interruptor de emergencia deliberado tras retirar el canal de mensajería externo que antes cumplía parcialmente esa función.',
+          'El segundo es el propio modo de privacidad, que difumina cualquier cifra sensible en toda la interfaz para poder compartir pantalla o documentar el sistema sin exponer datos económicos — la misma función usada para preparar el material de este portfolio.',
+        ],
+      },
+      {
+        placeholder: { icon: 'ledger', label: 'Registro de operaciones' },
+        title: 'Registro de operaciones',
+        paragraphs: [
+          'Cada operación queda registrada con identificación completa del mercado, momento exacto, dirección tomada, precio, tamaño, estado y resultado final, junto con trazabilidad íntegra de cómo se ejecutó la orden.',
+          'El sistema conserva además un conjunto de métricas internas del modelo en el momento exacto de tomar la decisión, que no se muestran públicamente por revelar el criterio interno de entrada.',
+        ],
+      },
+      {
+        placeholder: { icon: 'chart', label: 'Analytics del modelo' },
+        title: 'Analytics: diagnóstico del modelo',
+        paragraphs: [
+          'Una capa de análisis distinta tanto del ranking (que compara mercados entre sí) como del dashboard (que resume el estado financiero): aquí se audita si el propio modelo de predicción se comporta como se espera.',
+          'Incluye once visualizaciones agregadas sobre el histórico completo — desde una curva de calibración que compara la confianza estimada del modelo contra el acierto real observado, hasta el rendimiento cruzado por distintas dimensiones del pronóstico y de la operación. Es la pantalla que responde a la pregunta "¿el modelo se está comportando de forma consistente?", no "¿estoy ganando dinero?".',
+        ],
+      },
+      {
+        placeholder: { icon: 'terminal', label: 'Logs del sistema' },
+        title: 'Logs del sistema',
+        paragraphs: [
+          'Un sistema de logs propio y deliberadamente simple, sin herramientas externas de por medio: reúne el registro de cada mercado además del scheduler de agentes y la API, normaliza el formato de todas las fuentes en una única vista cronológica, con filtros por origen y búsqueda de texto libre.',
+          'Prioriza la simplicidad operativa sobre la sofisticación de un sistema de observabilidad completo, coherente con la escala real del proyecto.',
+        ],
+      },
+      {
+        placeholder: { icon: 'timeline', label: 'Timeline de eventos' },
+        title: 'Timeline: trazabilidad legible',
+        paragraphs: [
+          'Un feed cronológico centrado en eventos de negocio, no en logs técnicos: operaciones abiertas y cerradas con su resultado, cambios de régimen del gestor de riesgo con su justificación, pausas y reanudaciones de mercados, alertas del sistema de vigilancia y acciones manuales del propio operador.',
+          'Lo particular de esta capa es que unifica varias fuentes de datos heterogéneas —el histórico de operaciones, los snapshots de los agentes, un registro de auditoría de solo escritura, el estado de alertas y el modelo de calibración— en una única línea temporal coherente, deduplicando eventos para no mostrar la misma operación más de una vez. Incluye tanto lo que hizo el sistema de forma autónoma como lo que hizo el operador a mano.',
+        ],
+      },
+      {
+        placeholder: { icon: 'sliders', label: 'Configuración por capas' },
+        title: 'Configuración por mercado y global',
+        paragraphs: [
+          'Un sistema de configuración por capas: un conjunto de valores globales que actúan como comportamiento por defecto, y la posibilidad de sobrescribirlos de forma independiente para cada mercado activo, aplicándose en caliente sin necesidad de reiniciar el sistema. Cada mercado puede además pausarse o reanudarse de forma individual desde su propia vista.',
+          'No se detalla públicamente qué parámetros concretos son configurables, por formar parte del criterio interno de la estrategia.',
+        ],
+      },
+    ],
+    stackFull:
+      'Python 3.12 + FastAPI · Angular 21 PWA con signals · WebAuthn/passkeys · Web Push + VAPID · Ollama · systemd · nginx · Cloudflare · VPS Ubuntu en DigitalOcean',
+    // TODO: el repo showcase de POLYBOT aún no existe (el repo real es privado).
+    // Cuando esté publicado, descomentar y el enlace aparece solo en el pie del modal:
+    // repo: { label: 'Ver repo showcase', href: 'https://github.com/masanco7/...' },
+  },
 };

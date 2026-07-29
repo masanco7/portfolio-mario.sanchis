@@ -94,6 +94,8 @@ export const ui = {
     closeAria: 'Cerrar el detalle del proyecto',
     galleryAria: 'Pantallas del proyecto',
     stackLabel: 'Stack completo',
+    /** Rótulo de la placa que sustituye a la captura en pantallas no mostrables. */
+    noShotLabel: 'Descripción sin captura',
   },
   stack: {
     sectionLabel: '03 — Stack técnico',

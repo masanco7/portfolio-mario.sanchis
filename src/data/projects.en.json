@@ -1,18 +1,5 @@
 [
   {
-    "id": "finance-manager",
-    "title": "Finance Manager",
-    "host": null,
-    "badge": { "label": "In progress", "variant": "default" },
-    "description": "Personal finance manager replacing two Excel spreadsheets: bank transactions with a verification queue, rule-based categorization, bucket-based investments, net worth, savings goal and debts. The transactions vertical already works end-to-end against the backend; the full 15-table schema is designed and applied.",
-    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
-    "links": [
-      { "kind": "disabled", "label": "private repo" },
-      { "kind": "disabled", "label": "private demo" }
-    ],
-    "thumbKind": "finance"
-  },
-  {
     "id": "tallerapp",
     "title": "TallerApp",
     "host": null,
@@ -24,6 +11,19 @@
       { "kind": "disabled", "label": "private demo" }
     ],
     "thumbKind": "tallerapp"
+  },
+  {
+    "id": "polybot",
+    "title": "POLYBOT · Algorithmic trading",
+    "host": null,
+    "badge": { "label": "In production", "variant": "live" },
+    "descriptionHtml": "Autonomous bot trading weather markets on <strong>Polymarket</strong> with real money: it pulls the Open-Meteo GFS ensemble (31 members), builds the empirical probability distribution, contrasts it against the order book and places on-chain orders. 33 markets registered, 8 active. LLM decision agents, three layers of risk gates, on-chain fill reconciliation and a PWA dashboard with push notifications.",
+    "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
+    "links": [
+      { "kind": "disabled", "label": "private repo" },
+      { "kind": "disabled", "label": "no public metrics" }
+    ],
+    "thumbKind": "trading"
   },
   {
     "id": "gym-tracker",
@@ -39,6 +39,19 @@
     "thumbKind": "gym"
   },
   {
+    "id": "finance-manager",
+    "title": "Finance Manager",
+    "host": null,
+    "badge": { "label": "In progress", "variant": "default" },
+    "description": "Personal finance manager replacing two Excel spreadsheets: bank transactions with a verification queue, rule-based categorization, bucket-based investments, net worth, savings goal and debts. The transactions vertical already works end-to-end against the backend; the full 15-table schema is designed and applied.",
+    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
+    "links": [
+      { "kind": "disabled", "label": "private repo" },
+      { "kind": "disabled", "label": "private demo" }
+    ],
+    "thumbKind": "finance"
+  },
+  {
     "id": "web-jasb",
     "title": "JASB Website",
     "host": "jasbct.com",
@@ -52,20 +65,5 @@
     "thumbKind": "jasb",
     "thumbImage": "/projects/jasb.png",
     "thumbAlt": "jasbct.com hero — JASB Energy & Telco · connecting the cities of the future"
-  },
-  {
-    "id": "trading-bot",
-    "title": "POLYBOT · Algorithmic trading",
-    "host": null,
-    "badge": { "label": "In production", "variant": "live" },
-    "descriptionHtml": "Autonomous bot trading weather markets on <strong>Polymarket</strong> with real money: it pulls the Open-Meteo GFS ensemble (31 members), builds the empirical probability distribution, contrasts it against the order book and places on-chain orders sized by the <strong>Kelly criterion</strong>. 33 markets registered, 8 active. LLM decision agents, three layers of risk gates, on-chain fill reconciliation and a PWA dashboard with push notifications.",
-    "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
-    "links": [
-      { "kind": "disabled", "label": "private repo" },
-      { "kind": "disabled", "label": "no public metrics" }
-    ],
-    "thumbKind": "trading",
-    "thumbImage": "/projects/trading.png",
-    "thumbAlt": "Bot dashboard — global KPIs, P&L chart and market grid with individual stats"
   }
 ]

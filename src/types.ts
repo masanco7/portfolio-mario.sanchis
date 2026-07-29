@@ -31,15 +31,37 @@ export interface ProjectShotRef {
   alt: string;
 }
 
-export interface ProjectDetailSection extends ProjectShotRef {
+/** Icons available to a section that ships without a capture. */
+export type SectionIcon = 'ledger' | 'chart' | 'terminal' | 'timeline' | 'sliders';
+
+/**
+ * Marks a section as documented in text only. Set instead of `shot` when the
+ * screen cannot be shown — POLYBOT, for instance, keeps every screen that would
+ * expose a figure or a strategy parameter out of the gallery. The modal renders
+ * a labelled icon plate in the media slot so the row still reads as a designed
+ * block rather than a missing image.
+ */
+export interface SectionPlaceholder {
+  icon: SectionIcon;
+  /** Screen name shown under the icon. */
+  label: string;
+}
+
+export interface ProjectDetailSection {
   title: string;
   /** Plain paragraphs; inline HTML (<strong>, <em>) is allowed. */
   paragraphs: string[];
+  /** Key inside projectShots[projectId]. Omit when the section sets `placeholder`. */
+  shot?: string;
+  /** Alt text for `shot` — required whenever `shot` is set. */
+  alt?: string;
   /**
    * Optional portrait companion shown beside the main shot — for a section that
    * needs to show the same screen on desktop and on a phone.
    */
   phoneShot?: ProjectShotRef;
+  /** Set instead of `shot` for a screen documented without a capture. */
+  placeholder?: SectionPlaceholder;
 }
 
 export interface ProjectDetail {

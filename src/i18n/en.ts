@@ -96,6 +96,8 @@ export const ui: UiStrings = {
     closeAria: 'Close the project detail',
     galleryAria: 'Project screens',
     stackLabel: 'Full stack',
+    /** Label on the plate that replaces the capture for screens we cannot show. */
+    noShotLabel: 'Described, not shown',
   },
   stack: {
     sectionLabel: '03 — Tech stack',

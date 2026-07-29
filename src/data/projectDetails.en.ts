@@ -190,4 +190,139 @@ export const projectDetails: Record<string, ProjectDetail> = {
     // Once published, uncomment and the link shows up on its own in the modal footer:
     // repo: { label: 'View showcase repo', href: 'https://github.com/masanco7/...' },
   },
+
+  /**
+   * POLYBOT trades real money, so this detail is written under a strict rule:
+   * no strategy parameter and no real log or timeline content. Only 6 of the 11
+   * screens carry a capture, all taken with the dashboard's privacy mode on;
+   * the other 5 use `placeholder` and are described in text.
+   *
+   * Watch out when adding a new capture: privacy mode does NOT blur text that
+   * mixes a label and a figure in the same node. The notification tray is the
+   * known case — its capture shows daily-summary amounts, published at Mario's
+   * explicit request (2026-07-29).
+   */
+  polybot: {
+    id: 'polybot',
+    title: 'POLYBOT',
+    subtitle: 'Multi-agent algorithmic trading system · In production since July 2026',
+    badges: ['Python', 'FastAPI', 'Angular 21'],
+    hero: {
+      shot: 'login',
+      alt: 'POLYBOT sign-in screen with the Face ID entry button',
+    },
+    intro: [
+      'POLYBOT is a multi-agent algorithmic trading system that has been trading real money since July 2026, on weather prediction markets. The system pulls the 31-member ensemble of the GFS model through Open-Meteo, uses it to build its own probability distribution for every possible outcome band of the day, and decides whether to take a position by comparing that against the price the market is offering at that moment.',
+      'The project manages 33 registered markets, with several running in active production simultaneously, each with its own independent process that can be started or paused without affecting the rest. A risk manager can automatically pause a market when it detects a losing streak, with a scheduled resume.',
+      'All access goes through passkey authentication (Face ID), on a session deliberately isolated from the rest of my personal ecosystem: neither the cookie nor the biometric credential is shared with my other projects, even though they live on the same domain.',
+      'The notification system was redesigned from scratch after finding a design flaw in its first version (built on Telegram): a state alert must fire when the state changes, never on a timer. The redesign deduplicates by content instead of by date, and replaced a messaging bot with a good share of its commands broken by native push notifications on the PWA itself.',
+      'Built with Python and FastAPI on the backend, Angular 21 as a PWA on the frontend, and Ollama for generating natural-language summaries over data the system has already computed deterministically.',
+    ],
+    sections: [
+      {
+        shot: 'login',
+        alt: 'POLYBOT sign-in screen on desktop, with Face ID entry and the username form',
+        phoneShot: {
+          shot: 'login-phone',
+          alt: 'The same POLYBOT sign-in screen on the PWA installed on the phone',
+        },
+        title: 'Sign-in and session isolation',
+        paragraphs: [
+          'Access uses the same pattern as the rest of my ecosystem: passkey (WebAuthn/Face ID) as the main route, with username and password as the alternative. The deliberate difference here is isolation: the session cookie is host-only and never travels to any other subdomain, and each passkey is bound to POLYBOT’s exact domain, so a credential registered here does not work on any other project, or the other way round.',
+          'There is no user table and no roles — it is a single-operator system — but it protects the read-only panel and every action endpoint alike: starting or stopping a bot, pausing a market, changing any parameter.',
+        ],
+      },
+      {
+        shot: 'dashboard',
+        alt: 'POLYBOT dashboard with the global indicators blurred by privacy mode, the evolution curve and the market grid',
+        title: 'Operational dashboard',
+        paragraphs: [
+          'A financial and operational view of the whole fleet: accumulated performance, hit rate, number of operations and on-chain balance, with a cumulative evolution curve filterable by period. Each active market shows its own card with live status — running, automatically paused by the risk manager, or disabled — so the real state of the entire system reads at a glance.',
+          'It includes a privacy mode that blurs any sensitive figure while keeping the shape of the curve and the rest of the layout intact, meant for screen sharing or documenting the project without exposing financial data. It is the mode every capture in this section was taken in.',
+        ],
+      },
+      {
+        shot: 'ranking',
+        alt: 'POLYBOT cross-market ranking: one row per market with the performance metrics blurred by privacy mode',
+        title: 'Cross-market ranking',
+        paragraphs: [
+          'A comparison of every active market, sorted by different performance metrics, computed entirely on the server — the client only formats and displays what already arrives sorted.',
+          'The comparison period is selectable, and every change of time window recomputes against the real data instead of serving a precomputed view. The table order always answers a specific question ("which market is doing better by this metric"), it is not a free exploratory table.',
+        ],
+      },
+      {
+        shot: 'salud',
+        alt: 'POLYBOT health panel with the status of calibration, resolvers, forecast capturer, agents and services',
+        title: 'System health',
+        paragraphs: [
+          'A monitoring panel for the critical processes that keep the system running: when each scheduled task last completed successfully, not simply when it was last attempted — an important distinction, because a process that fails repeatedly is still "running" even though it never succeeds. Each type of task has its own normality threshold according to its nature.',
+          'Anomaly detection and alert delivery happen entirely independently of this screen, in a separate process: that way, if the visible part of the system were to fail, the alerts would still arrive.',
+        ],
+      },
+      {
+        shot: 'avisos',
+        alt: 'POLYBOT notification tray with the daily summary, stopped bots and reconciliation findings',
+        title: 'Notification system',
+        paragraphs: [
+          'A centralised notification tray, the result of a full redesign of the alerting system. The previous version sent the same notice several times because of a time-based design flaw; the current version identifies each alert by its actual content, not by when it was generated, avoiding duplicates.',
+          'Only genuinely actionable events arrive as a push notification on the phone — everything else stays available in the tray to be consulted when needed, without interrupting.',
+        ],
+      },
+      {
+        shot: 'sistema',
+        alt: 'POLYBOT system settings with the service controls, notifications, security and appearance modes',
+        title: 'System settings',
+        paragraphs: [
+          'A general configuration panel: push notification management, registration of the biometric access credential, appearance and sign-out — with two additions specific to a system that trades real money.',
+          'The first is a manual control over the system processes (API, scheduled agents, the set of per-market bots), designed as a deliberate emergency switch after retiring the external messaging channel that used to partly fill that role.',
+          'The second is privacy mode itself, which blurs any sensitive figure across the whole interface so the system can be screen-shared or documented without exposing financial data — the very function used to prepare the material for this portfolio.',
+        ],
+      },
+      {
+        placeholder: { icon: 'ledger', label: 'Operations record' },
+        title: 'Operations record',
+        paragraphs: [
+          'Every operation is recorded with full identification of the market, the exact moment, the direction taken, price, size, status and final outcome, together with complete traceability of how the order was executed.',
+          'The system also keeps a set of internal model metrics from the exact moment the decision was taken, which are not shown publicly because they would reveal the internal entry criteria.',
+        ],
+      },
+      {
+        placeholder: { icon: 'chart', label: 'Model analytics' },
+        title: 'Analytics: model diagnostics',
+        paragraphs: [
+          'An analysis layer distinct from both the ranking (which compares markets against each other) and the dashboard (which summarises financial state): here the prediction model itself is audited to check whether it behaves as expected.',
+          'It includes eleven aggregated visualisations over the full history — from a calibration curve comparing the model’s estimated confidence against the actually observed hit rate, to performance cross-cut by different dimensions of the forecast and of the operation. It is the screen that answers "is the model behaving consistently?", not "am I making money?".',
+        ],
+      },
+      {
+        placeholder: { icon: 'terminal', label: 'System logs' },
+        title: 'System logs',
+        paragraphs: [
+          'A custom and deliberately simple logging system, with no external tooling in between: it gathers the log of each market plus the agent scheduler and the API, normalises the format of every source into a single chronological view, with filters by origin and free-text search.',
+          'It prioritises operational simplicity over the sophistication of a full observability stack, in keeping with the real scale of the project.',
+        ],
+      },
+      {
+        placeholder: { icon: 'timeline', label: 'Event timeline' },
+        title: 'Timeline: human-readable traceability',
+        paragraphs: [
+          'A chronological feed focused on business events rather than technical logs: operations opened and closed with their outcome, risk manager regime changes with their rationale, market pauses and resumes, alerts from the monitoring system and manual actions by the operator.',
+          'What makes this layer distinctive is that it unifies several heterogeneous data sources —the operations history, the agent snapshots, a write-only audit record, the alert state and the calibration model— into a single coherent timeline, deduplicating events so the same operation is never shown more than once. It covers both what the system did autonomously and what the operator did by hand.',
+        ],
+      },
+      {
+        placeholder: { icon: 'sliders', label: 'Layered configuration' },
+        title: 'Per-market and global configuration',
+        paragraphs: [
+          'A layered configuration system: a set of global values acting as default behaviour, and the ability to override them independently for each active market, applied hot with no need to restart the system. Each market can also be paused or resumed individually from its own view.',
+          'Which specific parameters are configurable is not detailed publicly, as it forms part of the internal strategy criteria.',
+        ],
+      },
+    ],
+    stackFull:
+      'Python 3.12 + FastAPI · Angular 21 PWA with signals · WebAuthn/passkeys · Web Push + VAPID · Ollama · systemd · nginx · Cloudflare · Ubuntu VPS on DigitalOcean',
+    // TODO: the POLYBOT showcase repo does not exist yet (the real repo is private).
+    // Once published, uncomment and the link shows up on its own in the modal footer:
+    // repo: { label: 'View showcase repo', href: 'https://github.com/masanco7/...' },
+  },
 };
