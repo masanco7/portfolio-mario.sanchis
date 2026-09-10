@@ -1,0 +1,33 @@
+# BuildKit reads this file because it sits next to the Dockerfile named in
+# docker-compose.yml. A plain .dockerignore at the repo root would work too, but
+# then it would also apply to any other image built from this repo.
+
+# Installed and generated locally — the image builds both from scratch, and
+# copying a Windows node_modules into an alpine build is how you get native
+# modules compiled for the wrong platform.
+node_modules
+dist
+.astro
+
+# History and editor state: never needed to build, and .git alone is ~7 MB of
+# context uploaded to the daemon on every build.
+.git
+.gitignore
+.vscode
+.legacy
+
+# Sources for artefacts that are already committed under public/ as their
+# finished form: cv-src/ produces the CV PDFs (printed to PDF by hand) and
+# og-src/ produces og-image.png via `npm run og`. Neither runs during the build.
+cv-src
+og-src
+capturas
+
+# Secrets must never reach the image, even though this site has none today.
+.env
+.env.*
+
+# Deploy material: the Dockerfile pulls in nginx-site.conf by explicit path, and
+# the rest (host vhost, README) is documentation for the server, not build input.
+deploy/README.md
+deploy/nginx

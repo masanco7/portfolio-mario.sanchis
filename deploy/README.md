@@ -1,8 +1,12 @@
 # Deploy — portfolio.masanco-hub.com
 
-Despliegue del portfolio público de Mario Sanchis Colomer en el VPS masanco-hub
-(compartido con POLYBOT y Gym Tracker). Sitio **estático puro** (Astro 6 con
-`output: 'static'`), 2 idiomas (`/` ES, `/en/` EN), sin backend, sin auth.
+Despliegue del portfolio público de Mario Sanchis Colomer. Sitio **estático puro**
+(Astro 6 con `output: 'static'`), 2 idiomas (`/` ES, `/en/` EN), sin backend, sin auth.
+
+Desde 2026-09-10 corre **en Docker**. Es la primera app del VPS que se contenedoriza
+dentro del plan de migración al servidor casero; el objetivo es que mover el sitio a
+otra máquina sea copiar el repo y ejecutar un comando, sin reinstalar node ni recordar
+qué versión hacía falta.
 
 ## Arquitectura
 
@@ -10,131 +14,179 @@ Despliegue del portfolio público de Mario Sanchis Colomer en el VPS masanco-hub
 Cloudflare (proxy on, cert wildcard *.masanco-hub.com)
    │
    ▼  443
-nginx  ─── /etc/nginx/sites-enabled/portfolio.masanco-hub.com
-              │ root /opt/portfolio/dist
-              ▼
-           /opt/portfolio/
-              ├── .git/
-              ├── src/…
-              ├── package.json
-              └── dist/                 ← producto de `npm run build`
-                  ├── index.html        (ES)
-                  ├── en/index.html     (EN)
-                  ├── _astro/*.css      (hashed)
-                  ├── projects/*.png
-                  └── cv-*.pdf
+nginx del HOST  ─── /etc/nginx/sites-enabled/portfolio.masanco-hub.com.conf
+   │                  solo TLS + security headers + proxy_pass
+   ▼  127.0.0.1:8101
+contenedor `portfolio-web`  (nginx-unprivileged :8080)
+   │                  cache policy + rutas ES/EN + gzip
+   ▼
+/usr/share/nginx/html   ← dist/ de Astro, horneado en la imagen
 ```
 
-- **Usuario de servicio:** `portfolio:portfolio` con HOME en `/opt/portfolio/`
-  (mismo patrón que `polybot:polybot` y `gym:gym`).
-- **SSL:** reutiliza `/etc/ssl/cloudflare/origin.pem` (wildcard ya existente).
-- **Sin systemd:** nginx sirve los estáticos directamente. No hay backend.
+**El sitio ya no se sirve desde el disco del host.** No hay `/opt/portfolio/dist`,
+no hay symlink, no hay `npm run build` en el servidor: el build ocurre dentro de la
+imagen (stage `node:22-alpine`) y el resultado se copia al stage de nginx.
 
-## Pre-requisitos
+- **Puerto:** `127.0.0.1:8101`. Convención del VPS: `80xx` = servicios bare-metal
+  (polybot :8000, gym-api :8001), `81xx` = apps en Docker (integras :8100, portfolio :8101).
+- **Estado:** ninguno. El contenedor es `read_only: true` y no monta volúmenes.
+  Todo lo que sirve viene de la imagen, así que un `docker compose up` en otra
+  máquina da exactamente el mismo sitio.
+- **SSL:** sigue en el nginx del host, reutilizando `/etc/ssl/cloudflare/origin.pem`.
+  Es la fase 1 del plan; la fase 2 mueve el proxy a un contenedor (ver más abajo).
 
-- [x] VPS con POLYBOT y Gym Tracker desplegados.
-- [x] Certificado Cloudflare Origin wildcard `*.masanco-hub.com`.
-- [x] Snippet `/etc/nginx/snippets/common-ssl.conf` existente.
-- [ ] Registro DNS `portfolio.masanco-hub.com` → IP droplet (A record, proxy Cloudflare ON).
-- [ ] Repo GitHub `masanco7/portfolio-mario.sanchis` creado y con `main` subido.
+## Ficheros
 
-## Setup inicial (una sola vez)
+| Fichero | Qué es |
+|---|---|
+| `docker/Dockerfile` | Build multi-stage: Astro → nginx-unprivileged |
+| `docker/Dockerfile.dockerignore` | Qué NO entra en el contexto de build |
+| `docker/nginx-site.conf` | vhost **interno** del contenedor (cache, ES/EN, gzip) |
+| `docker/docker-compose.yml` | Servicio, puerto, logging, read-only |
+| `docker/update.sh` | Redespliegue con rollback automático |
+| `nginx/portfolio.masanco-hub.com.conf` | vhost del **host**: TLS + proxy_pass |
 
-SSH como `deploy` y ejecuta por bloques.
+## Migración de bare-metal a Docker (una sola vez)
 
-### 1. Usuario de servicio
+El sitio ya está desplegado en `/opt/portfolio/repo`. Estos pasos lo mueven a Docker
+sin borrar nada: si algo falla, restaurar el vhost viejo devuelve el sitio en segundos.
+
+### 0. Permiso de Docker para `deploy` (opcional, recomendado)
+
+`deploy` está en el grupo `sudo` pero no en `docker`, así que hoy todo comando
+`docker` necesita `sudo`. Para no arrastrar eso en cada despliegue:
 
 ```bash
-sudo useradd --system --create-home --home-dir /opt/portfolio --shell /bin/bash portfolio
-sudo chmod 755 /opt/portfolio
-id portfolio
+sudo usermod -aG docker deploy
+# cierra la sesión SSH y vuelve a entrar para que el grupo tome efecto
 ```
 
-### 2. Clonar el repo (público, sin PAT)
+> Ojo: pertenecer a `docker` equivale a root en la práctica. `deploy` ya tiene `sudo`,
+> así que no baja el listón de seguridad, pero conviene saberlo.
+
+### 1. Traer el commit con los ficheros de Docker
 
 ```bash
-sudo -u portfolio -H git clone https://github.com/masanco7/portfolio-mario.sanchis.git /opt/portfolio/repo
+sudo -u portfolio -H git -C /opt/portfolio/repo pull --ff-only
+ls /opt/portfolio/repo/deploy/docker/
 ```
 
-Astro necesita node 22+ (POLYBOT y Gym ya lo usan, así que está disponible). Build inicial:
+Esperado: `Dockerfile`, `docker-compose.yml`, `nginx-site.conf`, `update.sh`.
+
+### 2. Construir y levantar el contenedor
+
+Todavía sin tocar nginx: el sitio sigue sirviéndose desde disco mientras tanto.
 
 ```bash
-sudo -u portfolio -H bash -c 'cd /opt/portfolio/repo && npm ci && npm run build'
-sudo -u portfolio -H ln -sfn /opt/portfolio/repo/dist /opt/portfolio/dist
-ls -la /opt/portfolio/dist/index.html
+cd /opt/portfolio/repo/deploy/docker
+sudo REVISION="$(git -C /opt/portfolio/repo rev-parse --short HEAD)" docker compose build
+sudo docker compose up -d
+sudo docker compose ps
 ```
 
-El symlink `dist` apunta dentro del repo — así `update.sh` solo hace `git pull && npm run build` sin tocar nginx.
+Esperado: `portfolio-web` en estado `Up (healthy)`. El primer build tarda ~2-3 min
+(descarga node:22-alpine + `npm ci`); los siguientes reutilizan capas.
 
-### 3. nginx vhost
+### 3. Verificar el contenedor ANTES de mover el tráfico
 
 ```bash
-sudo cp /opt/portfolio/repo/deploy/nginx/portfolio.masanco-hub.com.conf /etc/nginx/sites-available/
-sudo ln -sf /etc/nginx/sites-available/portfolio.masanco-hub.com.conf /etc/nginx/sites-enabled/
+curl -I http://127.0.0.1:8101/                    # 200, text/html
+curl -I http://127.0.0.1:8101/en/                 # 200
+curl -I http://127.0.0.1:8101/cv-salesforce.pdf   # 200, application/pdf
+curl -sI http://127.0.0.1:8101/_astro/ -o /dev/null -w '%{http_code}\n'   # 403/404, no 500
+```
+
+Si algo de esto falla, **para aquí**: el sitio público sigue intacto.
+
+### 4. Cambiar el vhost del host a proxy
+
+```bash
+sudo cp /etc/nginx/sites-available/portfolio.masanco-hub.com.conf \
+        /root/portfolio.vhost.bak.$(date +%Y%m%d)      # red de seguridad
+sudo cp /opt/portfolio/repo/deploy/nginx/portfolio.masanco-hub.com.conf \
+        /etc/nginx/sites-available/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-### 4. DNS Cloudflare
+**`reload`, no `restart`.** nginx es compartido con polybot, gym e integras.
 
-En el panel de Cloudflare → DNS, crear A record:
-- Name: `portfolio`
-- IPv4: `138.68.185.149`
-- Proxy: ON (nube naranja)
-- TTL: Auto
+### 5. Verificar en público
 
-Comprobar: `curl -I https://portfolio.masanco-hub.com/` debe devolver 200.
+```bash
+curl -I https://portfolio.masanco-hub.com/
+curl -I https://portfolio.masanco-hub.com/en/
+curl -I https://portfolio.masanco-hub.com/cv-completo.pdf
+```
+
+Y abrir el sitio en el navegador: las imágenes de proyectos y los PDFs deben cargar.
+
+### 6. Limpiar el despliegue viejo (solo cuando lleve unos días bien)
+
+```bash
+sudo -u portfolio rm -rf /opt/portfolio/repo/node_modules /opt/portfolio/repo/dist
+sudo -u portfolio rm -f /opt/portfolio/dist        # el symlink
+```
+
+No borres `/opt/portfolio/repo`: es de donde sale el build.
 
 ## Update workflow (cada cambio)
 
-Desde tu PC:
+Desde el PC, como siempre:
 
 ```bash
-git add -A
-git commit -m "descripcion"
-git push
+git add -A && git commit -m "descripcion" && git push
 ```
 
-En el VPS:
+En el VPS, un solo comando:
 
 ```bash
-ssh -i ~/.ssh/id_ed25519_digitalocean deploy@138.68.185.149
-sudo -u portfolio -H bash -c 'cd /opt/portfolio/repo && git pull --ff-only && npm ci && npm run build'
+sudo bash /opt/portfolio/repo/deploy/docker/update.sh
 ```
 
-No hace falta reload de nginx — sirve los nuevos estáticos al siguiente request
-(salvo si cambia `nginx/portfolio.masanco-hub.com.conf`, en cuyo caso `sudo cp …` y
-`sudo systemctl reload nginx`).
+Hace `git pull` como `portfolio`, etiqueta la imagen actual como `:anterior`,
+reconstruye, levanta y espera health hasta 60s. **Si no queda sana, vuelve sola a
+la imagen anterior** y sale con error. No toca nginx.
 
-## Verificación
+Si cambiaste `deploy/nginx/portfolio.masanco-hub.com.conf`, el script te recuerda
+al final los dos comandos para copiarlo y recargar nginx.
+
+## Rollback manual
 
 ```bash
-# HTTP/2 200, Content-Type: text/html
-curl -I https://portfolio.masanco-hub.com/
-curl -I https://portfolio.masanco-hub.com/en/
-
-# CV se descarga
-curl -I https://portfolio.masanco-hub.com/cv-salesforce.pdf
-
-# Imágenes de proyectos
-curl -I https://portfolio.masanco-hub.com/projects/jasb.png
+sudo docker image tag portfolio-masanco-hub:anterior portfolio-masanco-hub:actual
+cd /opt/portfolio/repo/deploy/docker && sudo docker compose up -d --force-recreate
 ```
 
-Logs si algo falla:
+Para saber qué commit está corriendo ahora mismo:
 
 ```bash
-sudo tail -f /var/log/nginx/error.log
-sudo tail -f /var/log/nginx/access.log
+sudo docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' portfolio-web
 ```
 
-## Cambiar PDFs sin redeploy
-
-Si solo quieres reemplazar un CV sin tocar código:
+## Logs y diagnóstico
 
 ```bash
-scp -i ~/.ssh/id_ed25519_digitalocean ./public/cv-completo.pdf deploy@138.68.185.149:/tmp/
-ssh -i ~/.ssh/id_ed25519_digitalocean deploy@138.68.185.149 \
-  "sudo -u portfolio cp /tmp/cv-completo.pdf /opt/portfolio/repo/public/ && \
-   sudo -u portfolio bash -c 'cd /opt/portfolio/repo && npm run build'"
+sudo docker compose -p portfolio logs -f            # access/error log de nginx del contenedor
+sudo docker compose -p portfolio ps                 # estado + healthcheck
+sudo tail -f /var/log/nginx/error.log               # nginx del host (compartido)
 ```
 
-(O hazlo en local, commit y push como cualquier otro cambio.)
+Los logs del contenedor están capados a 10 MB × 5 ficheros, así que no pueden
+llenar el disco.
+
+**502 en el sitio público** → el contenedor está caído o el puerto no coincide:
+`sudo docker compose -p portfolio ps` y `curl -I http://127.0.0.1:8101/`.
+
+## Cambiar PDFs del CV
+
+Ya no se pueden reemplazar en caliente por `scp`: los PDFs viven dentro de la imagen.
+El flujo es el normal — reemplazar el fichero en `public/`, commit, push, `update.sh`.
+Es un paso más, pero a cambio la imagen y el repo nunca se desincronizan.
+
+## Fase 2 — proxy dentro de Docker (pendiente)
+
+Cuando las tres apps (portfolio, gym, polybot) estén contenedorizadas, el nginx del
+host se sustituye por un contenedor de proxy en una red `edge` compartida. Para este
+sitio el cambio ya está preparado en `docker-compose.yml`: se descomentan los bloques
+`networks:` y se borra el bloque `ports:`. El proxy alcanzará el contenedor como
+`portfolio:8080` y no habrá nada publicado en el host.

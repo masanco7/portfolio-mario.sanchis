@@ -1,0 +1,51 @@
+# Fixed project name: without it Compose derives one from the folder name
+# ("docker"), and on a server running several apps that is asking for a clash.
+name: portfolio
+
+services:
+  portfolio:
+    build:
+      # The context is the repo root: package.json, src/ and public/ live two
+      # levels above this file.
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+      args:
+        REVISION: ${REVISION:-unknown}
+    # Mobile tag pointing at the known-good image. Promotion and rollback are
+    # done by retagging, not by rebuilding — see "Rollback" in deploy/README.md.
+    image: portfolio-masanco-hub:actual
+    container_name: portfolio-web
+    restart: unless-stopped
+    ports:
+      # Localhost only: the one publishing to the internet is nginx on the host,
+      # which terminates TLS. 8000 and 8001 are the bare-metal APIs (polybot and
+      # gym) and 8100 is integras, so containerised apps take the 81xx range.
+      - "127.0.0.1:${PORTFOLIO_PORT:-8101}:8080"
+    # The whole site is baked into the image and nothing writes at runtime, so
+    # the filesystem can be read-only. nginx still needs somewhere to put its
+    # pid file and its temp dirs; the uid/gid match the image's `nginx` user,
+    # otherwise a tmpfs mounts owned by root and nginx cannot write to it.
+    read_only: true
+    tmpfs:
+      - /tmp:uid=101,gid=101
+      - /var/cache/nginx:uid=101,gid=101
+    logging:
+      # Without a cap the JSON log grows until it fills the disk.
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    # Static files, no long-lived connections to drain.
+    stop_grace_period: 10s
+
+    # Phase 2 — edge proxy inside Docker. When the reverse proxy moves into a
+    # container, uncomment the two blocks below and delete the `ports:` block
+    # above: the proxy reaches this container as `portfolio:8080` over the
+    # shared network and nothing needs publishing on the host at all.
+    #
+    # networks:
+    #   - edge
+
+# networks:
+#   edge:
+#     external: true
