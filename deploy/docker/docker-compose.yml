@@ -38,14 +38,23 @@ services:
     # Static files, no long-lived connections to drain.
     stop_grace_period: 10s
 
-    # Phase 2 — edge proxy inside Docker. When the reverse proxy moves into a
-    # container, uncomment the two blocks below and delete the `ports:` block
-    # above: the proxy reaches this container as `portfolio:8080` over the
-    # shared network and nothing needs publishing on the host at all.
+    # Phase 2 (2026-09-10): the container also joins the shared `edge` network,
+    # where the proxy reaches it as `portfolio-web:8080`.
     #
-    # networks:
-    #   - edge
+    # The `ports:` block above stays for now on purpose. Publishing on 127.0.0.1
+    # costs nothing and keeps the old host-nginx path working, so joining the
+    # network is reversible and causes no downtime. Drop it once the edge
+    # cutover has been stable for a few days.
+    #
+    # `default` has to be listed explicitly: declaring any network on a service
+    # stops Compose adding the implicit one.
+    networks:
+      - default
+      - edge
 
-# networks:
-#   edge:
-#     external: true
+networks:
+  edge:
+    # Created by hand with `docker network create edge`, shared with gym,
+    # polybot and the proxy. External so a `compose down` of any single app
+    # cannot take it away from the others.
+    external: true
