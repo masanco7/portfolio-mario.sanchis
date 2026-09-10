@@ -79,7 +79,11 @@ Todavía sin tocar nginx: el sitio sigue sirviéndose desde disco mientras tanto
 
 ```bash
 cd /opt/portfolio/repo/deploy/docker
-sudo REVISION="$(git -C /opt/portfolio/repo rev-parse --short HEAD)" docker compose build
+# El `git` va como `portfolio` a proposito: el repo es suyo, y si lo lanzas como
+# `deploy` git aborta con "detected dubious ownership", la variable llega vacia
+# y la imagen queda etiquetada como `unknown` en vez de con el commit.
+REV="$(sudo -u portfolio -H git -C /opt/portfolio/repo rev-parse --short HEAD)"
+sudo REVISION="$REV" docker compose build
 sudo docker compose up -d
 sudo docker compose ps
 ```
