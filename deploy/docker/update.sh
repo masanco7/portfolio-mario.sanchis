@@ -56,7 +56,7 @@ REVISION="$REVISION" docker compose --project-directory "$COMPOSE_DIR" up -d
 # --- 5. Verify ---------------------------------------------------------------
 log "5/5 waiting for health (up to ${HEALTH_TIMEOUT}s)"
 deadline=$(( SECONDS + HEALTH_TIMEOUT ))
-until curl -fsS -o /dev/null "$HEALTH_URL"; do
+until curl -fs -o /dev/null "$HEALTH_URL"; do
     if [ "$SECONDS" -ge "$deadline" ]; then
         printf '\n\033[1;31m!! not healthy — rolling back\033[0m\n' >&2
         docker compose --project-directory "$COMPOSE_DIR" logs --tail 40 || true
