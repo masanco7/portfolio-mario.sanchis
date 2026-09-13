@@ -13,6 +13,18 @@
 
 set -euo pipefail
 
+# Per-host settings, if any. This is what keeps the published port out of both
+# the command line and the repo: the VPS serves on 8101 and the home server on
+# 8110, same image and same script.
+#
+# Optional on purpose: where the file does not exist the compose default wins,
+# which is the VPS port. Mode 600 root, like every other /etc/<project>.env.
+if [ -f /etc/portfolio.env ]; then
+    set -a
+    . /etc/portfolio.env
+    set +a
+fi
+
 REPO_DIR="${REPO_DIR:-/opt/portfolio/repo}"
 SERVICE_USER="${SERVICE_USER:-portfolio}"
 IMAGE="portfolio-masanco-hub"
