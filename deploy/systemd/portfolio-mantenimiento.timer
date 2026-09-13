@@ -1,0 +1,24 @@
+[Unit]
+Description=Portfolio — mantenimiento semanal, sabados de madrugada
+
+[Timer]
+# Sabado a las 02:00 hora de Madrid, dicho explicitamente para no depender de
+# como tenga puesto el reloj la maquina.
+#
+# A las 02:00 porque el mantenimiento del host va a la 01:00 y tiene que ir
+# primero: si una actualizacion del sistema rompe algo, se ve antes de que
+# corra nada encima. Una hora de separacion es de sobra para un apt de un host
+# sin apenas paquetes.
+OnCalendar=Sat *-*-* 02:00:00 Europe/Madrid
+
+RandomizedDelaySec=10m
+
+# Si el servidor estaba apagado el sabado, se ejecuta al arrancar en vez de
+# saltarse la semana en silencio. El flock del script cubre el riesgo de que
+# eso caiga encima de un despliegue manual.
+Persistent=true
+
+Unit=portfolio-mantenimiento.service
+
+[Install]
+WantedBy=timers.target

@@ -187,7 +187,73 @@ Ya no se pueden reemplazar en caliente por `scp`: los PDFs viven dentro de la im
 El flujo es el normal — reemplazar el fichero en `public/`, commit, push, `update.sh`.
 Es un paso más, pero a cambio la imagen y el repo nunca se desincronizan.
 
-## Fase 2 — proxy dentro de Docker (pendiente)
+## Dónde vive esto ahora (2026-09-13)
+
+**El sitio se sirve desde `masancoserver`, el servidor de casa.** El contenedor
+del VPS quedó parado pero intacto ese mismo día.
+
+```
+Internet → Cloudflare → túnel saliente (cloudflared) → edge-proxy → portfolio-web
+```
+
+| | VPS (antes) | masancoserver (ahora) |
+|---|---|---|
+| Puerto de la app | 8101 | **8110** |
+| Canario | — | 8111 |
+| Entrada | 80/443 abiertos, cert Origin | túnel saliente, sin puertos |
+| Upstream del edge | `127.0.0.1:8101` | `portfolio-web:8080` |
+| Usuario de servicio | `portfolio` uid 995 | `portfolio` uid **1500** |
+
+El puerto no está en el repo: sale de `PORTFOLIO_PORT` en `/etc/portfolio.env`
+(600 root), que leen tanto `update.sh` como el mantenimiento. Donde ese fichero
+no existe manda el valor por defecto del compose, que es el del VPS. Mismo
+código en las dos máquinas.
+
+**Marcha atrás del cutover**, si alguna vez hiciera falta: en Cloudflare, DNS →
+registro `A` para `portfolio` → `138.68.185.149` con el proxy activado, y en el
+VPS `sudo docker compose -f /opt/portfolio/repo/deploy/docker/docker-compose.yml
+start`. Por eso el contenedor de allí se paró con `stop` y no con `down`.
+
+## Mantenimiento semanal
+
+Sábados a las **02:00** (Europe/Madrid), justo después del mantenimiento del
+host. Ficheros en `deploy/scripts/` y `deploy/systemd/`.
+
+```bash
+sudo /opt/portfolio/repo/deploy/scripts/mantenimiento.sh --seco   # ensayo
+sudo systemctl start portfolio-mantenimiento                       # de verdad
+journalctl -u portfolio-mantenimiento --since '1 day ago'
+```
+
+**Para qué sirve en un sitio estático.** No hay dependencias en ejecución ni
+datos que migrar: lo único que envejece es la imagen base. El `docker build
+--pull` vuelve a resolver `node:22-alpine` y `nginx-unprivileged`, que es la
+única vía por la que las actualizaciones de seguridad llegan al contenedor.
+
+**Cómo promociona.** Construye `:candidato`, lo prueba en el puerto 8111 en un
+contenedor aparte, y solo entonces reetiqueta `:actual` → `:anterior` y
+`:candidato` → `:actual`. Reetiquetar es instantáneo y no puede fallar a medias,
+que es lo que hace fiable la reversión.
+
+**Dos cosas que no son obvias y conviene no tocar:**
+
+- Las comprobaciones exigen la cadena `Mario Sanchis Colomer` en el cuerpo, no
+  un 200. El 12/09 el canario de Integras validó un despliegue suyo contra este
+  portfolio: un 200 no demuestra que quien contesta seas tú.
+- Después de promocionar comprueba **a través del edge**, con la cabecera `Host`
+  real, no solo por el puerto 8110. Ese salto es el que se rompe en silencio si
+  cambia el nombre del contenedor o la red compartida, y validar desde dentro es
+  justo lo que no detectó el 522 del primer cutover del VPS.
+
+Si el fallo ocurre **después** de promocionar, revierte sin preguntarle a la
+salud: los fallos posteriores a poner a servir son precisamente los que la salud
+no ve.
+
+El bot de Telegram es propio del proyecto (`notify-telegram-portfolio.sh`, con
+el token en `/etc/portfolio.env`). El aislamiento viene del token: si este se
+compromete, alcanza este canal y ninguno más.
+
+## ~~Fase 2 — proxy dentro de Docker~~ (hecho, 2026-09-10)
 
 Cuando las tres apps (portfolio, gym, polybot) estén contenedorizadas, el nginx del
 host se sustituye por un contenedor de proxy en una red `edge` compartida. Para este

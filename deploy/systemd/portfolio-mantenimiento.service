@@ -1,0 +1,20 @@
+[Unit]
+Description=Portfolio — mantenimiento semanal
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+# Red de seguridad final: el trap ERR del script no llega a ejecutarse si el
+# kernel lo mata por memoria, si se agota TimeoutStartSec o ante un kill -9.
+# En esos casos el mantenimiento desaparece sin avisar.
+OnFailure=portfolio-mantenimiento-fallo.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/portfolio/repo/deploy/scripts/mantenimiento.sh
+# La construccion de Astro con npm ci tarda un par de minutos en frio, pero el
+# margen cubre un mirror lento sin dejarlo colgado indefinidamente.
+TimeoutStartSec=1800
+Restart=no
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=portfolio-mantenimiento

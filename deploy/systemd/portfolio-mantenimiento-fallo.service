@@ -1,0 +1,13 @@
+[Unit]
+Description=Portfolio — avisa de que el mantenimiento no ha terminado
+# No se lanza sola: la dispara OnFailure= de portfolio-mantenimiento.service.
+
+[Service]
+Type=oneshot
+ExecStart=/opt/portfolio/repo/deploy/scripts/avisar-fallo.sh
+# Si ni siquiera se puede avisar, no hay nada mas que intentar.
+TimeoutStartSec=120
+Restart=no
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=portfolio-mantenimiento-fallo
