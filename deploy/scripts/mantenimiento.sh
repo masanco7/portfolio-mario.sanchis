@@ -354,7 +354,7 @@ fi
 paso "7/7  Limpieza"
 # Loose images from past weeks. 30 days because :anterior is never untagged and
 # therefore never pruned, so the rollback target is not at risk.
-liberado="$(docker image prune -af --filter "until=720h" 2>/dev/null | awk '/Total reclaimed space/ {print $4" "$5}')"
+liberado="$(docker image prune -af --filter "until=720h" 2>/dev/null | awk '/Total reclaimed space/ {print $4, $5}' | xargs)"
 registro "espacio liberado: ${liberado:-nada}"
 apuntar "Limpieza de imagenes: ${liberado:-nada que borrar}."
 
@@ -383,11 +383,17 @@ RESULTADO: ${titular}
 --- lo que hay que mirar ---
 ${AVISOS}"
 
+# Asked of the running container, never assumed from REVISION: in --seco
+# nothing was promoted, and after a rollback the serving version is the old one.
+# Reporting the version that was BUILT as the version that is SERVING is the
+# kind of small lie that makes a report untrustworthy exactly when it matters.
+revision_ahora="$(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$CONTENEDOR" 2>/dev/null || echo desconocida)"
+
 mensaje+="
 --- que se ha hecho ---
 ${RESUMEN}
 --- estado ---
-Sirviendo la revision: ${REVISION}
+Sirviendo la revision: ${revision_ahora}
 Disco libre: $(df -h /var/lib/docker --output=avail 2>/dev/null | tail -1 | tr -d ' ')"
 
 avisar_telegram "$mensaje"

@@ -33,11 +33,32 @@ if [ "${#mensaje}" -gt 3900 ]; then
 $(printf '%s' "$mensaje" | tail -c 3900)"
 fi
 
-# --fail so a rejected message is a non-zero exit and the caller can report it
-# instead of assuming the notice went out.
-curl -sS --fail --max-time 20 \
+# The response body is kept rather than discarded, because Telegram explains
+# itself in it and a rejected notice is exactly when the reason matters.
+#
+# `--fail` with `-o /dev/null` used to be here, and it hid the cause behind a
+# bare "curl: (22) error 400". The first send to a bot the recipient has never
+# pressed Start on returns 400 "chat not found", which is indistinguishable from
+# a bad token until you can read the description. That happened on 2026-09-13,
+# the very first time this ran.
+respuesta="$(curl -sS --max-time 20 \
     -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
     --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
     --data-urlencode "text=${mensaje}" \
-    --data-urlencode "disable_web_page_preview=true" \
-    -o /dev/null
+    --data-urlencode "disable_web_page_preview=true" 2>&1)" || {
+    echo "no se ha podido contactar con Telegram: ${respuesta}" >&2
+    exit 1
+}
+
+case "$respuesta" in
+    *'"ok":true'*) exit 0 ;;
+esac
+
+# grep -o and not a JSON parser on purpose: this script must not depend on jq
+# being installed on a machine where its whole job is to report that something
+# else is broken.
+motivo="$(printf '%s' "$respuesta" | grep -o '"description":"[^"]*"' | cut -d: -f2- | tr -d '"')"
+echo "Telegram ha rechazado el mensaje: ${motivo:-$respuesta}" >&2
+echo "Si dice 'chat not found', abre Telegram y dale a Start en el bot: no puede" >&2
+echo "iniciar una conversacion con alguien que nunca le ha hablado." >&2
+exit 1
