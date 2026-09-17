@@ -193,6 +193,13 @@ revertir() {
 # --- Bail out loudly ----------------------------------------------------------
 
 terminar_mal() {
+    # With -E the trap is inherited by command substitutions ($(...) forks a
+    # subshell). A failure inside one must not produce a second report - or,
+    # worse, a second revertir() retagging :actual back and forth for real -
+    # from a subshell: just fail there and let the real process, which is the
+    # one whose exit status the caller actually sees, handle it once.
+    if [ "$BASHPID" != "$$" ]; then exit 1; fi
+
     # A failure inside this function must not re-enter through the trap.
     trap - ERR
     local donde="$1"
