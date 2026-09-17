@@ -33,5 +33,8 @@ Edita el HTML (o `cv.css` para el estilo común) y vuelve a exportar.
 - **CVs Salesforce:** siguen forzando el salto con `page-break` en la sección
   *Proyectos personales*.
 - Color de acento en `cv.css` → variable `--blue`.
-- Tras regenerar los PDFs: `git add`, `commit`, `push` y en el VPS
-  `git pull && npm run build` (o copia el PDF directo, ver `deploy/README.md`).
+- Tras regenerar los PDFs: `git add`, `commit`, `push` y en el servidor
+  `sudo bash /opt/portfolio/repo/deploy/docker/update.sh` (o esperar al
+  mantenimiento del sábado). Los PDF van dentro de la imagen: ya no se pueden
+  copiar en caliente. Después, purga la URL del PDF en Cloudflare, que los
+  cachea. Ver `GUIA-SERVIDOR.md`.

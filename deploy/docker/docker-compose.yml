@@ -12,15 +12,17 @@ services:
       args:
         REVISION: ${REVISION:-unknown}
     # Mobile tag pointing at the known-good image. Promotion and rollback are
-    # done by retagging, not by rebuilding — see "Rollback" in deploy/README.md.
+    # done by retagging, not by rebuilding — see "Volver a la version anterior"
+    # in ../../GUIA-SERVIDOR.md.
     image: portfolio-masanco-hub:actual
     container_name: portfolio-web
     restart: unless-stopped
     ports:
-      # Localhost only: the one publishing to the internet is nginx on the host,
-      # which terminates TLS. 8000 and 8001 are the bare-metal APIs (polybot and
-      # gym) and 8100 is integras, so containerised apps take the 81xx range.
-      - "127.0.0.1:${PORTFOLIO_PORT:-8101}:8080"
+      # Localhost only: the public entry point is the edge-proxy container,
+      # reached over the shared `edge` network below as `portfolio-web:8080`.
+      # This block stays anyway because update.sh and the weekly maintenance
+      # script probe this port directly, without going through the edge.
+      - "127.0.0.1:${PORTFOLIO_PORT:-8110}:8080"
     # The whole site is baked into the image and nothing writes at runtime, so
     # the filesystem can be read-only. nginx still needs somewhere to put its
     # pid file and its temp dirs; the uid/gid match the image's `nginx` user,
@@ -38,13 +40,8 @@ services:
     # Static files, no long-lived connections to drain.
     stop_grace_period: 10s
 
-    # Phase 2 (2026-09-10): the container also joins the shared `edge` network,
-    # where the proxy reaches it as `portfolio-web:8080`.
-    #
-    # The `ports:` block above stays for now on purpose. Publishing on 127.0.0.1
-    # costs nothing and keeps the old host-nginx path working, so joining the
-    # network is reversible and causes no downtime. Drop it once the edge
-    # cutover has been stable for a few days.
+    # The container joins the shared `edge` network, where the proxy reaches
+    # it as `portfolio-web:8080`.
     #
     # `default` has to be listed explicitly: declaring any network on a service
     # stops Compose adding the implicit one.

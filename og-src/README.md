@@ -23,7 +23,7 @@ npm run og          # 2. regenera public/og-image.png
 git add public/og-image.png og-src/og-image.svg
 ```
 
-El PNG **se commitea** (es un asset servido por nginx, no se genera en el VPS).
+El PNG **se commitea** (es un asset servido por nginx, no se genera en el servidor ni durante el build de Docker).
 
 ## Cómo funciona
 
@@ -52,7 +52,7 @@ Inter → Segoe UI → Arial, y JetBrains Mono → Cascadia Mono → Consolas. E
 cae a Segoe UI / Cascadia Mono, visualmente muy cercanas. Si instalas Inter y
 JetBrains Mono como fuentes del sistema, el render mejora sin tocar el script.
 
-Corolario: **genera el PNG en local, no en el VPS** (Ubuntu no tiene esas fuentes y
+Corolario: **genera el PNG en local, no en el servidor** (Ubuntu no tiene esas fuentes y
 el resultado saldría distinto).
 
 ## Después de actualizar la imagen

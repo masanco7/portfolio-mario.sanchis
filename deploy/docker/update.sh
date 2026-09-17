@@ -13,12 +13,9 @@
 
 set -euo pipefail
 
-# Per-host settings, if any. This is what keeps the published port out of both
-# the command line and the repo: the VPS serves on 8101 and the home server on
-# 8110, same image and same script.
-#
-# Optional on purpose: where the file does not exist the compose default wins,
-# which is the VPS port. Mode 600 root, like every other /etc/<project>.env.
+# Per-host settings, if any. Optional on purpose: where the file does not
+# exist the compose default wins. Mode 600 root, like every other
+# /etc/<project>.env.
 if [ -f /etc/portfolio.env ]; then
     set -a
     . /etc/portfolio.env
@@ -29,14 +26,40 @@ REPO_DIR="${REPO_DIR:-/opt/portfolio/repo}"
 SERVICE_USER="${SERVICE_USER:-portfolio}"
 IMAGE="portfolio-masanco-hub"
 COMPOSE_DIR="${REPO_DIR}/deploy/docker"
-HEALTH_URL="http://127.0.0.1:${PORTFOLIO_PORT:-8101}/"
+PORT="${PORTFOLIO_PORT:-8110}"
+HEALTH_URL="http://127.0.0.1:${PORT}/"
+# A 200 is not proof that this is the portfolio answering: on 2026-09-12 a
+# canary running on a neighbouring port ended up validating against somebody
+# else's site. Every health check demands this string in the body too.
+MARCADOR="Mario Sanchis Colomer"
 HEALTH_TIMEOUT=60
+LOCK_FILE=/var/lock/portfolio-mantenimiento.lock
 
 log() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 fail() { printf '\n\033[1;31m!! %s\033[0m\n' "$*" >&2; exit 1; }
 
+# Body captured into a variable, never piped straight into `grep -q`: with
+# pipefail, curl streaming a ~74 KB page can get SIGPIPE the instant grep -q
+# finds the marker and closes its end, which used to surface as a false
+# "not healthy" and a rollback of a perfectly good deploy.
+health_ok() {
+    local cuerpo
+    cuerpo="$(curl -fsS --max-time 10 "$HEALTH_URL" 2>/dev/null)" || return 1
+    grep -qF -- "$MARCADOR" <<<"$cuerpo"
+}
+
 [ "$(id -u)" -eq 0 ] || fail "run me with sudo: sudo bash deploy/docker/update.sh"
 [ -d "$REPO_DIR/.git" ] || fail "no git repo at $REPO_DIR"
+
+# --- 0. Lock -------------------------------------------------------------
+# Same lock file as the Saturday maintenance script: a manual update.sh and
+# an unattended mantenimiento.sh must never retag :actual/:anterior at once.
+# Non-blocking on purpose — a manual deploy should fail fast and loud, not
+# queue up silently behind whichever one got there first.
+exec 9>"$LOCK_FILE"
+if ! flock -n 9; then
+    fail "ya hay un mantenimiento o despliegue en curso (lock $LOCK_FILE); prueba mas tarde"
+fi
 
 # --- 1. Pull -----------------------------------------------------------------
 log "1/5 git pull (as $SERVICE_USER)"
@@ -68,7 +91,7 @@ REVISION="$REVISION" docker compose --project-directory "$COMPOSE_DIR" up -d
 # --- 5. Verify ---------------------------------------------------------------
 log "5/5 waiting for health (up to ${HEALTH_TIMEOUT}s)"
 deadline=$(( SECONDS + HEALTH_TIMEOUT ))
-until curl -fs -o /dev/null "$HEALTH_URL"; do
+until health_ok; do
     if [ "$SECONDS" -ge "$deadline" ]; then
         printf '\n\033[1;31m!! not healthy — rolling back\033[0m\n' >&2
         docker compose --project-directory "$COMPOSE_DIR" logs --tail 40 || true
@@ -85,8 +108,3 @@ done
 echo
 echo "OK — portfolio serving on $HEALTH_URL (revision $REVISION)"
 echo "running image: $(docker inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' portfolio-web)"
-echo
-echo "nginx on the host is NOT touched by this script."
-echo "If deploy/nginx/portfolio.masanco-hub.com.conf changed, copy it and reload:"
-echo "  sudo cp $REPO_DIR/deploy/nginx/portfolio.masanco-hub.com.conf /etc/nginx/sites-available/"
-echo "  sudo nginx -t && sudo systemctl reload nginx"

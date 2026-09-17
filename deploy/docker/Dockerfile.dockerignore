@@ -14,7 +14,6 @@ dist
 .git
 .gitignore
 .vscode
-.legacy
 
 # Sources for artefacts that are already committed under public/ as their
 # finished form: cv-src/ produces the CV PDFs (printed to PDF by hand) and
@@ -27,7 +26,6 @@ capturas
 .env
 .env.*
 
-# Deploy material: the Dockerfile pulls in nginx-site.conf by explicit path, and
-# the rest (host vhost, README) is documentation for the server, not build input.
+# Deploy material: the Dockerfile pulls in nginx-site.conf by explicit path,
+# and the rest (README) is documentation for the server, not build input.
 deploy/README.md
-deploy/nginx

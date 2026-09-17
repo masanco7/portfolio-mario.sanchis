@@ -3,9 +3,11 @@
 # Portfolio - weekly maintenance.
 # ==============================================================================
 # Run by portfolio-mantenimiento.timer, Saturdays at 02:00 Europe/Madrid, right
-# after the host maintenance at 01:00.
+# after the host maintenance at 01:00. Root runs the copy installed at
+# /usr/local/lib/portfolio-mantenimiento/, never this file straight out of the
+# repo — see "Instalación" in ../README.md.
 #
-#   sudo /opt/portfolio/repo/deploy/scripts/mantenimiento.sh [options]
+#   sudo /usr/local/lib/portfolio-mantenimiento/mantenimiento.sh [options]
 #
 #     --seco       check and build, but never promote.
 #     --sin-aviso  do not send the Telegram report.
@@ -35,6 +37,13 @@ CONTENEDOR=portfolio-web
 COMPOSE_DIR="${REPO_DIR}/deploy/docker"
 NOTIFY=/usr/local/bin/notify-telegram-portfolio.sh
 LOCK_FILE=/var/lock/portfolio-mantenimiento.lock
+
+# This script runs as root but the repo is writable by the `portfolio` user,
+# so root never executes it from there: the .service points at this root
+# owned copy in /usr/local/lib instead. REPO_DIR is a fixed value, never
+# derived from $0 or from wherever this copy happens to live, so it keeps
+# pointing at the real git checkout regardless of where the script runs from.
+INSTALL_DIR=/usr/local/lib/portfolio-mantenimiento
 
 # The canary lives in this project's own port block (8110-8119), one above the
 # app. That separation is not cosmetic: on 2026-09-12 four projects shared the
@@ -115,6 +124,29 @@ limpiar_canario() {
     docker rm -f "$CONTENEDOR_CANARIO" >/dev/null 2>&1 || true
 }
 
+# Root must not silently start running different code than the last time it
+# was installed: if the repo's copies of these two scripts (or anything they
+# source) have moved on since INSTALL_DIR was last populated, that is a
+# deliberate reinstall Mario has to do by hand, not something this run does
+# to itself mid-flight.
+comprobar_scripts_instalados() {
+    local fichero cambiados=""
+    for fichero in mantenimiento.sh avisar-fallo.sh; do
+        cmp -s "${REPO_DIR}/deploy/scripts/${fichero}" "${INSTALL_DIR}/${fichero}" 2>/dev/null \
+            || cambiados+="${fichero} "
+    done
+    # notify-telegram.sh runs as root too (invoked by this very script), and
+    # lands somewhere else (/usr/local/bin, not INSTALL_DIR) with its own
+    # install command, so it needs its own cmp and its own line in the aviso.
+    cmp -s "${REPO_DIR}/deploy/scripts/notify-telegram.sh" "${NOTIFY}" 2>/dev/null \
+        || cambiados+="notify-telegram.sh "
+    [ -n "$cambiados" ] || return 0
+    registro "AVISO: scripts que corren como root cambiados en el repo: ${cambiados}"
+    alertar "Los scripts que corren como root han cambiado en el repo (${cambiados}) pero root sigue ejecutando las copias instaladas. Reinstala con:
+  sudo install -o root -g root -m 755 ${REPO_DIR}/deploy/scripts/mantenimiento.sh ${REPO_DIR}/deploy/scripts/avisar-fallo.sh ${INSTALL_DIR}/
+  sudo install -m 750 ${REPO_DIR}/deploy/scripts/notify-telegram.sh ${NOTIFY}"
+}
+
 # A GET whose body must contain the marker. Non-zero if the port does not
 # answer, answers something else, or answers somebody else's site.
 comprobar_url() {
@@ -123,7 +155,11 @@ comprobar_url() {
         registro "FALLO: $descripcion no responde ($url)"
         return 1
     }
-    if ! printf '%s' "$cuerpo" | grep -qF "$MARCADOR"; then
+    # <<< is a herestring (bash writes it via a temp file, not a pipe), so a
+    # 74 KB body cannot make grep -qF's early exit SIGPIPE the producer side
+    # the way `curl | grep -q` (or even `printf ... | grep -q`) can under
+    # pipefail.
+    if ! grep -qF -- "$MARCADOR" <<<"$cuerpo"; then
         registro "FALLO: $descripcion responde, pero el contenido no es el portfolio"
         return 1
     fi
@@ -226,14 +262,14 @@ Registro completo:
 
 trap 'terminar_mal "un error inesperado (linea $LINENO)"' ERR
 
-# The port comes from the host file, same as update.sh: the VPS serves on 8101
-# and this server on 8110, same repo and same script.
+# The port comes from the host file, same as update.sh, so it stays out of
+# both the command line and the repo defaults.
 if [ -f /etc/portfolio.env ]; then
     set -a
     . /etc/portfolio.env
     set +a
 fi
-PUERTO_APP="${PORTFOLIO_PORT:-8101}"
+PUERTO_APP="${PORTFOLIO_PORT:-8110}"
 
 # ------------------------------------------------------------------------------
 paso "Mantenimiento del portfolio · ${FECHA}"
@@ -259,6 +295,7 @@ else
     registro "hay codigo nuevo: ${revision_antes} -> ${REVISION}"
     apuntar "Codigo: ${revision_antes} -> ${REVISION}"
 fi
+comprobar_scripts_instalados
 
 paso "3/7  Construir el candidato"
 # --pull is the whole point of this job on a static site: it re-resolves
@@ -338,7 +375,10 @@ esperar_url "http://127.0.0.1:${PUERTO_APP}/" "el sitio en su puerto" 45 \
 # tunnel -> edge -> container, and the edge hop is the one that breaks silently
 # if the container name or the shared network ever changes.
 if docker ps --format '{{.Names}}' | grep -qx "$EDGE"; then
-    if docker exec "$EDGE" wget -q -O- --header "Host: ${DOMINIO}" http://127.0.0.1/ 2>/dev/null | grep -qF "$MARCADOR"; then
+    # Captured into a variable first, same reason as comprobar_url: piping
+    # wget straight into grep -q risks SIGPIPE on a page this size.
+    cuerpo_edge="$(docker exec "$EDGE" wget -q -O- --header "Host: ${DOMINIO}" http://127.0.0.1/ 2>/dev/null)" || cuerpo_edge=""
+    if grep -qF -- "$MARCADOR" <<<"$cuerpo_edge"; then
         registro "ok: el edge sirve el portfolio en ${DOMINIO}"
         apuntar "Comprobado a traves del edge: correcto."
     else
@@ -352,9 +392,13 @@ else
 fi
 
 paso "7/7  Limpieza"
-# Loose images from past weeks. 30 days because :anterior is never untagged and
-# therefore never pruned, so the rollback target is not at risk.
-liberado="$(docker image prune -af --filter "until=720h" 2>/dev/null | awk '/Total reclaimed space/ {print $4, $5}' | xargs)"
+# Dangling (untagged) images only: whatever lost its tag when :candidato was
+# retagged to :actual, on this project or any other on the same host. `-a`
+# would remove every unused image regardless of tag — host-wide — which would
+# also delete other projects' `:anterior` once it passes 30 days, taking away
+# their rollback target. `:anterior` stays tagged here, so this scoped prune
+# never touches it.
+liberado="$(docker image prune -f --filter "until=720h" 2>/dev/null | awk '/Total reclaimed space/ {print $4, $5}' | xargs)"
 registro "espacio liberado: ${liberado:-nada}"
 apuntar "Limpieza de imagenes: ${liberado:-nada que borrar}."
 

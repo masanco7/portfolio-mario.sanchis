@@ -10,7 +10,7 @@ OnFailure=portfolio-mantenimiento-fallo.service
 
 [Service]
 Type=oneshot
-ExecStart=/opt/portfolio/repo/deploy/scripts/mantenimiento.sh
+ExecStart=/usr/local/lib/portfolio-mantenimiento/mantenimiento.sh
 # La construccion de Astro con npm ci tarda un par de minutos en frio, pero el
 # margen cubre un mirror lento sin dejarlo colgado indefinidamente.
 TimeoutStartSec=1800

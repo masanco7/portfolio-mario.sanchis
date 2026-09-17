@@ -3,8 +3,8 @@
 Portfolio personal en producción en **[portfolio.masanco-hub.com](https://portfolio.masanco-hub.com)**.
 
 Sitio estático construido con Astro 6, TypeScript strict, i18n nativo (ES/EN) y
-desplegado en VPS propio dentro del ecosistema [masanco-hub](https://masanco-hub.com)
-junto a [POLYBOT](https://polybot.masanco-hub.com) y [Gym Tracker](https://gym.masanco-hub.com).
+autoalojado en Docker en un servidor propio (`masancoserver`, detrás de un túnel
+de Cloudflare) dentro del ecosistema [masanco-hub](https://masanco-hub.com) junto a [POLYBOT](https://polybot.masanco-hub.com) y [Gym Tracker](https://gym.masanco-hub.com).
 
 ## Stack
 
@@ -35,9 +35,16 @@ src/
 ├── scripts/main.js            # Theme toggle + nav spy + reveal
 └── types.ts                   # Project, ProjectLink
 
+cv-src/                        # HTML fuente de los CV en PDF (se exportan a mano)
+og-src/                        # Generador de public/og-image.png (npm run og)
+
 deploy/
-├── nginx/portfolio.masanco-hub.com.conf
-└── README.md                  # Setup + update workflow
+├── docker/                    # Dockerfile, compose, nginx interno, update.sh
+├── scripts/                   # Mantenimiento semanal + avisos por Telegram
+├── systemd/                   # Timer de los sábados 02:00 + unit de fallo
+└── README.md                  # Qué es cada fichero y por qué
+
+GUIA-SERVIDOR.md               # Operación en el servidor
 ```
 
 ## Desarrollo
@@ -53,7 +60,9 @@ Node 22+ recomendado (alineado con resto del ecosistema masanco-hub).
 
 ## Despliegue
 
-Ver **[deploy/README.md](deploy/README.md)** para setup inicial y workflow de updates al VPS.
+Ver **[GUIA-SERVIDOR.md](GUIA-SERVIDOR.md)** para desplegar y operar el sitio en
+`masancoserver`. El diseño de los ficheros de despliegue está en
+[deploy/README.md](deploy/README.md).
 
 ## Decisiones técnicas
 
