@@ -7,7 +7,7 @@
 
 Sitio estático (Astro 6, ES/EN), sin backend, sin base de datos y sin login.
 Desde el 2026-09-13 se sirve en Docker desde `masancoserver`, el servidor de casa.
-El VPS de DigitalOcean donde vivía antes se destruye el 2026-09-19. No queda
+El VPS de DigitalOcean donde vivía antes se destruyó el 2026-09-19. No queda
 ningún entorno alternativo al que volver.
 
 ## Resumen
