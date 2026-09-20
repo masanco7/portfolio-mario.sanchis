@@ -44,12 +44,29 @@ def literal_mode(node: ast.Call) -> str | None:
     return None
 
 
+def datetime_names(tree: ast.AST) -> set[str]:
+    """Names that stand for the datetime class in this module.
+
+    `from datetime import datetime as DT` makes `DT.now()` just as naive as
+    `datetime.now()`, and no amount of string matching on the dotted name would
+    see it. The import statements are right there in the tree; read them.
+    """
+    names = {"datetime"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module == "datetime":
+            for alias in node.names:
+                if alias.name == "datetime" and alias.asname:
+                    names.add(alias.asname)
+    return names
+
+
 def check(path: str) -> list[tuple[int, str]]:
     try:
         tree = ast.parse(open(path, encoding="utf-8").read(), filename=path)
     except (SyntaxError, UnicodeDecodeError) as exc:
         return [(getattr(exc, "lineno", 0) or 0, f"no se puede analizar: {exc}")]
 
+    clase_datetime = datetime_names(tree)
     found = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
@@ -57,9 +74,13 @@ def check(path: str) -> list[tuple[int, str]]:
         name = call_name(node)
 
         # datetime.now() / .today() with no tz, and utcnow() which never has one.
-        if name.endswith(".utcnow"):
+        # The module is identified by the component right before the method, never by
+        # the start of the dotted name: `import datetime as dt` makes it `dt.datetime.now`,
+        # and a prefix test lets that one through.
+        parts = name.split(".")
+        if parts[-1] == "utcnow":
             found.append((node.lineno, "utcnow() es naive: usa ZoneInfo('Europe/Madrid')"))
-        elif name.split(".")[-1] in NAIVE_NOW and name.startswith("datetime"):
+        elif parts[-1] in NAIVE_NOW and len(parts) >= 2 and parts[-2] in clase_datetime:
             has_tz = bool(node.args) or any(kw.arg == "tz" for kw in node.keywords)
             if not has_tz:
                 found.append((node.lineno, f"{name}() sin zona horaria: usa ZoneInfo('Europe/Madrid')"))
