@@ -29,6 +29,11 @@ def call_name(node: ast.Call) -> str:
         cur = cur.value
     if isinstance(cur, ast.Name):
         parts.append(cur.id)
+    else:
+        # The chain does not start at a plain name: `ZipFile(p).open(n)`, a subscript,
+        # a literal. Without this marker the name collapses to just `open` and the
+        # builtin check fires on a method that does not even take an encoding.
+        parts.append("?")
     return ".".join(reversed(parts))
 
 
@@ -78,7 +83,9 @@ def check(path: str) -> list[tuple[int, str]]:
         # the start of the dotted name: `import datetime as dt` makes it `dt.datetime.now`,
         # and a prefix test lets that one through.
         parts = name.split(".")
-        if parts[-1] == "utcnow":
+        # len >= 2 so a local aware wrapper simply called utcnow() is not flagged:
+        # only `algo.utcnow()` is the naive standard-library one.
+        if parts[-1] == "utcnow" and len(parts) >= 2:
             found.append((node.lineno, "utcnow() es naive: usa ZoneInfo('Europe/Madrid')"))
         elif parts[-1] in NAIVE_NOW and len(parts) >= 2 and parts[-2] in clase_datetime:
             has_tz = bool(node.args) or any(kw.arg == "tz" for kw in node.keywords)
