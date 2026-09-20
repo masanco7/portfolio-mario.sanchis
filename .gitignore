@@ -7,3 +7,8 @@ dist/
 .vscode/
 .idea/
 .legacy/
+
+# Los escribe el auditor en el runner; nunca se commitean.
+veredicto.yml
+diff.patch
+ficheros.txt
