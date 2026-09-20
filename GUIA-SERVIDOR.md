@@ -34,7 +34,7 @@ portfolio.masanco-hub.com.conf) → red edge → portfolio-web:8080
 ```
 
 El vhost del edge vive en `/opt/edge/nginx/conf.d/portfolio.masanco-hub.com.conf`
-(copia en `Pruebas/masanco-hub-edge-casa/`). Solo añade cabeceras de seguridad y
+(copia en `Pruebas/masancoserver/edge/`). Solo añade cabeceras de seguridad y
 hace `proxy_pass`. Las reglas de caché y las rutas ES/EN van dentro de la imagen
 (`deploy/docker/nginx-site.conf`).
 
@@ -309,7 +309,7 @@ Después, en los dos casos:
   conforma con un 200.
 - **No hay nginx en el host.** `deploy/nginx/` (vhost heredado del VPS) se
   borró el 2026-09-17. El vhost real es el del edge
-  (`/opt/edge/nginx/conf.d/`, copia en `Pruebas/masanco-hub-edge-casa/`).
+  (`/opt/edge/nginx/conf.d/`, copia en `Pruebas/masancoserver/edge/`).
 - **El 200 no prueba nada**: comprueba siempre la cadena `Mario Sanchis Colomer`.
 - **Probar desde el puerto no basta.** El salto edge → contenedor es el que se
   rompe en silencio si cambian el nombre del contenedor o la red.

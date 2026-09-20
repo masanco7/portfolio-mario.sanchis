@@ -24,7 +24,7 @@ queda qué es cada fichero y por qué está hecho así.
 
 El vhost que está en uso es el del edge. No está en este repo: vive en
 `/opt/edge/nginx/conf.d/portfolio.masanco-hub.com.conf`, con copia en
-`Pruebas/masanco-hub-edge-casa/`.
+`Pruebas/masancoserver/edge/`.
 
 ## Decisiones de diseño
 
