@@ -1,0 +1,174 @@
+# Comprobaciones del contrato de PR que NO dependen del stack: valen igual en un repo
+# de Angular, de Spring Boot o de scripts de shell. Se copia tal cual a los seis repos
+# del ecosistema; la CI especifica de cada proyecto vive en su propio workflow.
+#
+# Contrato completo: Pruebas/AGENCIA-IA/CONTRATO-PR.md
+#
+# Cada regla de aqui corresponde a una trampa que ya ha mordido en produccion, no a una
+# preferencia de estilo. Todas se probaron contra un repo sano (no dan falso positivo) y
+# contra violaciones deliberadas (detectan de verdad) antes de subirse.
+name: Contrato
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  ecosistema:
+    name: Estándares del ecosistema
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      # Commitear desde Windows pierde el bit +x y systemd responde 203/EXEC al
+      # desplegar. Aparecio en el primer commit de este mismo repo.
+      - name: Bit de ejecución en los scripts
+        run: |
+          fallos=$(git ls-files -s -- '*.sh' | awk '$1!="100755"{print $4}')
+          if [ -n "$fallos" ]; then
+            echo "::error::Estos .sh no estan como 100755. systemd dara 203/EXEC:"
+            echo "$fallos" | sed 's/^/  /'
+            echo "Arreglo: git update-index --chmod=+x <fichero>"
+            exit 1
+          fi
+          echo "Todos los .sh versionados estan en 100755."
+
+      # Un CRLF en un .sh da "bad interpreter: /bin/bash^M"; en una unidad systemd,
+      # un arranque que falla sin decir por que.
+      #
+      # Solo se mira donde el CRLF rompe algo: scripts, unidades y cualquier fichero
+      # con shebang. En un .csv el CRLF es correcto -es el estandar del RFC 4180- y
+      # exigir LF ahi tumbaria Polybot por 67 ficheros de datos sanos. Una regla que
+      # bloquea trabajo correcto acaba desactivada, y entonces no protege de nada.
+      # Se mira el INDICE (git ls-files --eol), no el arbol de trabajo: git en Windows
+      # convierte a CRLF al hacer checkout, asi que mirar los ficheros del disco da un
+      # resultado distinto segun la plataforma y la comprobacion no seria reproducible.
+      - name: Finales de línea LF en ejecutables
+        run: |
+          fallos=$(git ls-files --eol | while IFS= read -r linea; do
+            eol=${linea%%[[:space:]]*}
+            f=${linea#*$'\t'}
+            case "$eol" in i/crlf|i/mixed) ;; *) continue ;; esac
+            case "$f" in *.sh|*.bash|*.service|*.timer) echo "$f"; continue ;; esac
+            # Cualquier otro fichero que se declare ejecutable con un shebang.
+            git show ":$f" 2>/dev/null | head -c 2 | grep -q '#!' && echo "$f"
+          done)
+          if [ -n "$fallos" ]; then
+            echo "::error::Scripts o unidades con CRLF. En Linux esto los rompe:"
+            echo "$fallos" | sed 's/^/  /'
+            echo "Arreglo: .gitattributes con 'text eol=lf' y volver a anadir el fichero."
+            exit 1
+          fi
+          echo "Sin CRLF en scripts, unidades ni ficheros con shebang."
+
+      - name: Codificación UTF-8
+        run: |
+          fallos=""
+          for f in $(git ls-files); do
+            if file --mime-type "$f" | grep -qE 'text/|application/(json|xml|x-sh)'; then
+              iconv -f UTF-8 -t UTF-8 "$f" >/dev/null 2>&1 || fallos="$fallos$f"$'\n'
+            fi
+          done
+          if [ -n "$fallos" ]; then
+            echo "::error::Ficheros de texto que no son UTF-8 valido:"
+            echo "$fallos" | sed 's/^/  /'
+            exit 1
+          fi
+          echo "Todos los ficheros de texto son UTF-8 valido."
+
+  forma:
+    name: Forma del PR
+    # Solo tiene sentido en un PR: en un push directo no hay titulo ni cuerpo.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Título, rama y plantilla
+        # El titulo y el cuerpo los escribe quien abre el PR (manana, Grok). Van por
+        # variables de entorno y NUNCA interpolados dentro del script: interpolarlos
+        # seria inyeccion de comandos en el runner.
+        env:
+          PR_TITULO: ${{ github.event.pull_request.title }}
+          PR_CUERPO: ${{ github.event.pull_request.body }}
+          PR_RAMA: ${{ github.event.pull_request.head.ref }}
+        run: |
+          fallos=0
+          err() { echo "::error::$1"; fallos=1; }
+
+          # Prefijos validos: uno por repo del ecosistema (ver Pruebas/CLAUDE.md).
+          IDS='(PB|GT|FM|IN|PF|IF)-[0-9]{3}'
+
+          printf '%s' "$PR_TITULO" | grep -qE "^$IDS: .+" \
+            || err "El titulo debe ser '<ID>: descripcion', p.ej. 'IF-001: anadir el gate'. Recibido: '$PR_TITULO'"
+
+          printf '%s' "$PR_RAMA" | grep -qE "^$IDS-[a-z0-9-]+$" \
+            || err "La rama debe ser '<ID>-<slug-en-minusculas>'. Recibida: '$PR_RAMA'"
+
+          # La plantilla completa: una seccion vacia es una decision que nadie tomo.
+          while IFS= read -r seccion; do
+            printf '%s' "$PR_CUERPO" | grep -qF "$seccion" \
+              || err "Falta la seccion '$seccion' de la plantilla."
+          done <<'SECCIONES'
+          ## Ticket
+          ## Directriz original del Chairman
+          ## Qué hace este cambio
+          ## Criterios de aceptación
+          ## Alcance
+          ## Clase de cambio
+          ## Tests
+          ## Riesgos y rollback
+          ## Verificación en producción
+          ## Requiere secretos o sudo
+          SECCIONES
+
+          # El requisito menos evidente y el mas importante: sin la directriz literal,
+          # se audita el diff pero no el encargo.
+          printf '%s' "$PR_CUERPO" | grep -qE '^> *[^ [:space:]]' \
+            || err "La directriz original del Chairman esta vacia. Va citada con '>' y literal."
+
+          # "mbar" en vez de "Ambar" a proposito: evita depender del locale del runner.
+          marcadas=$(printf '%s' "$PR_CUERPO" | grep -cE '^- \[[xX]\] .*(Verde|mbar|Rojo)' || true)
+          [ "$marcadas" -eq 1 ] \
+            || err "Marca exactamente una clase de cambio (verde/ambar/rojo). Marcadas: $marcadas"
+
+          [ $fallos -eq 0 ] && echo "El PR cumple la forma del contrato."
+          exit $fallos
+
+      - name: Tamaño del diff
+        env:
+          BASE: ${{ github.event.pull_request.base.ref }}
+        run: |
+          git fetch -q origin "$BASE"
+          lineas=$(git diff --numstat "origin/$BASE...HEAD" -- . \
+            ':!*.lock' ':!package-lock.json' ':!pnpm-lock.yaml' ':!yarn.lock' ':!poetry.lock' \
+            | awk '{a+=$1; b+=$2} END {print a+b+0}')
+          echo "Lineas modificadas (sin ficheros de bloqueo): $lineas"
+          if [ "$lineas" -gt 400 ]; then
+            echo "::error::$lineas lineas modificadas, el limite del contrato son 400."
+            echo "No es rigidez: un PR de 2.000 lineas no se audita, se hojea. Divide el cambio."
+            exit 1
+          fi
+
+  secretos:
+    name: Secretos
+    runs-on: ubuntu-latest
+    # En un PR, gitleaks lista los commits por la API y sin esto responde 403
+    # "Resource not accessible by integration". En un push no hace falta.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          # gitleaks necesita el historial para escanear los commits del PR.
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
