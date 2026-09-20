@@ -47,7 +47,7 @@
 
 - [ ] 🟢 **Verde** — docs, copy/i18n, tests, formateo, bump *patch*
 - [ ] 🟡 **Ámbar** — feature B2C sin tocar auth, BD ni pagos; UI; endpoint nuevo no destructivo
-- [ ] 🔴 **Rojo** — migración de BD, secretos, auth, infra/edge-proxy, sizing o bankroll de Polybot, dependencia *major*, borrado de datos, publicación externa
+- [ ] 🔴 **Rojo** — migración de BD, secretos, auth, infra/edge-proxy, **cambios bajo `.github/`**, sizing o bankroll de Polybot, dependencia *major*, borrado de datos, publicación externa
 
 ## Tests
 
