@@ -29,18 +29,24 @@ def call_name(node: ast.Call) -> str:
         cur = cur.value
     if isinstance(cur, ast.Name):
         parts.append(cur.id)
+    elif isinstance(cur, ast.Call):
+        # A method on a fresh object keeps its constructor: `ZipFile(p).open(n)` becomes
+        # 'ZipFile().open' and `Path(cfg).open()` becomes 'Path().open', so the open()
+        # check can tell a binary archive member from a text file.
+        parts.append(call_name(cur) + "()")
     else:
-        # The chain does not start at a plain name: `ZipFile(p).open(n)`, a subscript,
-        # a literal. Without this marker the name collapses to just `open` and the
-        # builtin check fires on a method that does not even take an encoding.
+        # A subscript, a literal: nothing to tell it by.
         parts.append("?")
     return ".".join(reversed(parts))
 
 
-def literal_mode(node: ast.Call) -> str | None:
-    """The mode argument of open(), when it is a literal we can read."""
-    if len(node.args) >= 2 and isinstance(node.args[1], ast.Constant):
-        value = node.args[1].value
+def literal_mode(node: ast.Call, pos: int = 1) -> str | None:
+    """The mode argument of open(), when it is a literal we can read.
+
+    `pos` is its positional index: 1 for open(file, mode), 0 for Path(...).open(mode).
+    """
+    if len(node.args) > pos and isinstance(node.args[pos], ast.Constant):
+        value = node.args[pos].value
         return value if isinstance(value, str) else None
     for kw in node.keywords:
         if kw.arg == "mode" and isinstance(kw.value, ast.Constant):
@@ -93,8 +99,9 @@ def check(path: str) -> list[tuple[int, str]]:
                 found.append((node.lineno, f"{name}() sin zona horaria: usa ZoneInfo('Europe/Madrid')"))
 
         # open() in text mode without an explicit encoding.
-        elif name == "open":
-            mode = literal_mode(node)
+        # io.open is the builtin; Path(...).open takes an encoding too.
+        elif name in ("open", "io.open") or name.endswith("Path().open"):
+            mode = literal_mode(node, 0 if name.endswith("Path().open") else 1)
             if mode is not None and "b" in mode:
                 continue  # binary: encoding does not apply
             if not any(kw.arg == "encoding" for kw in node.keywords):
