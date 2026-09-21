@@ -47,7 +47,9 @@ jobs:
             case "$base" in
               *.sh) [ "$modo" = "100755" ] || echo "$f" ;;
               *.*)  ;;
-              *)    [ "$(git show ":$f" 2>/dev/null | head -c 2)" = '#!' ]                       && { [ "$modo" = "100755" ] || echo "$f"; } ;;
+              # Un if y no '[ ] && ...': con 'bash -e', un test falso en el ULTIMO fichero seria
+              # el status del bucle y abortaria el paso con 'fallos' vacio.
+              *)    if [ "$(git show ":$f" 2>/dev/null | head -c 2)" = '#!' ] && [ "$modo" != "100755" ]; then echo "$f"; fi ;;
             esac
           done)
           if [ -n "$fallos" ]; then
