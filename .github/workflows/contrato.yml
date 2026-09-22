@@ -78,7 +78,8 @@ jobs:
             case "$eol" in i/crlf|i/mixed) ;; *) continue ;; esac
             case "$f" in *.sh|*.bash|*.service|*.timer) echo "$f"; continue ;; esac
             # Cualquier otro fichero que se declare ejecutable con un shebang.
-            git show ":$f" 2>/dev/null | head -c 2 | grep -q '#!' && echo "$f"
+            # Un if y no '... && echo': el mismo aborto por 'bash -e' que en el paso anterior.
+            if git show ":$f" 2>/dev/null | head -c 2 | grep -q '#!'; then echo "$f"; fi
           done)
           if [ -n "$fallos" ]; then
             echo "::error::Scripts o unidades con CRLF. En Linux esto los rompe:"
