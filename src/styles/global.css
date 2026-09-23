@@ -174,16 +174,9 @@ p, li { text-wrap: pretty; }
 :focus-visible {
   outline: var(--mh-focus-width) solid var(--accent);
   outline-offset: var(--mh-focus-offset);
-  border-radius: 3px;
 }
 
 ::selection { background: var(--accent); color: var(--accent-fg); }
-
-/* Focus ring follows the radius of controls that have one */
-.btn:focus-visible,
-.lang-toggle:focus-visible,
-.theme-toggle:focus-visible,
-.pmodal-close:focus-visible { border-radius: var(--r-md); }
 
 /* =========================================================
    Layout primitives
