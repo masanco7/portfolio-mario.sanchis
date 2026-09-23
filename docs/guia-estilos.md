@@ -18,7 +18,10 @@ La base solo declara variables `--mh-*`: no pinta nada por sí misma. Cada app a
 sus propios tokens a ella, así que el código de los componentes no cambia de nombres.
 
 **La base es una copia idéntica en los cuatro repos.** Si se toca, se tocan las cuatro
-a la vez y se comprueba con `sha256sum` que siguen siendo iguales.
+a la vez (un PR por repo, abiertos en la misma tanda) y se comprueba con
+`git show HEAD:<ruta> | sha256sum` que los cuatro commits dan el mismo hash. La versión va
+en la cabecera del fichero; mientras los PRs de una tanda se mergean, `main` puede llevar
+una versión menos en algún repo, nunca dos.
 
 ## Escalas
 
@@ -47,8 +50,8 @@ a la vez y se comprueba con `sha256sum` que siguen siendo iguales.
    1-3 px en piezas diminutas (barras de progreso, miniaturas, scrollbar).
 2. **Legibilidad.** Ningún texto por debajo de 11 px. Texto a 4.5:1 de contraste como
    mínimo; bordes de controles a 3:1. El texto "tenue" también cumple.
-3. **Todo lo que se pulsa tiene cuatro estados:** hover, pulsado (escala 0.98; 0.94 en la
-   barra de pestañas), foco (`:focus-visible`, anillo del acento de 2 px con 2 px de
+3. **Todo lo que se pulsa tiene cuatro estados:** hover, pulsado (`--mh-press-scale`, 0.97;
+   `--mh-press-scale-tab`, 0.92, en la barra de pestañas), foco (`:focus-visible`, anillo del acento de 2 px con 2 px de
    separación) y desactivado (opacidad 0.5 y cursor `not-allowed`).
 4. **Profundidad por niveles, nunca decorativa.** Botones, campos y controles son planos.
    Las tarjetas descansan en `elev-1` (casi imperceptible), los popovers en `elev-2`, y solo

@@ -1,5 +1,5 @@
 /* =========================================================
-   masanco-hub foundation - v2 (2026-09-23)
+   masanco-hub foundation - v2.2 (2026-09-24)
 
    Shared by portfolio, finance-manager, gym-tracker and polybot. This file is
    an IDENTICAL copy in the four repos: change all four together (same bytes,
@@ -126,6 +126,7 @@
   --mh-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --mh-ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
   --mh-press-scale: 0.97;
+  --mh-press-scale-tab: 0.92;     /* tab bar items: small targets, deeper squeeze */
   --mh-dur-press: 80ms;           /* the squeeze while pressed */
   --mh-dur-sheet: 420ms;          /* sheets and dialogs on --mh-ease-sheet */
 
