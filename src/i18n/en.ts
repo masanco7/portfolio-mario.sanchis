@@ -20,6 +20,7 @@ export const ui: UiStrings = {
     themeToggleLight: 'Switch to light mode',
     langToggleAria: 'Cambiar a español',
     langToggleLabel: 'ES',
+    skipToContent: 'Skip to content',
     skipToTop: '↑ top',
   },
   hero: {

@@ -18,6 +18,7 @@ export const ui = {
     themeToggleLight: 'Cambiar a modo claro',
     langToggleAria: 'Switch to English',
     langToggleLabel: 'EN',
+    skipToContent: 'Saltar al contenido',
     skipToTop: '↑ subir',
   },
   hero: {
