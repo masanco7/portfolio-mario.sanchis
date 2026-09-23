@@ -50,8 +50,9 @@ a la vez y se comprueba con `sha256sum` que siguen siendo iguales.
 3. **Todo lo que se pulsa tiene cuatro estados:** hover, pulsado (escala 0.98; 0.94 en la
    barra de pestañas), foco (`:focus-visible`, anillo del acento de 2 px con 2 px de
    separación) y desactivado (opacidad 0.5 y cursor `not-allowed`).
-4. **Plano por defecto.** Sombra solo para lo que flota: hojas, diálogos, barras flotantes,
-   botón flotante.
+4. **Profundidad por niveles, nunca decorativa.** Botones, campos y controles son planos.
+   Las tarjetas descansan en `elev-1` (casi imperceptible), los popovers en `elev-2`, y solo
+   lo que flota (hojas, diálogos, barras flotantes, botón flotante) llega a `elev-3`.
 5. **Estados semánticos iguales en todas las apps:** `--mh-success`, `warning`, `danger`,
    `info`, en su variante `-light` en tema claro y `-dark` en tema oscuro. Los fondos
    tintados se derivan con `color-mix(... 12-15%, transparent)` y los bordes al 40 %.
