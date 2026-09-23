@@ -1,6 +1,6 @@
 # Guía de estilos
 
-Sistema visual común de masanco-hub (v1, 2026-09-23). Lo comparten **polybot,
+Sistema visual común de masanco-hub (base v2.2, 2026-09-24). Lo comparten **polybot,
 finance-manager, gym-tracker y el portfolio**. Integras queda fuera a propósito: es
 una herramienta B2B con identidad propia (plana, sin animaciones).
 
