@@ -62,6 +62,25 @@ a la vez y se comprueba con `sha256sum` que siguen siendo iguales.
 9. **Nunca `transition: all`**: anima también el layout. Se listan las propiedades
    (color, fondo, borde, sombra, transform, opacidad).
 
+## Acabado nivel Apple (base v2)
+
+La v2 de la base añade lo que separa una app correcta de una app de primera:
+
+- **Títulos grandes.** `--mh-fs-large-title` (34 px) con `--mh-tracking-large`. El
+  tracking se estrecha cuanto más grande es el texto (`large` < `title` < `body` <
+  `caption`): es el ajuste óptico que hace SF Pro y que Inter no hace solo.
+- **Profundidad por capas, no por líneas.** Tarjetas en `elev-1`, popovers en `elev-2`,
+  hojas, diálogos y botón flotante en `elev-3`. En claro son sombras suaves de dos capas;
+  en oscuro, un brillo superior de 1 px, porque la sombra no se ve sobre negro. Los bordes
+  pasan a filete (`--hairline`) y dejan de dibujar la interfaz.
+- **Materiales.** Cabeceras, barras de pestañas y hojas: `color-mix(superficie
+  --mh-material-mix, transparent)` + `--mh-material-filter`. Nunca en el contenido.
+- **Física.** Las hojas entran con `--mh-ease-sheet` (la curva de iOS); pulsaciones,
+  interruptores y pestañas vuelven con `--mh-ease-spring` (un rebote mínimo). Al pulsar,
+  escala `--mh-press-scale` en 80 ms; al soltar, muelle en `--mh-dur-base`.
+- **Controles de sistema.** Segmentado con pista tintada y "pulgar" blanco elevado;
+  interruptor con muelle; áreas táctiles de 44 px.
+
 **Base en este repo:** `src/styles/masanco-foundation.css`.
 
 ## Esta app: portfolio
