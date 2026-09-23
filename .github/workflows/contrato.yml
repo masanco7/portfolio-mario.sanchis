@@ -26,16 +26,39 @@ jobs:
 
       # Commitear desde Windows pierde el bit +x y systemd responde 203/EXEC al
       # desplegar. Aparecio en el primer commit de este mismo repo.
-      - name: Bit de ejecución en los scripts
+      #
+      # Se miran los *.sh y, ademas, los ficheros SIN extension que se declaran
+      # ejecutables con un shebang: mvnw, gradlew, hooks. Esos no entran por '*.sh' y
+      # son justo los que se escaparon -backend/mvnw en finance-manager tumbo los dos
+      # jobs de backend con 'Permission denied'-.
+      #
+      # No se extiende a todo fichero con shebang: en Polybot hay 45 modulos .py con
+      # shebang que se importan y nunca se ejecutan. Marcarlos bloquearia el repo entero
+      # por nada, y una regla que bloquea trabajo correcto acaba desactivada.
+      - name: Bit de ejecución en scripts y wrappers
         run: |
-          fallos=$(git ls-files -s -- '*.sh' | awk '$1!="100755"{print $4}')
+          fallos=$(git ls-files -s | while IFS= read -r linea; do
+            modo=${linea%% *}
+            f=${linea#*$'	'}
+            # Sobre el nombre, no sobre la ruta: '*.*' contra la ruta completa casa con
+            # cualquier directorio que lleve un punto, y se saltaria en silencio un
+            # .husky/pre-commit o cualquier script sin extension bajo .github/.
+            base=${f##*/}
+            case "$base" in
+              *.sh) [ "$modo" = "100755" ] || echo "$f" ;;
+              *.*)  ;;
+              # Un if y no '[ ] && ...': con 'bash -e', un test falso en el ULTIMO fichero seria
+              # el status del bucle y abortaria el paso con 'fallos' vacio.
+              *)    if [ "$(git show ":$f" 2>/dev/null | head -c 2)" = '#!' ] && [ "$modo" != "100755" ]; then echo "$f"; fi ;;
+            esac
+          done)
           if [ -n "$fallos" ]; then
-            echo "::error::Estos .sh no estan como 100755. systemd dara 203/EXEC:"
+            echo "::error::Estos scripts no estan como 100755. systemd dara 203/EXEC, y un wrapper como mvnw, 'Permission denied':"
             echo "$fallos" | sed 's/^/  /'
             echo "Arreglo: git update-index --chmod=+x <fichero>"
             exit 1
           fi
-          echo "Todos los .sh versionados estan en 100755."
+          echo "Scripts y wrappers versionados: todos en 100755."
 
       # Un CRLF en un .sh da "bad interpreter: /bin/bash^M"; en una unidad systemd,
       # un arranque que falla sin decir por que.
@@ -55,7 +78,8 @@ jobs:
             case "$eol" in i/crlf|i/mixed) ;; *) continue ;; esac
             case "$f" in *.sh|*.bash|*.service|*.timer) echo "$f"; continue ;; esac
             # Cualquier otro fichero que se declare ejecutable con un shebang.
-            git show ":$f" 2>/dev/null | head -c 2 | grep -q '#!' && echo "$f"
+            # Un if y no '... && echo': el mismo aborto por 'bash -e' que en el paso anterior.
+            if git show ":$f" 2>/dev/null | head -c 2 | grep -q '#!'; then echo "$f"; fi
           done)
           if [ -n "$fallos" ]; then
             echo "::error::Scripts o unidades con CRLF. En Linux esto los rompe:"
@@ -64,6 +88,11 @@ jobs:
             exit 1
           fi
           echo "Sin CRLF en scripts, unidades ni ficheros con shebang."
+
+      # Sobre el AST, no con una regex: una regex marca los comentarios y docstrings
+      # que *hablan* de la regla. Polybot tiene tres de esos y cero usos reales.
+      - name: Estándares de Python
+        run: python3 .github/scripts/check-python.py
 
       - name: Codificación UTF-8
         run: |
