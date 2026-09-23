@@ -44,7 +44,11 @@ jobs:
           BASE: ${{ github.event.pull_request.base.ref }}
         run: |
           git fetch -q origin "$BASE"
-          git diff "origin/$BASE...HEAD" > diff.patch
+          # Los lockfiles fuera del diff: son miles de lineas generadas que el modelo
+          # intenta leer y agotan los turnos (finance-manager#4 murio tres veces asi,
+          # 31-37 de 30) sin nada que auditar. Siguen en ficheros.txt, asi que el
+          # auditor sabe que cambiaron. '*' delante para que case en subdirectorios.
+          git diff "origin/$BASE...HEAD" -- . ':!*.lock' ':!*package-lock.json' ':!*pnpm-lock.yaml' > diff.patch
           git diff --stat "origin/$BASE...HEAD" | tee ficheros.txt
           wc -l diff.patch
 

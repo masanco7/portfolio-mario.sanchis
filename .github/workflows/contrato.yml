@@ -175,8 +175,10 @@ jobs:
           BASE: ${{ github.event.pull_request.base.ref }}
         run: |
           git fetch -q origin "$BASE"
+          # Con '*' delante: un pathspec sin comodin solo casa en la raiz, y
+          # ':!package-lock.json' dejaba contar frontend/package-lock.json entero.
           lineas=$(git diff --numstat "origin/$BASE...HEAD" -- . \
-            ':!*.lock' ':!package-lock.json' ':!pnpm-lock.yaml' ':!yarn.lock' ':!poetry.lock' \
+            ':!*.lock' ':!*package-lock.json' ':!*pnpm-lock.yaml' \
             | awk '{a+=$1; b+=$2} END {print a+b+0}')
           echo "Lineas modificadas (sin ficheros de bloqueo): $lineas"
           if [ "$lineas" -gt 400 ]; then
