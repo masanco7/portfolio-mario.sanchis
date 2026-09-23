@@ -126,6 +126,8 @@
   --mh-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
   --mh-ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
   --mh-press-scale: 0.97;
+  --mh-dur-press: 80ms;           /* the squeeze while pressed */
+  --mh-dur-sheet: 420ms;          /* sheets and dialogs on --mh-ease-sheet */
 
   /* Reading measure */
   --mh-measure: 68ch;

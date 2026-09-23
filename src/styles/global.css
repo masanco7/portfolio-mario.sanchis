@@ -498,7 +498,7 @@ p, li { text-wrap: pretty; }
     color var(--dur-fast) ease, transform var(--mh-dur-base) var(--mh-ease-spring);
   white-space: nowrap;
 }
-.btn:active { transform: scale(var(--mh-press-scale)); transition-duration: 80ms; }
+.btn:active { transform: scale(var(--mh-press-scale)); transition-duration: var(--mh-dur-press); }
 .btn .arrow { transition: transform 0.15s ease; }
 .btn:hover .arrow { transform: translate(2px, -2px); }
 
@@ -1029,7 +1029,7 @@ p, li { text-wrap: pretty; }
 .pmodal::backdrop {
   transition:
     opacity 0.26s ease,
-    transform 0.42s var(--mh-ease-sheet),
+    transform var(--mh-dur-sheet) var(--mh-ease-sheet),
     overlay 0.26s allow-discrete,
     display 0.26s allow-discrete;
 }
