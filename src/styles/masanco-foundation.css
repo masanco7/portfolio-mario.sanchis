@@ -1,0 +1,95 @@
+/* =========================================================
+   masanco-hub foundation - v1 (2026-09-23)
+
+   Shared by portfolio, finance-manager, gym-tracker and polybot. This file is
+   an IDENTICAL copy in the four repos: change all four together (same bytes,
+   compare with `sha256sum`). Guide: docs/guia-estilos.md in each repo.
+
+   What is shared: type scale, spacing, radii by role, control sizes, motion,
+   focus ring, layers and the matte status palette.
+   What stays per app (the brand): the palette (accent, surfaces, text) and the
+   typeface family. Each app maps its own tokens onto these.
+
+   Only custom properties here: no selectors that style elements, so importing
+   it changes nothing until an app points its tokens at it.
+   ========================================================= */
+:root {
+  /* Type families (finance keeps IBM Plex as its brand typeface) */
+  --mh-font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mh-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Type scale. 11px is the floor for any text; 17px is the reading size of
+     long prose (portfolio). Display sizes above 32px are fluid per app. */
+  --mh-fs-2xs: 11px;
+  --mh-fs-xs: 12px;
+  --mh-fs-sm: 13px;
+  --mh-fs-md: 14px;
+  --mh-fs-lg: 16px;
+  --mh-fs-reading: 17px;
+  --mh-fs-xl: 18px;
+  --mh-fs-2xl: 22px;
+  --mh-fs-3xl: 26px;
+  --mh-fs-4xl: 32px;
+  --mh-fs-display: 48px;
+
+  --mh-lh-tight: 1.1;
+  --mh-lh-snug: 1.3;
+  --mh-lh-base: 1.45;
+  --mh-lh-loose: 1.65;
+
+  /* Uppercase mono labels and large headings */
+  --mh-tracking-label: 0.06em;
+  --mh-tracking-tight: -0.02em;
+
+  /* Spacing: 4px base */
+  --mh-space-1: 4px;
+  --mh-space-2: 8px;
+  --mh-space-3: 12px;
+  --mh-space-4: 16px;
+  --mh-space-5: 24px;
+  --mh-space-6: 32px;
+  --mh-space-7: 48px;
+  --mh-space-8: 64px;
+  --mh-space-9: 96px;
+  --mh-space-10: 128px;
+
+  /* Radii by role, not by size */
+  --mh-radius-tag: 6px;      /* chips, badges, code */
+  --mh-radius-control: 10px; /* buttons, inputs, nav pills */
+  --mh-radius-card: 14px;    /* cards, panels */
+  --mh-radius-sheet: 20px;   /* sheets, dialogs, floating bars */
+  --mh-radius-pill: 999px;
+
+  /* Control sizes */
+  --mh-control-h: 40px;
+  --mh-control-h-sm: 32px;
+  --mh-touch: 44px;          /* minimum tap target on touch screens */
+
+  /* Motion */
+  --mh-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --mh-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --mh-dur-fast: 150ms;      /* hover, press, colour */
+  --mh-dur-base: 250ms;      /* sheets, dialogs, reveals */
+  --mh-dur-slow: 500ms;      /* progress bars, charts */
+
+  /* Focus ring: always the app accent, never removed without a replacement */
+  --mh-focus-width: 2px;
+  --mh-focus-offset: 2px;
+
+  /* Layers */
+  --mh-z-nav: 50;
+  --mh-z-overlay: 100;
+  --mh-z-toast: 200;
+
+  /* Matte status palette. Same hues in every app; each app picks the -light
+     or -dark variant inside its own theme blocks. All clear 4.5:1 on that
+     theme's card surface. */
+  --mh-success-light: #5c7a5e;
+  --mh-success-dark: #7a9a7c;
+  --mh-warning-light: #9a6b3a;
+  --mh-warning-dark: #c79a52;
+  --mh-danger-light: #a85d52;
+  --mh-danger-dark: #c77a6e;
+  --mh-info-light: #4a6c8c;
+  --mh-info-dark: #6b93c4;
+}

@@ -10,6 +10,15 @@
       root.removeAttribute('data-theme');
     }
     updateToggleState();
+    syncThemeColor();
+  }
+
+  function syncThemeColor() {
+    const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
+    if (!bg) return;
+    document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+      m.setAttribute('content', bg);
+    });
   }
 
   function getEffectiveTheme() {
@@ -30,6 +39,7 @@
 
   // Init from storage (set early via inline script in <head>; this just reflects state)
   updateToggleState();
+  if (root.hasAttribute('data-theme')) syncThemeColor();
 
   document.addEventListener('click', function (e) {
     const btn = e.target.closest('.theme-toggle');
