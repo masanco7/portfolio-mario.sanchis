@@ -55,6 +55,7 @@
   --fg-faint: #686e77;
   --border: #e5e5e2;
   --border-strong: #d0d0cc;
+  --hairline: color-mix(in srgb, var(--border) 70%, transparent);
 
   --accent: oklch(0.55 0.16 250);
   --accent-hover: oklch(0.48 0.17 250);
@@ -175,6 +176,12 @@ p, li { text-wrap: pretty; }
   outline: var(--mh-focus-width) solid var(--accent);
   outline-offset: var(--mh-focus-offset);
 }
+
+/* The ring follows each control's own shape */
+.btn:focus-visible,
+.lang-toggle:focus-visible,
+.theme-toggle:focus-visible,
+.pmodal-close:focus-visible { border-radius: var(--r-md); }
 
 ::selection { background: var(--accent); color: var(--accent-fg); }
 
@@ -571,7 +578,7 @@ p, li { text-wrap: pretty; }
 /* Trailhead block */
 .trailhead {
   background: var(--bg-elev);
-  border: 1px solid var(--border);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-xl);
   padding: var(--sp-6);
   margin-bottom: var(--sp-7);
@@ -704,7 +711,7 @@ p, li { text-wrap: pretty; }
 /* Experience */
 .experience {
   background: var(--bg-elev);
-  border: 1px solid var(--border);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-xl);
   box-shadow: var(--shadow-sm);
   padding: var(--sp-6);
@@ -806,7 +813,7 @@ p, li { text-wrap: pretty; }
 }
 .project {
   background: var(--bg-elev);
-  border: 1px solid var(--border);
+  border: 1px solid var(--hairline);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
