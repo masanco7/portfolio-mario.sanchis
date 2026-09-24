@@ -1,6 +1,6 @@
 # Guía de estilos
 
-Sistema visual común de masanco-hub (v1, 2026-09-23). Lo comparten **polybot,
+Sistema visual común de masanco-hub (base v2.2, 2026-09-24). Lo comparten **polybot,
 finance-manager, gym-tracker y el portfolio**. Integras queda fuera a propósito: es
 una herramienta B2B con identidad propia (plana, sin animaciones).
 
@@ -18,7 +18,10 @@ La base solo declara variables `--mh-*`: no pinta nada por sí misma. Cada app a
 sus propios tokens a ella, así que el código de los componentes no cambia de nombres.
 
 **La base es una copia idéntica en los cuatro repos.** Si se toca, se tocan las cuatro
-a la vez y se comprueba con `sha256sum` que siguen siendo iguales.
+a la vez (un PR por repo, abiertos en la misma tanda) y se comprueba con
+`git show HEAD:<ruta> | sha256sum` que los cuatro commits dan el mismo hash. La versión va
+en la cabecera del fichero; mientras los PRs de una tanda se mergean, `main` puede llevar
+una versión menos en algún repo, nunca dos.
 
 ## Escalas
 
@@ -47,11 +50,14 @@ a la vez y se comprueba con `sha256sum` que siguen siendo iguales.
    1-3 px en piezas diminutas (barras de progreso, miniaturas, scrollbar).
 2. **Legibilidad.** Ningún texto por debajo de 11 px. Texto a 4.5:1 de contraste como
    mínimo; bordes de controles a 3:1. El texto "tenue" también cumple.
-3. **Todo lo que se pulsa tiene cuatro estados:** hover, pulsado (escala 0.98; 0.94 en la
-   barra de pestañas), foco (`:focus-visible`, anillo del acento de 2 px con 2 px de
+3. **Todo lo que se pulsa tiene cuatro estados:** hover, pulsado (`--mh-press-scale`, 0.97;
+   `--mh-press-scale-tab`, 0.92, en la barra de pestañas), foco (`:focus-visible`, anillo del acento de 2 px con 2 px de
    separación) y desactivado (opacidad 0.5 y cursor `not-allowed`).
-4. **Plano por defecto.** Sombra solo para lo que flota: hojas, diálogos, barras flotantes,
-   botón flotante.
+4. **Profundidad por niveles, nunca decorativa.** Botones, campos y controles son planos.
+   Las tarjetas descansan en `elev-1` (casi imperceptible), los popovers en `elev-2`, y solo
+   lo que flota (hojas, diálogos, barras flotantes, botón flotante) llega a `elev-3`.
+   Excepción deliberada: los "pulgares" del segmentado y del interruptor llevan `elev-1`,
+   porque se deslizan por encima de su pista.
 5. **Estados semánticos iguales en todas las apps:** `--mh-success`, `warning`, `danger`,
    `info`, en su variante `-light` en tema claro y `-dark` en tema oscuro. Los fondos
    tintados se derivan con `color-mix(... 12-15%, transparent)` y los bordes al 40 %.
@@ -61,6 +67,25 @@ a la vez y se comprueba con `sha256sum` que siguen siendo iguales.
 8. **Movimiento reducido:** todo respeta `prefers-reduced-motion`.
 9. **Nunca `transition: all`**: anima también el layout. Se listan las propiedades
    (color, fondo, borde, sombra, transform, opacidad).
+
+## Acabado nivel Apple (base v2)
+
+La v2 de la base añade lo que separa una app correcta de una app de primera:
+
+- **Títulos grandes.** `--mh-fs-large-title` (34 px) con `--mh-tracking-large`. El
+  tracking se estrecha cuanto más grande es el texto (`large` < `title` < `body` <
+  `caption`): es el ajuste óptico que hace SF Pro y que Inter no hace solo.
+- **Profundidad por capas, no por líneas.** Tarjetas en `elev-1`, popovers en `elev-2`,
+  hojas, diálogos y botón flotante en `elev-3`. En claro son sombras suaves de dos capas;
+  en oscuro, un brillo superior de 1 px, porque la sombra no se ve sobre negro. Los bordes
+  pasan a filete (`--hairline`) y dejan de dibujar la interfaz.
+- **Materiales.** Cabeceras, barras de pestañas y hojas: `color-mix(superficie
+  --mh-material-mix, transparent)` + `--mh-material-filter`. Nunca en el contenido.
+- **Física.** Las hojas entran con `--mh-ease-sheet` (la curva de iOS); pulsaciones,
+  interruptores y pestañas vuelven con `--mh-ease-spring` (un rebote mínimo). Al pulsar,
+  escala `--mh-press-scale` en 80 ms; al soltar, muelle en `--mh-dur-base`.
+- **Controles de sistema.** Segmentado con pista tintada y "pulgar" blanco elevado;
+  interruptor con muelle; áreas táctiles de 44 px.
 
 **Base en este repo:** `src/styles/masanco-foundation.css`.
 

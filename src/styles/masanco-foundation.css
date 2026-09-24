@@ -1,5 +1,5 @@
 /* =========================================================
-   masanco-hub foundation - v1 (2026-09-23)
+   masanco-hub foundation - v2.2 (2026-09-24)
 
    Shared by portfolio, finance-manager, gym-tracker and polybot. This file is
    an IDENTICAL copy in the four repos: change all four together (same bytes,
@@ -92,4 +92,44 @@
   --mh-danger-dark: #c77a6e;
   --mh-info-light: #4a6c8c;
   --mh-info-dark: #6b93c4;
+
+  /* ---- v2: Apple-grade finish ---- */
+
+  /* Large titles: big, tight and heavy; hierarchy from size and weight, not colour */
+  --mh-fs-large-title: 34px;
+  --mh-lh-large-title: 1.12;
+  --mh-fw-regular: 400;
+  --mh-fw-medium: 500;
+  --mh-fw-semibold: 600;
+  --mh-fw-bold: 700;
+  /* Tracking shrinks as size grows (optical sizing by hand) */
+  --mh-tracking-large: -0.025em;  /* 26px and up */
+  --mh-tracking-title: -0.015em;  /* 18-22px */
+  --mh-tracking-body: -0.006em;   /* 13-17px */
+  --mh-tracking-caption: 0.01em;  /* 11-12px */
+
+  /* Depth by layers instead of lines. Light surfaces use soft two-layer
+     shadows; dark surfaces lift with a top highlight, since shadows vanish
+     on black. */
+  --mh-elev-1-light: 0 1px 2px rgba(16, 18, 24, 0.04), 0 1px 3px rgba(16, 18, 24, 0.04);
+  --mh-elev-2-light: 0 2px 6px rgba(16, 18, 24, 0.04), 0 8px 24px rgba(16, 18, 24, 0.06);
+  --mh-elev-3-light: 0 8px 20px rgba(16, 18, 24, 0.08), 0 24px 56px rgba(16, 18, 24, 0.12);
+  --mh-elev-1-dark: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --mh-elev-2-dark: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --mh-elev-3-dark: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 56px rgba(0, 0, 0, 0.6);
+
+  /* Materials: translucent chrome (headers, tab bars, sheets), never content */
+  --mh-material-filter: saturate(180%) blur(20px);
+  --mh-material-mix: 72%;         /* surface share in color-mix(... transparent) */
+
+  /* Motion with physics: iOS sheet curve and a gentle spring with overshoot */
+  --mh-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --mh-ease-spring: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --mh-press-scale: 0.97;
+  --mh-press-scale-tab: 0.92;     /* tab bar items: small targets, deeper squeeze */
+  --mh-dur-press: 80ms;           /* the squeeze while pressed */
+  --mh-dur-sheet: 420ms;          /* sheets and dialogs on --mh-ease-sheet */
+
+  /* Reading measure */
+  --mh-measure: 68ch;
 }
