@@ -4,11 +4,11 @@
 # Criterio de auditoria: .github/AUDITORIA.md, versionado para que quien produce el
 # codigo pueda leer con que se le va a juzgar.
 #
-# Permisos: NO lleva `contents: write`. El auditor puede bloquear y no puede mergear —
+# Permisos: NO lleva `contents: write`. El auditor puede bloquear y no puede mergear â€”
 # esa capacidad vive en la proteccion de rama, fuera del alcance de cualquier modelo.
 # El cuerpo del PR lo escribe quien lo abre, asi que para el modelo es dato no confiable;
 # si la capacidad de mergear estuviera a su alcance, bastaria con pedirsela en el PR.
-name: Auditoría
+name: AuditorÃ­a
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   auditoria:
-    name: Auditoría del código
+    name: AuditorÃ­a del cÃ³digo
     # Un borrador todavia no pide opinion.
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
