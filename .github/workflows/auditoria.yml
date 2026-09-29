@@ -81,7 +81,7 @@ jobs:
           # las herramientas que necesita: leer, buscar, escribir el veredicto y comentar
           # inline. Sin Bash, que es lo que intentaba usar. La MCP de comentarios solo se
           # arranca si se nombra aqui.
-          claude_args: --model claude-sonnet-5 --max-turns 60 --permission-mode acceptEdits --allowedTools "Read,Grep,Glob,Write,mcp__github_inline_comment__create_inline_comment"
+          claude_args: --model claude-sonnet-5-5 --max-turns 60 --permission-mode acceptEdits --allowedTools "Read,Grep,Glob,Write,mcp__github_inline_comment__create_inline_comment"
 
       - name: Aplicar el veredicto
         # Si el auditor no dejo veredicto, el check queda rojo. Ante la duda el sistema
