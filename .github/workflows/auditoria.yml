@@ -4,11 +4,11 @@
 # Criterio de auditoria: .github/AUDITORIA.md, versionado para que quien produce el
 # codigo pueda leer con que se le va a juzgar.
 #
-# Permisos: NO lleva `contents: write`. El auditor puede bloquear y no puede mergear â€”
+# Permisos: NO lleva `contents: write`. El auditor puede bloquear y no puede mergear —
 # esa capacidad vive en la proteccion de rama, fuera del alcance de cualquier modelo.
 # El cuerpo del PR lo escribe quien lo abre, asi que para el modelo es dato no confiable;
 # si la capacidad de mergear estuviera a su alcance, bastaria con pedirsela en el PR.
-name: AuditorÃ­a
+name: Auditoría
 
 on:
   pull_request:
@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   auditoria:
-    name: AuditorÃ­a del cÃ³digo
+    name: Auditoría del código
     # Un borrador todavia no pide opinion.
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
@@ -81,7 +81,7 @@ jobs:
           # las herramientas que necesita: leer, buscar, escribir el veredicto y comentar
           # inline. Sin Bash, que es lo que intentaba usar. La MCP de comentarios solo se
           # arranca si se nombra aqui.
-          claude_args: --model claude-sonnet-5 --max-turns 60 --permission-mode acceptEdits --allowedTools "Read,Grep,Glob,Write,mcp__github_inline_comment__create_inline_comment"
+          claude_args: --model claude-sonnet-5-5 --max-turns 60 --permission-mode acceptEdits --allowedTools "Read,Grep,Glob,Write,mcp__github_inline_comment__create_inline_comment"
 
       - name: Aplicar el veredicto
         # Si el auditor no dejo veredicto, el check queda rojo. Ante la duda el sistema
