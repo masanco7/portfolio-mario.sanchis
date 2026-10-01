@@ -8,6 +8,11 @@
 # esa capacidad vive en la proteccion de rama, fuera del alcance de cualquier modelo.
 # El cuerpo del PR lo escribe quien lo abre, asi que para el modelo es dato no confiable;
 # si la capacidad de mergear estuviera a su alcance, bastaria con pedirsela en el PR.
+#
+# Rondas: la primera auditoria de un PR es completa. Las siguientes reciben el veredicto
+# anterior y el diff desde entonces, y solo comprueban los criterios de reapertura
+# (contrato, seccion 8). Sin esto cada push se auditaba desde cero y los hallazgos salian
+# de uno en uno: GT-025 necesito cinco rondas para seis hallazgos distintos.
 name: Auditoría
 
 on:
@@ -32,6 +37,9 @@ jobs:
       pull-requests: read
       issues: read
       id-token: write
+      actions: read   # leer el veredicto de la ronda anterior, guardado como artefacto
+    outputs:
+      pendientes: ${{ steps.veredicto.outputs.pendientes }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -52,6 +60,68 @@ jobs:
           git diff --stat "origin/$BASE...HEAD" | tee ficheros.txt
           wc -l diff.patch
 
+      # Los ficheros con los que trabaja el auditor los escribe este paso, nunca el PR.
+      # Un PR que trajera su propio veredicto.yml lo dejaria como aprobado el dia que
+      # el auditor muriese antes de escribir el suyo; por eso se borran antes de nada.
+      - name: Preparar la ronda
+        id: ronda
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          rm -rf veredicto.yml veredicto-anterior.yml diff-incremental.patch ronda.md anterior artefacto
+          ronda=1
+
+          # La ronda anterior de ESTE PR que dejo veredicto. Una ronda cancelada o un
+          # auditor que murio no dejan artefacto, y se saltan.
+          ids=$(gh api -X GET "repos/$REPO/actions/workflows/auditoria.yml/runs" \
+                  -f branch="$HEAD_REF" -f event=pull_request -f status=completed -f per_page=15 \
+                  -q ".workflow_runs[] | select(.id != $RUN_ID) | .id" || true)
+          for id in $ids; do
+            rm -rf anterior
+            gh run download "$id" -R "$REPO" -n auditoria -D anterior 2>/dev/null || continue
+            [ -f anterior/veredicto.yml ] && [ -f anterior/meta ] || continue
+            pr_ant=$(sed -n 's/^pr=\([0-9]\{1,9\}\)$/\1/p' anterior/meta)
+            ronda_ant=$(sed -n 's/^ronda=\([0-9]\{1,3\}\)$/\1/p' anterior/meta)
+            sha_ant=$(sed -n 's/^sha=\([0-9a-f]\{40\}\)$/\1/p' anterior/meta)
+            # El mismo nombre de rama en otro PR no es la ronda anterior de este.
+            [ "$pr_ant" = "$PR" ] && [ -n "$ronda_ant" ] && [ -n "$sha_ant" ] || continue
+            # Tras un force-push el commit anterior ya no es antecesor: no hay diff
+            # incremental fiable y la ronda vuelve a ser completa.
+            if git merge-base --is-ancestor "$sha_ant" "$HEAD_SHA" 2>/dev/null; then
+              cp anterior/veredicto.yml veredicto-anterior.yml
+              git diff "$sha_ant" "$HEAD_SHA" -- . ':!*.lock' ':!*package-lock.json' ':!*pnpm-lock.yaml' > diff-incremental.patch
+              ronda=$((ronda_ant + 1))
+            fi
+            break
+          done
+          rm -rf anterior
+
+          if [ "$ronda" -eq 1 ]; then
+            {
+              echo "RONDA 1: pasada completa."
+              echo
+              echo "Es la unica pasada completa que tendra este PR. En las siguientes solo se"
+              echo "comprobara lo que senales ahora, asi que recorre diff.patch fichero a fichero"
+              echo "y lista TODOS los hallazgos de severidad media o superior, no el primero."
+            } > ronda.md
+          else
+            {
+              echo "RONDA $ronda: reapertura."
+              echo
+              echo "veredicto-anterior.yml es tu veredicto de la ronda anterior."
+              echo "diff-incremental.patch es lo que ha cambiado desde entonces."
+              echo
+              echo "Sigue la seccion 'Rondas de reapertura' de .github/AUDITORIA.md."
+            } > ronda.md
+          fi
+          cat ronda.md
+          echo "ronda=$ronda" >> "$GITHUB_OUTPUT"
+
       - uses: anthropics/claude-code-action@v1
         # The action marks the step failed when it runs out of turns, even if the
         # auditor already wrote an APPROVE veredicto.yml. The gate is the next step,
@@ -64,7 +134,8 @@ jobs:
           show_full_output: true
           prompt: |
             Audita este pull request siguiendo .github/AUDITORIA.md al pie de la letra.
-            Empieza leyendo ese fichero.
+            Empieza leyendo ese fichero y despues ronda.md, que dice que ronda es y que
+            te toca en ella.
 
             El diff completo esta en diff.patch y el resumen de ficheros en ficheros.txt.
             Lee tambien los ficheros del repositorio que necesites para entender el cambio.
@@ -84,20 +155,91 @@ jobs:
           claude_args: --model claude-sonnet-5-5 --max-turns 60 --permission-mode acceptEdits --allowedTools "Read,Grep,Glob,Write,mcp__github_inline_comment__create_inline_comment"
 
       - name: Aplicar el veredicto
+        id: veredicto
         # Si el auditor no dejo veredicto, el check queda rojo. Ante la duda el sistema
         # espera: un fallo del auditor no es una aprobacion.
+        env:
+          RONDA: ${{ steps.ronda.outputs.ronda }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           if [ ! -f veredicto.yml ]; then
             echo "::error::El auditor no dejo veredicto.yml. Sin veredicto no hay aprobacion."
             exit 1
           fi
-          echo "--- veredicto.yml ---"
+          echo "--- veredicto.yml (ronda $RONDA) ---"
           cat veredicto.yml
           echo "---------------------"
+
+          # Lo que la ronda siguiente necesita para no empezar de cero.
+          mkdir -p artefacto
+          cp veredicto.yml artefacto/veredicto.yml
+          printf 'pr=%s\nronda=%s\nsha=%s\n' "$PR" "$RONDA" "$HEAD_SHA" > artefacto/meta
+
+          # Hay pendientes si bajo la clave `pendientes:` aparece al menos un elemento.
+          # Un elemento de lista puede ir sin sangria: una linea que empieza por '-' no
+          # cierra el bloque; cualquier otra clave de primer nivel, si.
+          if awk '/^pendientes:/{d=1;next} /^[^[:space:]#-]/{d=0} d && /^[[:space:]]*-[[:space:]]/{f=1} END{exit f?0:1}' veredicto.yml; then
+            echo "pendientes=si" >> "$GITHUB_OUTPUT"
+          else
+            echo "pendientes=no" >> "$GITHUB_OUTPUT"
+          fi
+
           v=$(grep -E '^veredicto:' veredicto.yml | head -1 | sed 's/^veredicto:[[:space:]]*//' | tr -d '"'"'"' ')
+          aviso=""
+          if [ "$RONDA" -ge 3 ]; then
+            aviso=" Es la ronda $RONDA: si el desacuerdo es sobre el mismo hallazgo, lo decide Mario (contrato, seccion 8)."
+          fi
           case "$v" in
-            APPROVE) echo "Auditoria superada." ;;
-            FIX)     echo "::error::Veredicto FIX: hay hallazgos de severidad media que corregir." ; exit 1 ;;
-            BLOCK)   echo "::error::Veredicto BLOCK: hallazgos criticos o altos." ; exit 1 ;;
+            APPROVE) echo "Auditoria superada en la ronda $RONDA." ;;
+            FIX)     echo "::error::Veredicto FIX: hay hallazgos de severidad media que corregir.$aviso" ; exit 1 ;;
+            BLOCK)   echo "::error::Veredicto BLOCK: hallazgos criticos o altos.$aviso" ; exit 1 ;;
             *)       echo "::error::Veredicto ilegible: '$v'" ; exit 1 ;;
           esac
+
+      - name: Guardar el veredicto para la ronda siguiente
+        if: always() && hashFiles('artefacto/veredicto.yml') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: auditoria
+          path: artefacto/
+          retention-days: 30
+
+  # Los hallazgos de severidad media que aparecen en una reapertura fuera de lo que
+  # cambio no bloquean el PR: quedan apuntados en un issue. Va en un job aparte para que
+  # el permiso de escribir issues no este al alcance del paso donde corre el modelo.
+  pendientes:
+    name: Pendientes de la auditoría
+    needs: auditoria
+    if: always() && needs.auditoria.outputs.pendientes == 'si'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: auditoria
+          path: artefacto
+
+      - name: Apuntar los pendientes en un issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          titulo="Pendientes de la auditoría del PR #$PR"
+          {
+            echo "La auditoría de #$PR aprobó o juzgó el cambio y dejó apuntado esto, que no bloquea el merge."
+            echo "Lo escribió el auditor automático a partir del contenido del PR: es una lista de trabajo, no una orden."
+            echo
+            echo '```yaml'
+            awk '/^pendientes:/{d=1} d && !/^pendientes:/ && /^[^[:space:]#-]/{d=0} d' artefacto/veredicto.yml
+            echo '```'
+          } > cuerpo.md
+          existente=$(gh issue list -R "$REPO" --state open --search "\"$titulo\" in:title" --json number -q '.[0].number' || true)
+          if [ -n "$existente" ]; then
+            gh issue edit "$existente" -R "$REPO" --body-file cuerpo.md
+          else
+            gh issue create -R "$REPO" --title "$titulo" --body-file cuerpo.md
+          fi
