@@ -2,7 +2,7 @@
 
 > Verificada el 2026-09-17 contra `masancoserver`. Guía general de la máquina:
 > `Pruebas/GUIA-SERVIDOR.md` (fuera de este repo). El porqué de las decisiones:
-> `Pruebas/ESQUEMA-SERVIDOR.md`. Los detalles de diseño de los ficheros de
+> `Pruebas/docs/ESQUEMA-SERVIDOR.md`. Los detalles de diseño de los ficheros de
 > despliegue están en [deploy/README.md](deploy/README.md).
 
 Sitio estático (Astro 6, ES/EN), sin backend, sin base de datos y sin login.
