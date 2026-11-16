@@ -334,7 +334,6 @@ p, li { text-wrap: pretty; }
 @media (min-width: 768px) and (max-width: 1023px) {
   .nav-links { gap: 0; }
   .nav-links a { padding: var(--sp-2) 0.5rem; font-size: var(--fs-xs); white-space: nowrap; }
-  .nav-actions { gap: var(--sp-1); }
 }
 .nav-links a:hover { color: var(--fg); background: var(--bg-subtle); }
 .nav-links a[aria-current='true'] {
@@ -343,6 +342,9 @@ p, li { text-wrap: pretty; }
 }
 
 .nav-actions { display: flex; align-items: center; gap: var(--sp-2); }
+@media (min-width: 768px) and (max-width: 1023px) {
+  .nav-actions { gap: var(--sp-1); }
+}
 
 .lang-toggle {
   min-width: var(--mh-touch);
