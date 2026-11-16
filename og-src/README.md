@@ -46,8 +46,8 @@ usa desde ahí. Si algún día falla con *Cannot find module 'sharp'*:
 npm i -D sharp
 ```
 
-Las tipografías del sitio (Inter / JetBrains Mono) vienen de Google Fonts y **no
-están instaladas en el sistema**, así que el SVG declara un stack con fallback:
+Las tipografías del sitio (Inter / JetBrains Mono) se sirven desde el propio sitio con `@fontsource` (nada de Google Fonts), pero **no
+están instaladas en el sistema** donde corre este script, así que el SVG declara un stack con fallback:
 Inter → Segoe UI → Arial, y JetBrains Mono → Cascadia Mono → Consolas. En Windows
 cae a Segoe UI / Cascadia Mono, visualmente muy cercanas. Si instalas Inter y
 JetBrains Mono como fuentes del sistema, el render mejora sin tocar el script.

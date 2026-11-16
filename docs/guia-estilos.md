@@ -107,4 +107,4 @@ La v2 de la base añade lo que separa una app correcta de una app de primera:
 | `--ease-out` · `--dur-fast` · `--dur-base` | `--mh-ease-out` · `--mh-dur-fast` · `--mh-dur-base` |
 
 Recetas: `.btn-primary` / `.btn-secondary` / `.btn-ghost` (alto táctil de 44 px),
-`.tag`, `.project` (tarjeta), `.pmodal` (diálogo), `.section-label` (etiqueta mono).
+`.tag`, `.project` (tarjeta que enlaza a su página de caso), `.section-label` (etiqueta mono).
