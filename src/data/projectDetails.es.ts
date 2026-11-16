@@ -207,14 +207,14 @@ export const projectDetails: Record<string, ProjectDetail> = {
   polybot: {
     id: 'polybot',
     title: 'POLYBOT',
-    subtitle: 'Sistema de trading algorítmico multi-agente · En producción desde julio 2026',
+    subtitle: 'Investigación y simulación con acciones de EE. UU., sin dinero real',
     badges: ['Python', 'FastAPI', 'Angular 21'],
     hero: {
       shot: 'login',
       alt: 'Pantalla de acceso de POLYBOT con el botón de entrada por Face ID',
     },
     intro: [
-      'POLYBOT es un sistema de trading algorítmico multi-agente que opera con dinero real desde julio de 2026, sobre mercados de predicción meteorológicos. El sistema descarga el ensemble de 31 miembros del modelo GFS a través de Open-Meteo, construye con él una distribución de probabilidad propia para cada tramo de resultado posible del día, y decide si tomar posición comparándola contra el precio que ofrece el mercado en ese momento.',
+      'POLYBOT es un sistema de investigación y simulación con acciones de EE. UU., sin dinero real: rastrea los valores que más se mueven y prueba estrategias sobre carteras de papel. Construido con Python, FastAPI y Angular, corre en mi servidor doméstico.',
       'El proyecto gestiona 33 mercados registrados, con varios operando en producción activa de forma simultánea, cada uno con su propio proceso independiente que puede activarse o pausarse sin afectar al resto. Un gestor de riesgo puede pausar automáticamente un mercado si detecta una racha de pérdidas, con reanudación programada.',
       'Todo el acceso pasa por autenticación con passkey (Face ID), en una sesión deliberadamente aislada del resto de mi ecosistema personal: ni la cookie ni la credencial biométrica se comparten con mis otros proyectos, aunque convivan en el mismo dominio.',
       'El sistema de notificaciones fue rediseñado por completo tras detectar un fallo de diseño en su primera versión (basada en Telegram): una alerta de estado debe dispararse cuando el estado cambia, nunca por temporizador. El rediseño deduplica por contenido en vez de por fecha, y sustituyó un bot de mensajería con buena parte de sus comandos rotos por notificaciones push nativas sobre la propia PWA.',

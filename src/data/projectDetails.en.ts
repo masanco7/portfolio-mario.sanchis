@@ -205,14 +205,14 @@ export const projectDetails: Record<string, ProjectDetail> = {
   polybot: {
     id: 'polybot',
     title: 'POLYBOT',
-    subtitle: 'Multi-agent algorithmic trading system · In production since July 2026',
+    subtitle: 'Research and simulation with US stocks, no real money',
     badges: ['Python', 'FastAPI', 'Angular 21'],
     hero: {
       shot: 'login',
       alt: 'POLYBOT sign-in screen with the Face ID entry button',
     },
     intro: [
-      'POLYBOT is a multi-agent algorithmic trading system that has been trading real money since July 2026, on weather prediction markets. The system pulls the 31-member ensemble of the GFS model through Open-Meteo, uses it to build its own probability distribution for every possible outcome band of the day, and decides whether to take a position by comparing that against the price the market is offering at that moment.',
+      'POLYBOT is a research and simulation system for US stocks, with no real money: it tracks the biggest movers and tests strategies on paper books. Built with Python, FastAPI and Angular, it runs on my home server.',
       'The project manages 33 registered markets, with several running in active production simultaneously, each with its own independent process that can be started or paused without affecting the rest. A risk manager can automatically pause a market when it detects a losing streak, with a scheduled resume.',
       'All access goes through passkey authentication (Face ID), on a session deliberately isolated from the rest of my personal ecosystem: neither the cookie nor the biometric credential is shared with my other projects, even though they live on the same domain.',
       'The notification system was redesigned from scratch after finding a design flaw in its first version (built on Telegram): a state alert must fire when the state changes, never on a timer. The redesign deduplicates by content instead of by date, and replaced a messaging bot with a good share of its commands broken by native push notifications on the PWA itself.',
