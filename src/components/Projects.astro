@@ -15,6 +15,10 @@ const t = getTranslations(lang);
 const projects = (lang === 'es' ? projectsEs : projectsEn) as Project[];
 const details = lang === 'es' ? detailsEs : detailsEn;
 // Only projects with an entry in projectDetails.<lang>.ts get an overlay.
+// Featured projects get the large cards; every other project goes to the compact list.
+const FEATURED_IDS = ['gym-tracker', 'polybot', 'finance-manager'];
+const featured = FEATURED_IDS.map((id) => projects.find((p) => p.id === id)).filter((p): p is Project => p !== undefined);
+const others = projects.filter((p) => !FEATURED_IDS.includes(p.id));
 const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefined);
 ---
 <section id="proyectos" class="section" aria-labelledby="projects-title">
@@ -22,8 +26,8 @@ const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefi
     <p class="section-label reveal">{t.projects.sectionLabel}</p>
     <h2 id="projects-title" class="section-title reveal">{t.projects.title}</h2>
     <p class="section-intro reveal">{t.projects.intro}</p>
-    <div class="projects-grid">
-      {projects.map((p) => (
+    <div class="projects-grid projects-grid--featured">
+      {featured.map((p) => (
         <ProjectCard
           project={p}
           detailId={details[p.id] ? p.id : undefined}
@@ -34,6 +38,34 @@ const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefi
         />
       ))}
     </div>
+
+    <h3 class="projects-more-title reveal">{t.projects.moreTitle}</h3>
+    <ul class="projects-compact" role="list">
+      {others.map((p) => (
+        <li class="project-compact reveal">
+          <div class="project-compact-main">
+            <p class="project-compact-title">
+              {p.title}
+              {p.host && <span class="project-host">{p.host}</span>}
+              <span class="project-compact-badge">{p.badge.label}</span>
+            </p>
+            <p class="project-compact-summary">{p.summary}</p>
+            <ul class="project-stack" role="list">
+              {p.stack.map((s) => <li>{s}</li>)}
+            </ul>
+          </div>
+          {details[p.id]
+            ? (
+              <button type="button" class="project-link" data-pmodal-open={p.id} aria-haspopup="dialog" aria-controls={`pmodal-${p.id}`} aria-label={`${t.projectDetail.openAria}: ${p.title}`}>
+                {t.projectDetail.openLabel}
+              </button>
+            )
+            : p.links.filter((l) => l.href).map((l) => (
+              <a class="project-link" href={l.href} target="_blank" rel="noopener">{l.label}</a>
+            ))}
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 

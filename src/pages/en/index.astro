@@ -2,8 +2,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Hero from '../../components/Hero.astro';
-import Salesforce from '../../components/Salesforce.astro';
 import Projects from '../../components/Projects.astro';
+import Experience from '../../components/Experience.astro';
+import Salesforce from '../../components/Salesforce.astro';
 import Stack from '../../components/Stack.astro';
 import About from '../../components/About.astro';
 import Contact from '../../components/Contact.astro';
@@ -19,6 +20,7 @@ const year = new Date().getFullYear();
     <a id="top" tabindex="-1" aria-hidden="true"></a>
     <Hero lang={lang} />
     <Projects lang={lang} />
+    <Experience lang={lang} />
     <Salesforce lang={lang} />
     <Stack lang={lang} />
     <About lang={lang} />
