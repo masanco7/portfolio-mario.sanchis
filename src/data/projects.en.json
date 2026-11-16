@@ -15,11 +15,11 @@
   },
   {
     "id": "polybot",
-    "title": "Polybot · US stocks simulation",
+    "title": "POLYBOT · Algorithmic trading",
     "host": null,
-    "badge": { "label": "Simulation", "variant": "default" },
-    "descriptionHtml": "Research and simulation with US stocks, <strong>no real money</strong>. A scanner measures the US market's movers, several paper books run in parallel and a local research engine tests hypotheses against historical data. It runs on my home server: FastAPI API, Angular PWA dashboard and all persistence in SQLite.",
-    "stack": ["Python 3.12", "FastAPI", "SQLite", "Angular 21 PWA", "WebAuthn", "Docker"],
+    "badge": { "label": "In production", "variant": "live" },
+    "descriptionHtml": "Autonomous bot trading weather markets on <strong>Polymarket</strong> with real money: it pulls the Open-Meteo GFS ensemble (31 members), builds the empirical probability distribution, contrasts it against the order book and places on-chain orders. 33 markets registered, 8 active. LLM decision agents, three layers of risk gates, on-chain fill reconciliation and a PWA dashboard with push notifications.",
+    "stack": ["Python 3.12", "FastAPI", "Angular 21 PWA", "Polymarket CLOB V2", "web3.py · Polygon", "Open-Meteo GFS", "Ollama"],
     "links": [
       { "kind": "disabled", "label": "private repo" },
       { "kind": "disabled", "label": "no public metrics" }
