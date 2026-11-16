@@ -21,6 +21,7 @@ export const ui = {
     langToggleLabel: 'EN',
     skipToContent: 'Saltar al contenido',
     skipToTop: '↑ subir',
+    cvLabel: 'CV',
   },
   hero: {
     eyebrow: 'Disponible para mi primer full-time · Valencia o en remoto',
@@ -153,11 +154,12 @@ export const ui = {
   contact: {
     sectionLabel: '06 — Contacto',
     titleHtml: '¿Buscas a alguien que <em>construye con criterio</em>? Hablemos.',
-    lede: 'Mejor un email directo que un formulario. Respondo en menos de 24 horas y vengo con CV, ejemplos y disponibilidad lista.',
+    lede: 'Mejor un email directo que un formulario. Suelo responder el mismo día laborable y vengo con CV, ejemplos y disponibilidad lista.',
     channelEmail: 'Email',
     channelLinkedIn: 'LinkedIn',
     channelGitHub: 'GitHub',
     channelTrailhead: 'Trailhead',
+    channelCv: 'CV',
   },
   footer: {
     copyright: 'Mario Sanchis Colomer · Valencia, ES',

@@ -355,6 +355,9 @@ p, li { text-wrap: pretty; }
   background: var(--bg-subtle);
 }
 
+.nav-cv { color: var(--accent); border-color: var(--accent); }
+.nav-cv:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
 .theme-toggle {
   width: var(--mh-touch);
   height: var(--mh-touch);
