@@ -29,7 +29,7 @@ export const ui = {
     title: '<strong>Full-Stack Developer</strong> · Salesforce',
     tagline: 'Construyo cosas reales mientras aprendo.',
     metaGym: 'Gym Tracker en producción',
-    metaPolybot: 'Polybot en producción',
+    metaPolybot: 'Polybot en simulación',
     metaFinance: 'Finance Manager en desarrollo',
     ctaProjects: 'Ver proyectos',
   },

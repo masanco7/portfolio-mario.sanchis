@@ -31,7 +31,7 @@ export const ui: UiStrings = {
     title: '<strong>Full-Stack Developer</strong> · Salesforce',
     tagline: 'I build real things while I learn.',
     metaGym: 'Gym Tracker in production',
-    metaPolybot: 'Polybot in production',
+    metaPolybot: 'Polybot in simulation',
     metaFinance: 'Finance Manager in development',
     ctaProjects: 'See projects',
   },
