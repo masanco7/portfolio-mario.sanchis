@@ -26,7 +26,7 @@ export const ui: UiStrings = {
     cvLabel: 'CV',
   },
   hero: {
-    eyebrow: 'Available for my first full-time role · Valencia or remote',
+    eyebrow: 'Founding Engineer at Lotto Check · Valencia',
     name: 'Mario Sanchis<br/>Colomer.',
     title: '<strong>Full-Stack Developer</strong> · Salesforce',
     tagline: 'I build real things while I learn.',
@@ -42,8 +42,15 @@ export const ui: UiStrings = {
   },
   experience: {
     sectionLabel: '02 — Experience',
-    title: 'Internship and education.',
+    title: 'Experience and education.',
     items: [
+      {
+        role: 'Founding Engineer',
+        org: 'Lotto Check',
+        dates: 'Nov 2026 — present',
+        meta: 'Full-time · Hybrid · Alboraya (Valencia)',
+        chips: [],
+      },
       {
         role: 'Salesforce Junior Consultant',
         org: 'Capgemini DCX',
@@ -144,7 +151,7 @@ export const ui: UiStrings = {
     title: "Who's behind the CV.",
     p1Html: "I'm <strong>Mario</strong>, a <strong>Computer Engineer</strong> from the University of Valencia (2026), and I've been building real software since before finishing my degree: <strong>TallerApp</strong> (my final degree project, graded 9 — Angular + NestJS + PostgreSQL), <strong>Gym Tracker</strong> (PWA in production) and, right now, a <strong>personal finance manager</strong> with React and Spring Boot.",
     p2Html: 'I work in an <strong>iterative and methodical</strong> way: I read before I write, prototype small, and only then scale. I use AI <strong>as a tool, not as a shortcut</strong>.',
-    p3Html: 'Until April 2026 I was <strong>Salesforce Junior Consultant</strong> at <strong>Capgemini DCX</strong> (Apex, Flow Builder, Lightning Pages), seven months of internship where I learned to work in real consulting with agile methodology. I remain open to that path if the right opportunity comes along.',
+    p3Html: 'Since November 2026 I have been a <strong>Founding Engineer</strong> at <strong>Lotto Check</strong>, full-time. Before that, until April 2026, I was <strong>Salesforce Junior Consultant</strong> at <strong>Capgemini DCX</strong> (Apex, Flow Builder, Lightning Pages), seven months of internship where I learned to work in real consulting with agile methodology.',
     cvDownload: 'Download full CV',
     cvFile: '/cv-completo-en.pdf',
     factEducationLabel: 'Education',
@@ -161,7 +168,7 @@ export const ui: UiStrings = {
   contact: {
     sectionLabel: '06 — Contact',
     titleHtml: "Looking for someone who <em>builds with judgment</em>? Let's talk.",
-    lede: 'Better a direct email than a form. I usually reply the same working day and come ready with CV, examples, and availability.',
+    lede: 'Better a direct email than a form. I usually reply the same working day.',
     channelEmail: 'Email',
     channelLinkedIn: 'LinkedIn',
     channelGitHub: 'GitHub',

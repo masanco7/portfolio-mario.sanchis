@@ -24,7 +24,7 @@ export const ui = {
     cvLabel: 'CV',
   },
   hero: {
-    eyebrow: 'Disponible para mi primer full-time · Valencia o en remoto',
+    eyebrow: 'Founding Engineer en Lotto Check · Valencia',
     name: 'Mario Sanchis<br/>Colomer.',
     title: '<strong>Full-Stack Developer</strong> · Salesforce',
     tagline: 'Construyo cosas reales mientras aprendo.',
@@ -40,8 +40,15 @@ export const ui = {
   },
   experience: {
     sectionLabel: '02 — Experiencia',
-    title: 'Prácticas y formación.',
+    title: 'Experiencia y formación.',
     items: [
+      {
+        role: 'Founding Engineer',
+        org: 'Lotto Check',
+        dates: 'Nov 2026 — actualidad',
+        meta: 'Jornada completa · Híbrido · Alboraya (Valencia)',
+        chips: [],
+      },
       {
         role: 'Salesforce Junior Consultant',
         org: 'Capgemini DCX',
@@ -142,7 +149,7 @@ export const ui = {
     title: 'Quién está detrás del CV.',
     p1Html: 'Soy <strong>Mario</strong>, <strong>Ingeniero Informático</strong> por la Universidad de Valencia (2026), y construyo software real desde antes de terminar la carrera: <strong>TallerApp</strong> (mi TFG, nota 9 — Angular + NestJS + PostgreSQL), <strong>Gym Tracker</strong> (PWA en producción) y ahora mismo un <strong>gestor de finanzas personales</strong> con React y Spring Boot.',
     p2Html: 'Trabajo de manera <strong>iterativa y ordenada</strong>: leo antes de escribir, prototipo en pequeño y solo entonces escalo. Uso IA <strong>como herramienta, no como atajo</strong>.',
-    p3Html: 'Hasta abril de 2026 fui <strong>Salesforce Junior Consultant</strong> en <strong>Capgemini DCX</strong> (Apex, Flow Builder, Lightning Pages), siete meses de prácticas donde aprendí a moverme en consultoría real con metodología ágil. Sigo abierto a esa vía si aparece la oportunidad adecuada.',
+    p3Html: 'Desde noviembre de 2026 soy <strong>Founding Engineer</strong> en <strong>Lotto Check</strong>, a jornada completa. Antes, hasta abril de 2026, fui <strong>Salesforce Junior Consultant</strong> en <strong>Capgemini DCX</strong> (Apex, Flow Builder, Lightning Pages), siete meses de prácticas donde aprendí a moverme en consultoría real con metodología ágil.',
     cvDownload: 'Descargar CV completo',
     cvFile: '/cv-completo.pdf',
     factEducationLabel: 'Educación',
@@ -159,7 +166,7 @@ export const ui = {
   contact: {
     sectionLabel: '06 — Contacto',
     titleHtml: '¿Buscas a alguien que <em>construye con criterio</em>? Hablemos.',
-    lede: 'Mejor un email directo que un formulario. Suelo responder el mismo día laborable y vengo con CV, ejemplos y disponibilidad lista.',
+    lede: 'Mejor un email directo que un formulario. Suelo responder el mismo día laborable.',
     channelEmail: 'Email',
     channelLinkedIn: 'LinkedIn',
     channelGitHub: 'GitHub',
