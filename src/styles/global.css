@@ -1589,6 +1589,59 @@ button.project-link { background: none; border: 0; padding: 0; cursor: pointer; 
 .footer-links { display: flex; gap: var(--sp-4); flex-wrap: wrap; }
 
 /* =========================================================
+   Case pages (/proyectos/<id>, /en/projects/<id>)
+   ========================================================= */
+.case-wrap { max-width: 1040px; padding-top: var(--sp-6); padding-bottom: var(--sp-9); }
+.case-back {
+  display: inline-block;
+  margin-bottom: var(--sp-6);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--fg-muted);
+}
+.case-back:hover { color: var(--accent); }
+.case-status { margin: 0 0 var(--sp-3) 0; }
+.case-status .project-badge { position: static; }
+.case-title { margin: 0 0 var(--sp-2) 0; font-size: var(--fs-2xl); line-height: 1.1; letter-spacing: -0.02em; }
+.case-subtitle { margin: 0 0 var(--sp-6) 0; color: var(--fg-muted); }
+.case-cover {
+  margin: 0 0 var(--sp-8) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--bg-subtle);
+}
+.case-cover img, .case-shot-media img { display: block; width: 100%; height: auto; }
+.case-section { padding: var(--sp-6) 0; border-top: 1px solid var(--border); }
+.case-section p { max-width: var(--max-w-prose); color: var(--fg-muted); }
+.case-section strong { color: var(--fg); font-weight: 500; }
+.case-h2 { margin: 0 0 var(--sp-4) 0; font-size: var(--fs-xl); font-weight: 500; }
+.case-h3 { margin: 0 0 var(--sp-3) 0; font-size: var(--fs-lg); font-weight: 500; }
+.case-shots { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-8); }
+.case-shot { display: grid; gap: var(--sp-4); }
+@media (min-width: 900px) {
+  .case-shot:has(.case-shot-media) { grid-template-columns: 3fr 2fr; align-items: start; gap: var(--sp-6); }
+  .case-shot:nth-child(even):has(.case-shot-media) .case-shot-media { order: 2; }
+}
+.case-shot-media { display: flex; align-items: flex-start; gap: var(--sp-3); min-width: 0; }
+.case-shot-media figure {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.case-shot-media .case-shot-phone { flex: 0 0 24%; }
+.case-shot-note { font-family: var(--font-mono); font-size: var(--fs-xs); color: var(--fg-faint); }
+.case-stack-full { margin-top: var(--sp-3); font-size: var(--fs-sm); }
+.case-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.case-status-line { margin: 0 0 var(--sp-3) 0; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
+/* =========================================================
    Reveal animation
    ========================================================= */
 .reveal {

@@ -103,7 +103,8 @@ export const projectDetails: Record<string, ProjectDetail> = {
       alt: 'Gym Tracker sign-in screen with the Face ID entry button',
     },
     intro: [
-      'Gym Tracker is my personal training log, a PWA I have used daily since April 2026. It comes from a concrete need: keeping track of my routines with full control over how progress and progressions are computed, without depending on a generic app.',
+      'Gym Tracker is my personal training log, a PWA I have used daily since April 2026.',
+      'It comes from a concrete need: keeping track of my routines with full control over how progress and progressions are computed, without depending on a generic app.',
       'The heart of the project is a deterministic progression engine: cyclic double progression around a per-routine rep target, which automatically decides when to add reps and when to add weight, working over each exercise’s full history. A local language model (Ollama) only writes the natural-language summary — the progression decision never depends on the LLM.',
       'Day-to-day access is completely passwordless: passkeys (WebAuthn) verified on the server itself, with Face ID as the gesture that unlocks the device. Rest between sets is announced with real push notifications, which arrive even with the phone locked and the app closed. And the progress charts are hand-drawn in SVG, with no charting library in between.',
       'Built with Angular 21 zoneless and signals on the frontend, FastAPI on the backend, and persistence in JSON and CSV with atomic writes.',

@@ -1,0 +1,12 @@
+---
+import ProjectCase from '../../../components/ProjectCase.astro';
+import { projectDetails } from '../../../data/projectDetails.es';
+
+export function getStaticPaths() {
+  // Both locales ship the same ids; one page per project that has detail data.
+  return Object.keys(projectDetails).map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+---
+<ProjectCase lang="en" slug={slug!} />

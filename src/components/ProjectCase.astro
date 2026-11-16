@@ -1,0 +1,164 @@
+---
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from './Nav.astro';
+import projectsEs from '../data/projects.es.json';
+import projectsEn from '../data/projects.en.json';
+import { projectDetails as detailsEs } from '../data/projectDetails.es';
+import { projectDetails as detailsEn } from '../data/projectDetails.en';
+import { caseStructure } from '../data/caseStructure';
+import { getShot } from '../data/projectShots';
+import { getTranslations, type Lang } from '../i18n';
+import type { Project } from '../types';
+
+interface Props {
+  lang: Lang;
+  /** Project id, also the last segment of the URL. */
+  slug: string;
+}
+
+const { lang, slug } = Astro.props as Props;
+const t = getTranslations(lang);
+const c = t.projectCase;
+
+const detail = (lang === 'es' ? detailsEs : detailsEn)[slug];
+const project = ((lang === 'es' ? projectsEs : projectsEn) as Project[]).find((p) => p.id === slug);
+if (!detail || !project) throw new Error(`No case data for project "${slug}"`);
+
+const structure = caseStructure[slug] ?? { what: detail.intro.map((_, i) => i), decisions: [] };
+const pick = (indexes: number[] = []) => indexes.map((i) => detail.intro[i]).filter((p): p is string => p !== undefined);
+const what = pick(structure.what);
+const problem = pick(structure.problem);
+const decisions = pick(structure.decisions);
+const result = pick(structure.result);
+
+const home = lang === 'es' ? '/' : '/en/';
+const paths = {
+  es: `${getTranslations('es').projectCase.basePath}/${slug}`,
+  en: `${getTranslations('en').projectCase.basePath}/${slug}`,
+};
+
+// Open Graph: the project's cover screenshot, as a JPEG with an absolute URL.
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? '';
+const cover = getShot(slug, detail.hero.shot);
+const ogImage = cover ? `${siteUrl}${(await getImage({ src: cover, width: 1200, format: 'jpeg', quality: 80 })).src}` : undefined;
+const description = (detail.intro[0] ?? detail.subtitle).replace(/<[^>]+>/g, '');
+
+const screens = detail.sections.map((section) => ({
+  ...section,
+  // The cover is already the page hero: its section only keeps the phone companion.
+  image: section.shot && section.shot !== detail.hero.shot ? getShot(slug, section.shot) : undefined,
+  phoneImage: section.phoneShot ? getShot(slug, section.phoneShot.shot) : undefined,
+}));
+
+const links = [
+  ...project.links.filter((l) => l.href).map((l) => ({ label: l.label, href: l.href! })),
+  ...(detail.repo ? [detail.repo] : []),
+];
+---
+<BaseLayout
+  lang={lang}
+  title={`${detail.title} · ${c.titleSuffix}`}
+  description={description}
+  paths={paths}
+  ogImage={ogImage}
+  ogImageAlt={detail.hero.alt}
+  ogType="article"
+>
+  <Nav lang={lang} home={home} altHref={paths[lang === 'es' ? 'en' : 'es']} />
+  <main id="main" class="case">
+    <div class="container case-wrap">
+      <a class="case-back" href={`${home}#proyectos`}>{c.backLabel}</a>
+
+      <header class="case-hero">
+        <p class="case-status"><span class="project-badge" class:list={[{ live: project.badge.variant === 'live' }]}>{project.badge.label}</span></p>
+        <h1 class="case-title" transition:name={`ptitle-${slug}`}>{detail.title}</h1>
+        <p class="case-subtitle">{detail.subtitle}</p>
+        {cover && (
+          <div class="case-cover" transition:name={`pimg-${slug}`}>
+            <Image src={cover} alt={detail.hero.alt} widths={[640, 960, 1280]} sizes="(min-width: 1100px) 1040px, 92vw" format="webp" quality={72} loading="eager" />
+          </div>
+        )}
+      </header>
+
+      <section class="case-section" aria-labelledby="case-what">
+        <h2 id="case-what" class="case-h2">{c.whatTitle}</h2>
+        {what.map((p) => <p set:html={p} />)}
+      </section>
+
+      {problem.length > 0 && (
+        <section class="case-section" aria-labelledby="case-problem">
+          <h2 id="case-problem" class="case-h2">{c.problemTitle}</h2>
+          {problem.map((p) => <p set:html={p} />)}
+        </section>
+      )}
+
+      {decisions.length > 0 && (
+        <section class="case-section" aria-labelledby="case-decisions">
+          <h2 id="case-decisions" class="case-h2">{c.decisionsTitle}</h2>
+          {decisions.map((p) => <p set:html={p} />)}
+        </section>
+      )}
+
+      <section class="case-section" aria-labelledby="case-screens">
+        <h2 id="case-screens" class="case-h2">{c.screensTitle}</h2>
+        <ol class="case-shots" role="list">
+          {screens.map((s) => (
+            <li class="case-shot">
+              {(s.image || s.phoneImage) && (
+                <div class="case-shot-media" class:list={[{ 'has-phone': Boolean(s.image && s.phoneImage) }]}>
+                  {s.image && (
+                    <figure><Image src={s.image} alt={s.alt ?? ''} widths={[640, 960, 1280]} sizes="(min-width: 900px) 640px, 92vw" format="webp" quality={70} loading="lazy" decoding="async" /></figure>
+                  )}
+                  {s.phoneImage && s.phoneShot && (
+                    <figure class="case-shot-phone"><Image src={s.phoneImage} alt={s.phoneShot.alt} widths={[280, 420, 560]} sizes="160px" format="webp" quality={70} loading="lazy" decoding="async" /></figure>
+                  )}
+                </div>
+              )}
+              <div class="case-shot-text">
+                <h3 class="case-h3">{s.title}</h3>
+                {s.placeholder && <p class="case-shot-note">{s.placeholder.label} · {c.noShotLabel}</p>}
+                {s.paragraphs.map((p) => <p set:html={p} />)}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section class="case-section" aria-labelledby="case-result">
+        <h2 id="case-result" class="case-h2">{c.resultTitle}</h2>
+        <p class="case-status-line"><strong>{c.statusLabel}:</strong> {project.badge.label}{project.host ? ` · ${project.host}` : ''}</p>
+        {result.map((p) => <p set:html={p} />)}
+      </section>
+
+      <section class="case-section" aria-labelledby="case-stack">
+        <h2 id="case-stack" class="case-h2">{c.stackTitle}</h2>
+        <ul class="project-stack" role="list">
+          {project.stack.map((s) => <li>{s}</li>)}
+        </ul>
+        <p class="case-stack-full"><strong>{c.stackFullLabel}:</strong> {detail.stackFull}</p>
+      </section>
+
+      {links.length > 0 && (
+        <section class="case-section" aria-labelledby="case-links">
+          <h2 id="case-links" class="case-h2">{c.linksTitle}</h2>
+          <ul class="case-links" role="list">
+            {links.map((l) => <li><a class="btn btn-ghost" href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
+          </ul>
+        </section>
+      )}
+    </div>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="container footer-inner">
+      <span>© <span data-year>{new Date().getFullYear()}</span> {t.footer.copyright}</span>
+      <div class="footer-links">
+        <a href="https://github.com/masanco7" target="_blank" rel="noopener">{t.footer.githubLabel}</a>
+        <a href="https://www.linkedin.com/in/mario-sanchis-colomer/?skipRedirect=true" target="_blank" rel="noopener">{t.footer.linkedinLabel}</a>
+        <a href="mailto:msanchiscolomer@gmail.com">{t.footer.emailLabel}</a>
+        <a href={`${home}#proyectos`}>{c.backLabel}</a>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>

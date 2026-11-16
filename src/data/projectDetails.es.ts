@@ -104,7 +104,8 @@ export const projectDetails: Record<string, ProjectDetail> = {
       alt: 'Pantalla de acceso de Gym Tracker con el botón de entrada por Face ID',
     },
     intro: [
-      'Gym Tracker es mi cuaderno de entrenamiento personal, una PWA que uso a diario desde abril de 2026. Nace de una necesidad concreta: llevar el registro de mis rutinas con control total sobre cómo se calcula el progreso y las progresiones, sin depender de una app genérica.',
+      'Gym Tracker es mi cuaderno de entrenamiento personal, una PWA que uso a diario desde abril de 2026.',
+      'Nace de una necesidad concreta: llevar el registro de mis rutinas con control total sobre cómo se calcula el progreso y las progresiones, sin depender de una app genérica.',
       'El corazón del proyecto es un motor de progresión determinista: doble progresión cíclica alrededor de un objetivo de repeticiones por rutina, que decide automáticamente cuándo toca subir repeticiones y cuándo subir peso, trabajando sobre el historial completo de cada ejercicio. Un modelo de lenguaje local (Ollama) se limita a redactar el resumen en lenguaje natural — la decisión de progresión nunca depende del LLM.',
       'El acceso es completamente sin contraseña en el día a día: passkeys (WebAuthn) verificados en el propio servidor, con Face ID como el gesto de desbloqueo del dispositivo. El descanso entre series se avisa con notificaciones push reales, que llegan aunque el móvil esté bloqueado y la app cerrada. Y las gráficas de progreso están dibujadas a mano en SVG, sin ninguna librería de gráficos de por medio.',
       'Construida con Angular 21 zoneless y signals en el frontend, FastAPI en el backend, y persistencia en JSON y CSV con escritura atómica.',

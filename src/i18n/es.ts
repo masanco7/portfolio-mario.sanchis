@@ -124,6 +124,24 @@ export const ui = {
     /** Rótulo de la placa que sustituye a la captura en pantallas no mostrables. */
     noShotLabel: 'Descripción sin captura',
   },
+  projectCase: {
+    /** Path prefix of the case pages: <basePath>/<project id> */
+    basePath: '/proyectos',
+    openLabel: 'Ver caso',
+    openAria: 'Ver la página del proyecto',
+    backLabel: '← Volver a proyectos',
+    whatTitle: 'Qué es',
+    problemTitle: 'El problema',
+    decisionsTitle: 'Decisiones técnicas',
+    screensTitle: 'Pantallas',
+    resultTitle: 'Resultado y estado',
+    statusLabel: 'Estado',
+    stackTitle: 'Stack',
+    stackFullLabel: 'Stack completo',
+    linksTitle: 'Enlaces',
+    noShotLabel: 'Descripción sin captura',
+    titleSuffix: 'Mario Sanchis Colomer · Portfolio',
+  },
   stack: {
     sectionLabel: '04 — Stack técnico',
     title: 'Las herramientas con las que trabajo.',
