@@ -25,6 +25,7 @@ const otherLangHref = lang === 'es' ? '/en/' : '/';
     </nav>
 
     <div class="nav-actions">
+      <a class="lang-toggle nav-cv" href={t.cv.file} download aria-label={t.cv.label}>{t.nav.cvLabel}</a>
       <a class="lang-toggle" href={otherLangHref} aria-label={t.nav.langToggleAria}>
         {t.nav.langToggleLabel}
       </a>

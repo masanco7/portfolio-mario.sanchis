@@ -23,6 +23,7 @@ export const ui: UiStrings = {
     langToggleLabel: 'ES',
     skipToContent: 'Skip to content',
     skipToTop: '↑ top',
+    cvLabel: 'CV',
   },
   hero: {
     eyebrow: 'Available for my first full-time role · Valencia or remote',
@@ -155,11 +156,12 @@ export const ui: UiStrings = {
   contact: {
     sectionLabel: '06 — Contact',
     titleHtml: "Looking for someone who <em>builds with judgment</em>? Let's talk.",
-    lede: 'Better a direct email than a form. I reply within 24 hours and come ready with CV, examples, and availability.',
+    lede: 'Better a direct email than a form. I usually reply the same working day and come ready with CV, examples, and availability.',
     channelEmail: 'Email',
     channelLinkedIn: 'LinkedIn',
     channelGitHub: 'GitHub',
     channelTrailhead: 'Trailhead',
+    channelCv: 'CV',
   },
   footer: {
     copyright: 'Mario Sanchis Colomer · Valencia, ES',
