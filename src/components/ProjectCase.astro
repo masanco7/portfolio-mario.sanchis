@@ -42,7 +42,12 @@ const paths = {
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? '';
 const cover = getShot(slug, detail.hero.shot);
 const ogImage = cover ? `${siteUrl}${(await getImage({ src: cover, width: 1200, format: 'jpeg', quality: 80 })).src}` : undefined;
-const description = (detail.intro[0] ?? detail.subtitle).replace(/<[^>]+>/g, '');
+const rawDescription = (detail.intro[0] ?? detail.subtitle).replace(/<[^>]+>/g, '');
+// Trim to ~155 chars at a word boundary for the meta description.
+const description =
+  rawDescription.length <= 155
+    ? rawDescription
+    : `${rawDescription.slice(0, 155).replace(/\s+\S*$/, '').replace(/[\s,;:.]+$/, '')}…`;
 
 const screens = detail.sections.map((section) => ({
   ...section,
