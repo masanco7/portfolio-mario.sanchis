@@ -18,7 +18,7 @@ const details = lang === 'es' ? detailsEs : detailsEn;
 const FEATURED_IDS = ['gym-tracker', 'polybot', 'finance-manager'];
 const featured = FEATURED_IDS.map((id) => projects.find((p) => p.id === id)).filter((p): p is Project => p !== undefined);
 const others = projects.filter((p) => !FEATURED_IDS.includes(p.id));
-const caseHref = (id: string) => (details[id] ? `${t.projectCase.basePath}/${id}` : undefined);
+const caseHref = (id: string) => (details[id] ? `${t.projectCase.basePath}/${id}/` : undefined);
 ---
 <section id="proyectos" class="section" aria-labelledby="projects-title">
   <div class="container">
