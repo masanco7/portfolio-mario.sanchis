@@ -5,8 +5,8 @@ import type { Project } from '../types';
 
 interface Props {
   project: Project;
-  /** Set when the project has an entry in projectDetails.<lang>.ts — turns the whole card into the modal trigger. */
-  detailId?: string;
+  /** Set when the project has a case page — turns the whole card into a link to it. */
+  href?: string;
   openLabel?: string;
   openAria?: string;
   /** Cover shot from the project detail (detail.hero), used when the card has no thumbImage of its own. */
@@ -14,29 +14,26 @@ interface Props {
   coverAlt?: string;
 }
 
-const { project, detailId, openLabel, openAria, coverImage, coverAlt } = Astro.props as Props;
+const { project, href, openLabel, openAria, coverImage, coverAlt } = Astro.props as Props;
 const badgeClass = project.badge.variant === 'live' ? 'project-badge live' : 'project-badge';
 // thumbImage (a file in /public) wins; otherwise the detail's cover shot, which
 // astro:assets optimises; the abstract SVG below is the last resort.
 const hasImage = Boolean(project.thumbImage) || Boolean(coverImage);
 ---
-<article class="project reveal" class:list={[{ 'has-detail': Boolean(detailId) }]}>
-  {detailId && (
-    <button
-      type="button"
+<article class="project reveal" class:list={[{ 'has-detail': Boolean(href) }]}>
+  {href && (
+    <a
       class="project-open"
-      data-pmodal-open={detailId}
-      aria-haspopup="dialog"
-      aria-controls={`pmodal-${detailId}`}
+      href={href}
       aria-label={`${openAria}: ${project.title}`}
     >
       <span class="project-open-pill">
         <span>{openLabel}</span>
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 13L13 3M6 3h7v7"/></svg>
       </span>
-    </button>
+    </a>
   )}
-  <div class="project-thumb" aria-hidden={hasImage ? undefined : 'true'}>
+  <div class="project-thumb" transition:name={href ? `pimg-${project.id}` : undefined} aria-hidden={hasImage ? undefined : 'true'}>
     <span class={badgeClass}>{project.badge.label}</span>
 
     {project.thumbImage && (
@@ -187,7 +184,7 @@ const hasImage = Boolean(project.thumbImage) || Boolean(coverImage);
   </div>
 
   <div class="project-body">
-    <h3 class="project-title">
+    <h3 class="project-title" transition:name={href ? `ptitle-${project.id}` : undefined}>
       {project.title}
       {project.host && <span class="project-host">{project.host}</span>}
     </h3>
