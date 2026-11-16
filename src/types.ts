@@ -11,6 +11,8 @@ export interface Project {
   badge: { label: string; variant: 'default' | 'live' };
   description?: string;
   descriptionHtml?: string;
+  /** One-line text for the compact list (projects that are not featured). */
+  summary?: string;
   stack: string[];
   links: ProjectLink[];
   thumbKind: 'tallerapp' | 'gym' | 'jasb' | 'trading' | 'finance';

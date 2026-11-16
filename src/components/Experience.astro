@@ -1,0 +1,28 @@
+---
+import { getTranslations, type Lang } from '../i18n';
+
+const { lang = 'es' } = Astro.props as { lang?: Lang };
+const t = getTranslations(lang);
+---
+<section id="experiencia" class="section" aria-labelledby="exp-title">
+  <div class="container">
+    <p class="section-label reveal">{t.experience.sectionLabel}</p>
+    <h2 id="exp-title" class="section-title reveal">{t.experience.title}</h2>
+
+    <ol class="timeline" role="list">
+      {t.experience.items.map((item) => (
+        <li class="timeline-item reveal">
+          <p class="timeline-dates">{item.dates}</p>
+          <div class="timeline-body">
+            <h3 class="timeline-role">{item.role}</h3>
+            <p class="timeline-org">{item.org}</p>
+            <p class="timeline-meta">{item.meta}</p>
+            <ul class="project-stack" role="list">
+              {item.chips.map((chip) => <li>{chip}</li>)}
+            </ul>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>

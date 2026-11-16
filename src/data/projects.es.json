@@ -1,6 +1,7 @@
 [
   {
     "id": "tallerapp",
+    "summary": "Gestión de taller multimarca: órdenes de reparación, facturación, inventario y planificador. Trabajo de Fin de Grado.",
     "title": "TallerApp",
     "host": null,
     "badge": { "label": "TFG · 9/10", "variant": "default" },
@@ -53,6 +54,7 @@
   },
   {
     "id": "web-jasb",
+    "summary": "Web corporativa multi-idioma para JASB Energía & Telco.",
     "title": "Web JASB",
     "host": "jasbct.com",
     "badge": { "label": "En producción", "variant": "live" },

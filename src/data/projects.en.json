@@ -1,6 +1,7 @@
 [
   {
     "id": "tallerapp",
+    "summary": "Multi-brand repair shop management: repair orders, invoicing, inventory and scheduler. Final degree project.",
     "title": "TallerApp",
     "host": null,
     "badge": { "label": "Final project · 9/10", "variant": "default" },
@@ -53,6 +54,7 @@
   },
   {
     "id": "web-jasb",
+    "summary": "Multi-language corporate website for JASB Energy & Telco.",
     "title": "JASB Website",
     "host": "jasbct.com",
     "badge": { "label": "In production", "variant": "live" },

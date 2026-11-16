@@ -426,6 +426,11 @@ p, li { text-wrap: pretty; }
   background: var(--accent);
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
+.hero-availability {
+  padding: var(--sp-2) var(--sp-4);
+  background: var(--accent-soft);
+  border-radius: 999px;
+}
 .hero-name {
   font-size: var(--fs-3xl);
   font-weight: 600;
@@ -990,6 +995,69 @@ p, li { text-wrap: pretty; }
 .project.has-detail:hover { cursor: pointer; }
 /* Links must sit above the stretched trigger to remain clickable. */
 .project.has-detail .project-links { position: relative; z-index: 3; }
+
+/* Featured projects: one large card per row (thumb beside the text on wide screens). */
+@media (min-width: 900px) {
+  .projects-grid--featured { grid-template-columns: 1fr; }
+  .projects-grid--featured .project { flex-direction: row; }
+  .projects-grid--featured .project-thumb { flex: 0 0 46%; aspect-ratio: auto; min-height: 280px; border-bottom: 0; border-right: 1px solid var(--border); }
+  .projects-grid--featured .project-body { padding: var(--sp-6); justify-content: center; }
+}
+.projects-more-title {
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  margin: var(--sp-8) 0 var(--sp-4) 0;
+}
+.projects-compact {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+.project-compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-5);
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--border);
+}
+.project-compact-main { flex: 1 1 22rem; min-width: 0; }
+.project-compact-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-1) 0;
+  font-weight: 500;
+}
+.project-compact-badge {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  color: var(--fg-faint);
+}
+.project-compact-summary { margin: 0 0 var(--sp-3) 0; font-size: var(--fs-sm); color: var(--fg-muted); }
+.project-compact .project-stack { margin: 0; }
+button.project-link { background: none; border: 0; padding: 0; cursor: pointer; }
+
+/* Experience timeline */
+.timeline { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }
+.timeline-item {
+  display: grid;
+  gap: var(--sp-2) var(--sp-6);
+  padding: var(--sp-6) 0;
+  border-bottom: 1px solid var(--border);
+}
+@media (min-width: 720px) {
+  .timeline-item { grid-template-columns: 12rem 1fr; }
+}
+.timeline-dates { margin: 0; font-family: var(--font-mono); font-size: var(--fs-sm); color: var(--fg-faint); }
+.timeline-role { margin: 0 0 var(--sp-1) 0; font-size: var(--fs-lg); font-weight: 500; }
+.timeline-org { margin: 0; color: var(--fg); }
+.timeline-meta { margin: 0 0 var(--sp-3) 0; font-size: var(--fs-sm); color: var(--fg-muted); }
+.timeline .project-stack { margin: 0; }
 
 /* Page behind the overlay: frozen, without the sideways jump. */
 :root.pmodal-open { overflow: hidden; }
