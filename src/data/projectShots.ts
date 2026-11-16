@@ -19,11 +19,6 @@ import gymPerfil from '../assets/projects/gym-tracker/Perfil-Web.png';
 
 import polybotLogin from '../assets/projects/polybot/Login-Web.png';
 import polybotLoginPhone from '../assets/projects/polybot/Login-Movil.jpeg';
-import polybotDashboard from '../assets/projects/polybot/Dashboard-Web.png';
-import polybotRanking from '../assets/projects/polybot/Ranking-Web.png';
-import polybotSalud from '../assets/projects/polybot/Salud-Web.png';
-import polybotAvisos from '../assets/projects/polybot/Avisos-Web.png';
-import polybotSistema from '../assets/projects/polybot/Sistema-Web.png';
 
 /**
  * Screenshots per project, keyed by project id and then by shot name.
@@ -54,19 +49,13 @@ export const projectShots: Record<string, Record<string, ImageMetadata>> = {
     perfil: gymPerfil,
   },
   /**
-   * Polybot ships few shots on purpose: the captures below show the previous UI, so
-   * screens that would expose a strategy parameter get no capture and are
+   * Polybot only publishes the login screen (desktop + phone): screens that
+   * would expose a figure or a strategy parameter get no capture and are
    * documented in text instead (see `placeholder` in projectDetails).
-   * Every capture here was taken with the dashboard's privacy mode on.
    */
   polybot: {
     login: polybotLogin,
     'login-phone': polybotLoginPhone,
-    dashboard: polybotDashboard,
-    ranking: polybotRanking,
-    salud: polybotSalud,
-    avisos: polybotAvisos,
-    sistema: polybotSistema,
   },
 };
 

@@ -9,7 +9,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
   tallerapp: {
     id: 'tallerapp',
     title: 'TallerApp',
-    subtitle: 'Sistema de gestión de taller mecánico · TFG · Nota 9',
+    subtitle: 'Sistema de gestión de taller mecánico · TFG · Nota 9/10',
     badges: ['Angular 21', 'NestJS 11', 'PostgreSQL'],
     hero: {
       shot: 'login',

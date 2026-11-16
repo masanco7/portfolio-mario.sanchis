@@ -43,9 +43,9 @@
     "id": "finance-manager",
     "title": "Finance Manager",
     "host": null,
-    "badge": { "label": "In progress", "variant": "default" },
+    "badge": { "label": "In development", "variant": "default" },
     "description": "Personal finance manager replacing two Excel spreadsheets: bank transactions with a verification queue, rule-based categorization, bucket-based investments, net worth, savings goal and debts. The transactions vertical already works end-to-end against the backend; the full 15-table schema is designed and applied.",
-    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
+    "stack": ["Java 25", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
     "links": [
       { "kind": "disabled", "label": "private repo" },
       { "kind": "disabled", "label": "private demo" }

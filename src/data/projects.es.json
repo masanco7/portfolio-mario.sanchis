@@ -45,7 +45,7 @@
     "host": null,
     "badge": { "label": "En desarrollo", "variant": "default" },
     "description": "Gestor de finanzas personales que sustituye dos hojas de Excel: transacciones bancarias con cola de verificación, categorización por reglas, inversiones por buckets, patrimonio neto, objetivo de ahorro y deudas. La vertical de transacciones ya funciona end-to-end contra el backend; el esquema completo de 15 tablas está diseñado y aplicado.",
-    "stack": ["Java 21", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
+    "stack": ["Java 25", "Spring Boot 3.5", "PostgreSQL 16", "Flyway", "React 19", "TypeScript", "Docker"],
     "links": [
       { "kind": "disabled", "label": "repo privado" },
       { "kind": "disabled", "label": "demo privada" }
