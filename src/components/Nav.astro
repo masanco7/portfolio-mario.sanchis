@@ -1,26 +1,33 @@
 ---
 import { getTranslations, type Lang } from '../i18n';
 
-const { lang = 'es' } = Astro.props as { lang?: Lang };
+interface Props {
+  lang?: Lang;
+  /** Home path to prefix section anchors with on pages other than the home ('' on the home itself). */
+  home?: string;
+  /** Path of the same page in the other language; defaults to the other home. */
+  altHref?: string;
+}
+const { lang = 'es', home = '', altHref } = Astro.props as Props;
 const t = getTranslations(lang);
 
-const otherLangHref = lang === 'es' ? '/en/' : '/';
+const otherLangHref = altHref ?? (lang === 'es' ? '/en/' : '/');
 ---
 <a class="skip-link" href="#main">{t.nav.skipToContent}</a>
 <header class="nav" role="banner">
   <div class="nav-inner">
-    <a href="#top" class="nav-brand" aria-label={t.nav.brandAriaLabel}>
+    <a href={`${home}#top`} class="nav-brand" aria-label={t.nav.brandAriaLabel}>
       <span class="nav-brand-name">Mario Sanchis</span>
     </a>
 
     <nav aria-label={t.nav.sectionsLabel}>
       <ul class="nav-links">
-        <li><a href="#proyectos">{t.nav.projects}</a></li>
-        <li><a href="#experiencia">{t.nav.experience}</a></li>
-        <li><a href="#salesforce">{t.nav.salesforce}</a></li>
-        <li><a href="#stack">{t.nav.stack}</a></li>
-        <li><a href="#sobre-mi">{t.nav.about}</a></li>
-        <li><a href="#contacto">{t.nav.contact}</a></li>
+        <li><a href={`${home}#proyectos`}>{t.nav.projects}</a></li>
+        <li><a href={`${home}#experiencia`}>{t.nav.experience}</a></li>
+        <li><a href={`${home}#salesforce`}>{t.nav.salesforce}</a></li>
+        <li><a href={`${home}#stack`}>{t.nav.stack}</a></li>
+        <li><a href={`${home}#sobre-mi`}>{t.nav.about}</a></li>
+        <li><a href={`${home}#contacto`}>{t.nav.contact}</a></li>
       </ul>
     </nav>
 
