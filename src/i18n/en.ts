@@ -126,6 +126,24 @@ export const ui: UiStrings = {
     /** Label on the plate that replaces the capture for screens we cannot show. */
     noShotLabel: 'Described, not shown',
   },
+  projectCase: {
+    /** Path prefix of the case pages: <basePath>/<project id> */
+    basePath: '/en/projects',
+    openLabel: 'View case',
+    openAria: 'View the project page',
+    backLabel: '← Back to projects',
+    whatTitle: 'What it is',
+    problemTitle: 'The problem',
+    decisionsTitle: 'Technical decisions',
+    screensTitle: 'Screens',
+    resultTitle: 'Result and status',
+    statusLabel: 'Status',
+    stackTitle: 'Stack',
+    stackFullLabel: 'Full stack',
+    linksTitle: 'Links',
+    noShotLabel: 'Description without a capture',
+    titleSuffix: 'Mario Sanchis Colomer · Portfolio',
+  },
   stack: {
     sectionLabel: '04 — Tech stack',
     title: 'The tools I work with.',
