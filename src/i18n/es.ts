@@ -115,7 +115,7 @@ export const ui = {
     /** Path prefix of the case pages: <basePath>/<project id> */
     basePath: '/proyectos',
     openLabel: 'Ver caso',
-    openAria: 'Ver la página del proyecto',
+    openAria: 'Ver caso del proyecto',
     backLabel: '← Volver a proyectos',
     whatTitle: 'Qué es',
     problemTitle: 'El problema',
