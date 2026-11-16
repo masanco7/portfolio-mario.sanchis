@@ -16,24 +16,24 @@ const otherLangHref = altHref ?? (lang === 'es' ? '/en/' : '/');
 <a class="skip-link" href="#main">{t.nav.skipToContent}</a>
 <header class="nav" role="banner">
   <div class="nav-inner">
-    <a href={`${home}#top`} class="nav-brand" aria-label={t.nav.brandAriaLabel}>
+    <a data-astro-reload href={`${home}#top`} class="nav-brand" aria-label={t.nav.brandAriaLabel}>
       <span class="nav-brand-name">Mario Sanchis</span>
     </a>
 
     <nav aria-label={t.nav.sectionsLabel}>
       <ul class="nav-links">
-        <li><a href={`${home}#proyectos`}>{t.nav.projects}</a></li>
-        <li><a href={`${home}#experiencia`}>{t.nav.experience}</a></li>
-        <li><a href={`${home}#salesforce`}>{t.nav.salesforce}</a></li>
-        <li><a href={`${home}#stack`}>{t.nav.stack}</a></li>
-        <li><a href={`${home}#sobre-mi`}>{t.nav.about}</a></li>
-        <li><a href={`${home}#contacto`}>{t.nav.contact}</a></li>
+        <li><a data-astro-reload href={`${home}#proyectos`}>{t.nav.projects}</a></li>
+        <li><a data-astro-reload href={`${home}#experiencia`}>{t.nav.experience}</a></li>
+        <li><a data-astro-reload href={`${home}#salesforce`}>{t.nav.salesforce}</a></li>
+        <li><a data-astro-reload href={`${home}#stack`}>{t.nav.stack}</a></li>
+        <li><a data-astro-reload href={`${home}#sobre-mi`}>{t.nav.about}</a></li>
+        <li><a data-astro-reload href={`${home}#contacto`}>{t.nav.contact}</a></li>
       </ul>
     </nav>
 
     <div class="nav-actions">
       <a class="lang-toggle nav-cv" href={t.cv.file} download aria-label={t.cv.label}>{t.nav.cvLabel}</a>
-      <a class="lang-toggle" href={otherLangHref} aria-label={t.nav.langToggleAria}>
+      <a class="lang-toggle" href={otherLangHref} data-astro-reload aria-label={t.nav.langToggleAria}>
         {t.nav.langToggleLabel}
       </a>
       <button class="theme-toggle" type="button" aria-pressed="false" aria-label={t.nav.themeToggleDark}
