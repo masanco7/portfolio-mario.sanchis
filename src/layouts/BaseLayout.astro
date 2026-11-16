@@ -22,6 +22,12 @@ const altEn = `${siteUrl}/en/`;
 // hero.tagline changes, or the social preview drifts from the site.
 const ogImage = `${siteUrl}/og-image.png`;
 
+// Self-hosted fonts: only the weights global.css uses (Inter 400/500/600, JetBrains Mono 400/500).
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
 import '../styles/global.css';
 ---
 <!doctype html>
@@ -90,10 +96,6 @@ import '../styles/global.css';
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
     <script is:inline>
       (function () {

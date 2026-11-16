@@ -73,6 +73,10 @@
 
   color-scheme: light;
 
+  /* Modal backdrop tint; same value in both themes. --scrim-strong is the mobile full-screen sheet. */
+  --scrim: rgba(8, 10, 14, 0.62);
+  --scrim-strong: rgba(8, 10, 14, 0.8);
+
   --shadow-sm: var(--mh-elev-1-light);
   --shadow-md: var(--mh-elev-2-light);
   --shadow-lg: var(--mh-elev-3-light);
@@ -105,7 +109,9 @@
   color-scheme: dark;
 }
 
-/* Auto theme via system */
+/* Auto theme via system.
+   Keep in sync with :root[data-theme='dark'] above (CSS cannot share a block
+   between a selector and a media query). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --bg: #0d0f12;
@@ -142,13 +148,6 @@ html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
   scroll-padding-top: 80px;
-}
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
-  }
 }
 
 body {
@@ -335,7 +334,8 @@ p, li { text-wrap: pretty; }
 .nav-actions { display: flex; align-items: center; gap: var(--sp-2); }
 
 .lang-toggle {
-  height: 38px;
+  min-width: var(--mh-touch);
+  height: var(--mh-touch);
   padding: 0 0.65rem;
   border-radius: var(--r-md);
   display: inline-flex;
@@ -356,8 +356,8 @@ p, li { text-wrap: pretty; }
 }
 
 .theme-toggle {
-  width: 38px;
-  height: 38px;
+  width: var(--mh-touch);
+  height: var(--mh-touch);
   border-radius: var(--r-md);
   display: inline-flex;
   align-items: center;
@@ -1019,7 +1019,7 @@ p, li { text-wrap: pretty; }
 
 .pmodal::backdrop {
   /* Blurred + darkened: the page behind is unreadable but still not flat black. */
-  background: rgba(8, 10, 14, 0.62);
+  background: var(--scrim);
   -webkit-backdrop-filter: blur(16px) saturate(140%);
   backdrop-filter: blur(16px) saturate(140%);
 }
@@ -1088,8 +1088,8 @@ p, li { text-wrap: pretty; }
 }
 .pmodal-close {
   flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
+  width: var(--mh-touch);
+  height: var(--mh-touch);
   border-radius: var(--r-md);
   display: inline-flex;
   align-items: center;
@@ -1317,24 +1317,9 @@ p, li { text-wrap: pretty; }
   .pmodal::backdrop {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    background: rgba(8, 10, 14, 0.8);
+    background: var(--scrim-strong);
   }
   .pmodal-title { font-size: var(--fs-lg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pmodal,
-  .pmodal::backdrop {
-    transition:
-      overlay 0.001ms allow-discrete,
-      display 0.001ms allow-discrete;
-  }
-  .pmodal { opacity: 1; transform: none; }
-  .pmodal::backdrop { opacity: 1; }
-  @starting-style {
-    .pmodal[open] { opacity: 1; transform: none; }
-    .pmodal[open]::backdrop { opacity: 1; }
-  }
 }
 
 /* =========================================================
@@ -1544,6 +1529,27 @@ p, li { text-wrap: pretty; }
   opacity: 1;
   transform: none;
 }
+
+/* =========================================================
+   Reduced motion (single block, kept last so it wins the cascade)
+   ========================================================= */
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  .pmodal,
+  .pmodal::backdrop {
+    transition:
+      overlay 0.001ms allow-discrete,
+      display 0.001ms allow-discrete;
+  }
+  .pmodal { opacity: 1; transform: none; }
+  .pmodal::backdrop { opacity: 1; }
+  @starting-style {
+    .pmodal[open] { opacity: 1; transform: none; }
+    .pmodal[open]::backdrop { opacity: 1; }
+  }
   .reveal { opacity: 1; transform: none; }
 }
