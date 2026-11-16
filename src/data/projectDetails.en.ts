@@ -235,7 +235,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
         title: 'Paper trading on Alpaca',
         paragraphs: [
           'Intraday paper trading simulates the scanner\'s triggers to measure what the history cannot: real execution, slippage and latency between the trigger and the order.',
-          'It is exploratory: its results validate execution and decide nothing about real money.',
+          'It is exploratory: its results validate execution and decide nothing on their own about real money.',
         ],
       },
       {

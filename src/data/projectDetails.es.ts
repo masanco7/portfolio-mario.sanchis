@@ -236,7 +236,7 @@ export const projectDetails: Record<string, ProjectDetail> = {
         title: 'Papel en Alpaca',
         paragraphs: [
           'El papel intradía opera en simulación los disparos del escáner para medir lo que el histórico no puede: ejecución real, deslizamiento y latencia entre el disparo y la orden.',
-          'Es exploratorio: sus resultados sirven para validar la ejecución, no deciden nada sobre dinero real.',
+          'Es exploratorio: sus resultados sirven para validar la ejecución, no deciden por sí solos nada sobre dinero real.',
         ],
       },
       {
