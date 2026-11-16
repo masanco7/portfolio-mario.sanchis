@@ -44,6 +44,15 @@ import '../styles/global.css';
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- Legacy modal deep links (?proyecto= / ?project=) -> case pages. Full loads only. -->
+    <script is:inline>
+      (function () {
+        var en = location.pathname.indexOf('/en') === 0;
+        var id = new URLSearchParams(location.search).get(en ? 'project' : 'proyecto');
+        if (id && /^(tallerapp|gym-tracker|polybot)$/.test(id))
+          location.replace((en ? '/en/projects/' : '/proyectos/') + id);
+      })();
+    </script>
     <title>{finalTitle}</title>
 
     <meta name="description" content={finalDescription} />
