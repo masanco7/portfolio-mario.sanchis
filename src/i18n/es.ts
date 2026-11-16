@@ -111,24 +111,11 @@ export const ui = {
       repo: 'repo',
     },
   },
-  projectDetail: {
-    /** Query param que hace enlazable el overlay: ?proyecto=tallerapp */
-    urlParam: 'proyecto',
-    openLabel: 'Ver detalle',
-    openAria: 'Ver el detalle del proyecto',
-    dialogAria: 'Detalle del proyecto',
-    closeLabel: 'Cerrar',
-    closeAria: 'Cerrar el detalle del proyecto',
-    galleryAria: 'Pantallas del proyecto',
-    stackLabel: 'Stack completo',
-    /** Rótulo de la placa que sustituye a la captura en pantallas no mostrables. */
-    noShotLabel: 'Descripción sin captura',
-  },
   projectCase: {
     /** Path prefix of the case pages: <basePath>/<project id> */
     basePath: '/proyectos',
     openLabel: 'Ver caso',
-    openAria: 'Ver la página del proyecto',
+    openAria: 'Ver caso del proyecto',
     backLabel: '← Volver a proyectos',
     whatTitle: 'Qué es',
     problemTitle: 'El problema',

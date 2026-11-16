@@ -21,7 +21,7 @@ export interface Project {
 }
 
 /* ---------------------------------------------------------------
-   Project detail — the overlay opened from a project card.
+   Project detail — the data behind a case page (/proyectos/<id>).
    Screenshots live in src/data/projectShots.ts (shared by both
    locales); the text lives in projectDetails.{es,en}.ts and points
    at a screenshot by key.
@@ -33,19 +33,18 @@ export interface ProjectShotRef {
   alt: string;
 }
 
-/** Icons available to a section that ships without a capture. */
+/** Icon hint for a section that ships without a capture (kept in the data; the case page shows the label only). */
 export type SectionIcon = 'ledger' | 'chart' | 'terminal' | 'timeline' | 'sliders';
 
 /**
  * Marks a section as documented in text only. Set instead of `shot` when the
  * screen cannot be shown — POLYBOT, for instance, keeps every screen that would
- * expose a figure or a strategy parameter out of the gallery. The modal renders
- * a labelled icon plate in the media slot so the row still reads as a designed
- * block rather than a missing image.
+ * expose a figure or a strategy parameter out of the gallery. The case page renders
+ * a text note with the label instead of an image.
  */
 export interface SectionPlaceholder {
   icon: SectionIcon;
-  /** Screen name shown under the icon. */
+  /** Screen name shown in the note. */
   label: string;
 }
 
@@ -71,11 +70,10 @@ export interface ProjectDetail {
   id: string;
   title: string;
   subtitle: string;
-  /** Short stack chips shown in the sticky header. */
+  /** Short stack chips (not rendered on the case page, which uses Project.stack). */
   badges: string[];
   /**
-   * Cover shot for the card in the projects grid — NOT rendered inside the
-   * panel, which opens straight on the write-up. Convention: always the login
+   * Cover shot: the card in the projects grid and the hero of the case page. Convention: always the login
    * screen in its desktop version, even for projects that also ship a PWA, so
    * every card in the grid reads the same.
    */

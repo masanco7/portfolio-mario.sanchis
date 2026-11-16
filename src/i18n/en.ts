@@ -113,24 +113,11 @@ export const ui: UiStrings = {
       repo: 'repo',
     },
   },
-  projectDetail: {
-    /** Query param that makes the overlay linkable: ?project=tallerapp */
-    urlParam: 'project',
-    openLabel: 'View detail',
-    openAria: 'View the project detail',
-    dialogAria: 'Project detail',
-    closeLabel: 'Close',
-    closeAria: 'Close the project detail',
-    galleryAria: 'Project screens',
-    stackLabel: 'Full stack',
-    /** Label on the plate that replaces the capture for screens we cannot show. */
-    noShotLabel: 'Described, not shown',
-  },
   projectCase: {
     /** Path prefix of the case pages: <basePath>/<project id> */
     basePath: '/en/projects',
     openLabel: 'View case',
-    openAria: 'View the project page',
+    openAria: 'View case for the project',
     backLabel: '← Back to projects',
     whatTitle: 'What it is',
     problemTitle: 'The problem',
