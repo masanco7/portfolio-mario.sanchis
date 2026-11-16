@@ -54,7 +54,7 @@ export const projectShots: Record<string, Record<string, ImageMetadata>> = {
     perfil: gymPerfil,
   },
   /**
-   * POLYBOT ships fewer shots than screens on purpose: it trades real money, so
+   * Polybot ships few shots on purpose: the captures below show the previous UI, so
    * screens that would expose a strategy parameter get no capture and are
    * documented in text instead (see `placeholder` in projectDetails).
    * Every capture here was taken with the dashboard's privacy mode on.
