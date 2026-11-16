@@ -50,7 +50,7 @@ import '../styles/global.css';
         var en = location.pathname.indexOf('/en') === 0;
         var id = new URLSearchParams(location.search).get(en ? 'project' : 'proyecto');
         if (id && /^(tallerapp|gym-tracker|polybot)$/.test(id))
-          location.replace((en ? '/en/projects/' : '/proyectos/') + id);
+          location.replace((en ? '/en/projects/' : '/proyectos/') + id + '/');
       })();
     </script>
     <title>{finalTitle}</title>
