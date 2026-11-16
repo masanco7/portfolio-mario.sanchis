@@ -947,10 +947,9 @@ p, li { text-wrap: pretty; }
 }
 
 /* =========================================================
-   Project detail overlay
-   Native <dialog> in the top layer. The card keeps its own markup;
-   .project-open stretches over it so the whole card is the trigger
-   while the real links stay clickable above it.
+   Project card link
+   .project-open is a link stretched over the whole card, so the card
+   leads to its case page while the real links stay clickable above it.
    ========================================================= */
 .project.has-detail { position: relative; }
 
@@ -1043,7 +1042,6 @@ p, li { text-wrap: pretty; }
 }
 .project-compact-summary { margin: 0 0 var(--sp-3) 0; font-size: var(--fs-sm); color: var(--fg-muted); }
 .project-compact .project-stack { margin: 0; }
-button.project-link { background: none; border: 0; padding: 0; cursor: pointer; }
 
 /* Experience timeline */
 .timeline { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border); }

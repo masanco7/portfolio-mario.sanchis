@@ -5,7 +5,6 @@ import { projectDetails as detailsEs } from '../data/projectDetails.es';
 import { projectDetails as detailsEn } from '../data/projectDetails.en';
 import { getShot } from '../data/projectShots';
 import ProjectCard from './ProjectCard.astro';
-import ProjectModal from './ProjectModal.astro';
 import { getTranslations, type Lang } from '../i18n';
 import type { Project } from '../types';
 
@@ -14,12 +13,12 @@ const t = getTranslations(lang);
 
 const projects = (lang === 'es' ? projectsEs : projectsEn) as Project[];
 const details = lang === 'es' ? detailsEs : detailsEn;
-// Only projects with an entry in projectDetails.<lang>.ts get an overlay.
+// Only projects with an entry in projectDetails.<lang>.ts get a case page (/proyectos/<id>).
 // Featured projects get the large cards; every other project goes to the compact list.
 const FEATURED_IDS = ['gym-tracker', 'polybot', 'finance-manager'];
 const featured = FEATURED_IDS.map((id) => projects.find((p) => p.id === id)).filter((p): p is Project => p !== undefined);
 const others = projects.filter((p) => !FEATURED_IDS.includes(p.id));
-const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefined);
+const caseHref = (id: string) => (details[id] ? `${t.projectCase.basePath}/${id}` : undefined);
 ---
 <section id="proyectos" class="section" aria-labelledby="projects-title">
   <div class="container">
@@ -30,9 +29,9 @@ const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefi
       {featured.map((p) => (
         <ProjectCard
           project={p}
-          detailId={details[p.id] ? p.id : undefined}
-          openLabel={t.projectDetail.openLabel}
-          openAria={t.projectDetail.openAria}
+          href={caseHref(p.id)}
+          openLabel={t.projectCase.openLabel}
+          openAria={t.projectCase.openAria}
           coverImage={details[p.id] ? getShot(p.id, details[p.id]!.hero.shot) : undefined}
           coverAlt={details[p.id]?.hero.alt}
         />
@@ -56,9 +55,9 @@ const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefi
           </div>
           {details[p.id]
             ? (
-              <button type="button" class="project-link" data-pmodal-open={p.id} aria-haspopup="dialog" aria-controls={`pmodal-${p.id}`} aria-label={`${t.projectDetail.openAria}: ${p.title}`}>
-                {t.projectDetail.openLabel}
-              </button>
+              <a class="project-link" href={caseHref(p.id)} aria-label={`${t.projectCase.openAria}: ${p.title}`}>
+                {t.projectCase.openLabel}
+              </a>
             )
             : p.links.filter((l) => l.href).map((l) => (
               <a class="project-link" href={l.href} target="_blank" rel="noopener">{l.label}</a>
@@ -68,5 +67,3 @@ const withDetail = projects.map((p) => details[p.id]).filter((d) => d !== undefi
     </ul>
   </div>
 </section>
-
-{withDetail.map((detail) => <ProjectModal detail={detail} lang={lang} />)}
