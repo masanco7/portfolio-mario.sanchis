@@ -117,7 +117,7 @@ export const ui: UiStrings = {
     /** Path prefix of the case pages: <basePath>/<project id> */
     basePath: '/en/projects',
     openLabel: 'View case',
-    openAria: 'View the project page',
+    openAria: 'View case for the project',
     backLabel: '← Back to projects',
     whatTitle: 'What it is',
     problemTitle: 'The problem',
