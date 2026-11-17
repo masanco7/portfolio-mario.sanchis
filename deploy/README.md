@@ -78,6 +78,7 @@ El vhost que está en uso es el del edge. No está en este repo: vive en
   que `mantenimiento.sh`, sin bloquearse: si el mantenimiento del sábado está
   en marcha, un despliegue manual sale con un mensaje claro en vez de pisarle
   el reetiquetado de `:actual`/`:anterior`.
+- **Cadena del sábado (PF-026).** `portfolio-mantenimiento.service` lleva un `After=` extra con `masanco-mantenimiento.service` (host 01:00 → portfolio 02:00 → polybot 03:00 → gym 04:00 → integras 05:00; `masanco-backup` espera a los cinco). Solo ordena trabajos que coinciden en cola (un sábado largo, o `Persistent=true` tras un apagón); un sábado normal no cambia y la espera no cuenta contra `TimeoutStartSec`. Hay que copiar la `.service` y hacer `daemon-reload`.
 - **Avisos fiables (PF-025).** `mantenimiento.sh` sale con **código 3** solo si
   su informe de fallo **llegó** (entonces `avisar-fallo.sh`, que exige
   `ExecMainCode=1` y `ExecMainStatus=3`, calla); con cualquier otro código
