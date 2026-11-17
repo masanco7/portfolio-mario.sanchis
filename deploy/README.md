@@ -83,6 +83,15 @@ El vhost que está en uso es el del edge. No está en este repo: vive en
   imagen sin contenedor de cualquier proyecto del host, incluido un
   `:anterior` de más de 30 días que dejó de ser el `:actual`. `:anterior`
   sigue etiquetada, así que el prune sin `-a` nunca la toca.
+- **La limpieza no deshace una versión buena.** Tras comprobar el puerto y el
+  edge, `mantenimiento.sh` pone `PROMOCIONADO=0`; si el prune falla (p. ej.
+  «a prune operation is already running») se apunta en el informe y no hay
+  rollback. La comprobación del edge usa `docker inspect`, `wget -T 10` y
+  5 intentos con 5 s entre ellos, para que un 502 momentáneo tras recargar
+  el edge no revierta la promoción.
+  Si algo falla despues de esa comprobacion (limpieza o informe), el aviso lo dice
+  asi y no deshace nada (estado `VERIFICADO`). Si el edge no esta corriendo, se
+  espera hasta 30 s a que arranque; si no, solo se comprueba el puerto y se avisa.
 
 ## Histórico
 
