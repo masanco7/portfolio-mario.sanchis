@@ -3,7 +3,7 @@
 Las lee el auditor automático en cada PR. Están versionadas a propósito: quien produce el
 código debe poder leer con qué criterio se le va a juzgar.
 
-Contrato completo: `Pruebas/AGENCIA-IA/CONTRATO-PR.md`.
+Contrato completo: `docs/CONTRATO-PR.md` de `masanco7/masanco-config` (en local, `Pruebas/docs/CONTRATO-PR.md`).
 
 ## Tu papel
 

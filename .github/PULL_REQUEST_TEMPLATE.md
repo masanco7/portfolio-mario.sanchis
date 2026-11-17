@@ -1,7 +1,7 @@
 <!--
   Plantilla obligatoria. Copiar a .github/PULL_REQUEST_TEMPLATE.md en cada repositorio.
   Un PR con secciones vacías o con marcadores sin rellenar se cierra sin auditar.
-  Contrato completo: AGENCIA-IA/CONTRATO-PR.md
+  Contrato completo: docs/CONTRATO-PR.md de masanco7/masanco-config (en local, Pruebas/docs/)
 -->
 
 ## Ticket

@@ -2,7 +2,7 @@
 # de Angular, de Spring Boot o de scripts de shell. Se copia tal cual a los seis repos
 # del ecosistema; la CI especifica de cada proyecto vive en su propio workflow.
 #
-# Contrato completo: Pruebas/AGENCIA-IA/CONTRATO-PR.md
+# Contrato completo: docs/CONTRATO-PR.md de masanco7/masanco-config (en local, Pruebas/docs/)
 #
 # Cada regla de aqui corresponde a una trampa que ya ha mordido en produccion, no a una
 # preferencia de estilo. Todas se probaron contra un repo sano (no dan falso positivo) y
