@@ -158,6 +158,8 @@ y `Persistent=true`. Es el primero después del mantenimiento del host (01:00):
   mantenimiento antes de que lleguen a Polybot (03:00), Gym (04:00) e
   INTEGRAS (05:00).
 
+**Cadena del sábado (PF-026).** Cada `.service` de mantenimiento lleva un `After=` extra con los anteriores (host `masanco-mantenimiento` 01:00 → portfolio 02:00 → polybot 03:00 → gym 04:00 → integras 05:00; `masanco-backup` espera a los cinco). Si coinciden (un sábado que se alarga, o los timers con `Persistent=true` disparando juntos tras un apagón), cada uno espera a los anteriores. Un sábado normal no cambia: el orden solo afecta a trabajos que están en cola a la vez, y la espera no cuenta contra `TimeoutStartSec`. El host vigila `ultimo-ok` (IF-029): avisa si tiene más de 8 días.
+
 **Para qué sirve en un sitio estático:** el `docker build --pull` vuelve a
 resolver `node:22-alpine` y `nginx-unprivileged`. Es la única vía por la que
 llegan al contenedor los parches de seguridad de la imagen base. Además
