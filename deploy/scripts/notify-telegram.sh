@@ -12,6 +12,9 @@
 # ==============================================================================
 
 set -uo pipefail
+# Byte cuts below are only safe if the locale is UTF-8 (and iconv -c drops any
+# half character a byte cut leaves behind).
+export LC_ALL=C.UTF-8
 
 ENV_FILE=/etc/portfolio.env
 
@@ -26,11 +29,16 @@ set +a
 mensaje="${1:?uso: $0 \"mensaje\"}"
 
 # Telegram rejects anything over 4096 characters outright - the whole report
-# would be lost, not trimmed. Cut to 3900 keeping the END, because that is
-# where the verdict and the last log lines are.
+# would be lost, not trimmed. Keep the BEGINNING: the headline and "lo que hay
+# que mirar" come first; the log tail at the end is the part that can go.
 if [ "${#mensaje}" -gt 3900 ]; then
-    mensaje="[...recortado...]
-$(printf '%s' "$mensaje" | tail -c 3900)"
+    # iconv -c exits 1 when it drops a byte, hence the `|| true`. If it leaves
+    # nothing, fall back to the raw cut; if that is empty too, there is no message.
+    recorte="$(printf '%s' "$mensaje" | head -c 3850 | iconv -c -f UTF-8 -t UTF-8 || true)"
+    [ -n "$recorte" ] || recorte="$(printf '%s' "$mensaje" | head -c 3850)"
+    [ -n "$recorte" ] || { echo "el mensaje ha quedado vacio tras el recorte" >&2; exit 1; }
+    mensaje="${recorte}
+[...recortado...]"
 fi
 
 # The response body is kept rather than discarded, because Telegram explains
@@ -41,8 +49,12 @@ fi
 # pressed Start on returns 400 "chat not found", which is indistinguishable from
 # a bad token until you can read the description. That happened on 2026-09-13,
 # the very first time this ran.
-respuesta="$(curl -sS --max-time 20 \
-    -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+#
+# The URL (it carries the token) goes in through a curl config on stdin, not in
+# argv, so it never shows up in `ps`. printf is a builtin: no process either.
+respuesta="$(printf 'url = "https://api.telegram.org/bot%s/sendMessage"\n' "$TELEGRAM_TOKEN" \
+  | curl -sS -K - --retry 3 --retry-all-errors --connect-timeout 10 --max-time 30 \
+    -X POST \
     --data-urlencode "chat_id=${TELEGRAM_CHAT_ID}" \
     --data-urlencode "text=${mensaje}" \
     --data-urlencode "disable_web_page_preview=true" 2>&1)" || {

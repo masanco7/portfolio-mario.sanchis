@@ -14,14 +14,25 @@
 # ==============================================================================
 
 set -uo pipefail
+export LC_ALL=C.UTF-8   # safe byte cuts; see notify-telegram.sh
 
 NOTIFY=/usr/local/bin/notify-telegram-portfolio.sh
 UNIDAD=portfolio-mantenimiento.service
+ESTADO_DIR=/var/lib/portfolio-mantenimiento
 
 [ -x "$NOTIFY" ] || { echo "no existe $NOTIFY" >&2; exit 1; }
 
 motivo="$(systemctl show "$UNIDAD" -p Result --value 2>/dev/null)"
 codigo="$(systemctl show "$UNIDAD" -p ExecMainStatus --value 2>/dev/null)"
+# ExecMainCode 1 = CLD_EXITED (a real exit, not a signal or a kill).
+tipo="$(systemctl show "$UNIDAD" -p ExecMainCode --value 2>/dev/null)"
+
+# Exit 3 is the script's "I failed AND my own report was delivered": a second
+# one would only contradict it. Anything else (1, 143, signals, OOM...) warns.
+if [ "$tipo" = 1 ] && [ "$codigo" = 3 ]; then
+    echo "el mantenimiento ya aviso por su cuenta (codigo 3); no se manda un segundo aviso"
+    exit 0
+fi
 
 # Only the lines from the run that just died, not last week's.
 invocacion="$(systemctl show "$UNIDAD" -p InvocationID --value 2>/dev/null)"
@@ -32,7 +43,7 @@ else
 fi
 # A single log line can be an entire HTML dump. Telegram truncates keeping the
 # end, so without cutting here the verdict is exactly what gets dropped.
-cola="$(printf '%s\n' "$cola" | cut -c1-200 | tail -c 1200)"
+cola="$(printf '%s\n' "$cola" | cut -c1-200 | tail -c 1200 | iconv -c -f UTF-8 -t UTF-8 || true)"
 
 case "$motivo" in
     timeout)   explicacion="Se agoto el tiempo maximo y systemd lo corto." ;;
@@ -56,4 +67,10 @@ que sirve. Lo primero que hay que mirar es si el sitio responde:
   curl -sI https://portfolio.masanco-hub.com
 
 --- ultimas lineas del registro ---
-${cola:-sin registro disponible}"
+${cola:-sin registro disponible}" || {
+    echo "no se ha podido enviar el aviso de fallo" >&2
+    # Same file and format as mantenimiento.sh: its next report mentions it.
+    install -d -m 755 "$ESTADO_DIR" \
+        && printf '%s\t%s\n' "$(date '+%Y-%m-%d %H:%M')" "el mantenimiento se corto o fallo sin informe (${motivo:-?}, codigo ${codigo:-?})" >> "$ESTADO_DIR/aviso-pendiente"
+    exit 1
+}

@@ -6,7 +6,7 @@ Description=Portfolio — avisa de que el mantenimiento no ha terminado
 Type=oneshot
 ExecStart=/usr/local/lib/portfolio-mantenimiento/avisar-fallo.sh
 # Si ni siquiera se puede avisar, no hay nada mas que intentar.
-TimeoutStartSec=120
+TimeoutStartSec=180
 Restart=no
 StandardOutput=journal
 StandardError=journal
