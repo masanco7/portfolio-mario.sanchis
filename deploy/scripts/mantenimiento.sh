@@ -98,6 +98,12 @@ FECHA="$(date '+%Y-%m-%d %H:%M')"
 # "failed with the new version already serving", and those need opposite
 # reactions.
 PROMOCIONADO=0
+# Set once the new version has passed the port and edge checks. After that
+# a failure (cleanup, report) must neither roll back nor claim nothing changed.
+VERIFICADO=0
+# What the edge check found, so a failure report can say it honestly.
+EDGE_COMPROBADO=0
+EDGE_FALLIDO=0
 
 RESUMEN=""
 apuntar() { RESUMEN+="$1"$'\n'; }
@@ -207,9 +213,27 @@ terminar_mal() {
 
     limpiar_canario
 
-    local estado_servicio cambio_aplicado urgencia
+    local estado_servicio cambio_aplicado urgencia resultado comprobado
+    resultado="NO SE HA PODIDO ACTUALIZAR."
 
-    if [ "$PROMOCIONADO" -eq 1 ]; then
+    if [ "$VERIFICADO" -eq 1 ]; then
+        # The new version is serving and already passed every check. What failed
+        # came afterwards (cleanup or the report itself): no rollback, and no
+        # pretending that nothing changed.
+        registro "el fallo es posterior a la verificacion: no se toca la version nueva"
+        comprobado="su puerto local"
+        [ "$EDGE_COMPROBADO" -eq 1 ] && comprobado="su puerto local y el edge"
+        resultado="HECHO, PERO HA FALLADO LA LIMPIEZA O EL INFORME."
+        estado_servicio="El sitio esta sirviendo y habia pasado las comprobaciones (${comprobado}); lo que ha fallado vino despues."
+        if [ "$SECO" -eq 1 ]; then
+            cambio_aplicado="Era un ensayo: no se ha promocionado nada."
+        elif [ "${hay_cambios:-0}" -eq 0 ]; then
+            cambio_aplicado="No habia nada que actualizar: sigue la version de siempre."
+        else
+            cambio_aplicado="Se ha puesto la version nueva y se ha mantenido."
+        fi
+        urgencia="No hay nada urgente, pero conviene revisarlo antes del lunes."
+    elif [ "$PROMOCIONADO" -eq 1 ]; then
         # The new version was already serving. Health is NOT consulted here:
         # the failures that happen after promoting are precisely the ones that
         # health does not see. Roll back unconditionally.
@@ -221,8 +245,16 @@ terminar_mal() {
         fi
         cambio_aplicado="Se habia llegado a poner la version nueva y se ha deshecho."
         urgencia="Conviene revisarlo hoy mismo."
+    elif [ "$EDGE_FALLIDO" -eq 1 ]; then
+        # Nothing was promoted, but the edge WAS checked and does not serve the
+        # site: visitors see an outage, so this is urgent, not a quiet note.
+        resultado="EL PORTFOLIO NO SE VE DESDE INTERNET."
+        estado_servicio="ATENCION: el edge NO sirve el portfolio (comprobado), aunque el contenedor responde en su puerto local (127.0.0.1:${PUERTO_APP})."
+        cambio_aplicado="No se ha cambiado la version: sigue la de siempre."
+        urgencia="Hay que mirarlo cuanto antes: los visitantes no ven el sitio."
     else
-        estado_servicio="El sitio sigue disponible con la version de siempre."
+        # Say what was actually checked: only the local port, not the edge.
+        estado_servicio="El sitio responde en su puerto local (127.0.0.1:${PUERTO_APP}) con la version de siempre; el edge no se ha comprobado."
         if ! comprobar_url "http://127.0.0.1:${PUERTO_APP}/" "el sitio" >/dev/null 2>&1; then
             registro "el sitio no responde; intentando volver a la version anterior"
             if revertir; then
@@ -244,10 +276,10 @@ terminar_mal() {
     cola="$(tail -n 25 "$BITACORA" | cut -c1-200 | tail -c 1500)"
 
     avisar_telegram "PORTFOLIO · mantenimiento del sabado
-Servidor: $(hostname -s) (${DOMINIO})
+Servidor: $(hostname -s 2>/dev/null || echo desconocido) (${DOMINIO})
 Fecha: ${FECHA}
 
-RESULTADO: NO SE HA PODIDO ACTUALIZAR.
+RESULTADO: ${resultado}
 
 ${estado_servicio}
 ${cambio_aplicado}
@@ -381,33 +413,92 @@ esperar_url "http://127.0.0.1:${PUERTO_APP}/" "el sitio en su puerto" 45 \
 # outage on the VPS cutover. What a visitor actually traverses is Cloudflare ->
 # tunnel -> edge -> container, and the edge hop is the one that breaks silently
 # if the container name or the shared network ever changes.
-if docker ps --format '{{.Names}}' | grep -qx "$EDGE"; then
+#
+# One attempt is not enough: right after the edge reloads, a momentary 502 is
+# normal and must not roll back a good version. A few spaced retries, each with
+# its own timeout so a hung wget cannot stall the run.
+FALLO_EDGE=""
+comprobar_edge_una_vez() {
+    local cuerpo rc=0
     # Captured into a variable first, same reason as comprobar_url: piping
-    # wget straight into grep -q risks SIGPIPE on a page this size.
-    cuerpo_edge="$(docker exec "$EDGE" wget -q -O- --header "Host: ${DOMINIO}" http://127.0.0.1/ 2>/dev/null)" || cuerpo_edge=""
-    if grep -qF -- "$MARCADOR" <<<"$cuerpo_edge"; then
+    # wget straight into grep -q risks SIGPIPE on a page this size. No `-t`:
+    # the edge image is nginx:alpine, whose busybox wget may not accept it, and
+    # busybox wget does not retry on its own anyway. stderr is kept so a failed
+    # attempt says why.
+    cuerpo="$(docker exec "$EDGE" wget -q -T 10 -O- --header "Host: ${DOMINIO}" http://127.0.0.1/ 2>&1)" || rc=$?
+    if [ "$rc" -ne 0 ]; then
+        FALLO_EDGE="wget ha salido con ${rc}: ${cuerpo:0:200}"
+        return 1
+    fi
+    if ! grep -qF -- "$MARCADOR" <<<"$cuerpo"; then
+        FALLO_EDGE="ha respondido, pero sin la marca del portfolio"
+        return 1
+    fi
+}
+
+comprobar_edge() {
+    local intento
+    for intento in 1 2 3 4 5; do
+        if comprobar_edge_una_vez; then
+            return 0
+        fi
+        registro "el edge aun no sirve el portfolio (intento ${intento}/5: ${FALLO_EDGE})"
+        if [ "$intento" -lt 5 ]; then sleep 5; fi
+    done
+    return 1
+}
+
+# inspect, not `docker ps | grep -q`: with pipefail the early exit of grep can
+# SIGPIPE the producer and give a false negative.
+# Right after `up -d` the edge may be mid-restart: give it a few seconds, and
+# tell "edge absent" apart from "restarting" or a docker inspect error.
+estado_edge=""
+for _ in 1 2 3 4 5 6; do
+    estado_edge="$(docker inspect -f '{{.State.Status}}' "$EDGE" 2>&1)" || estado_edge="error de docker inspect: ${estado_edge:0:200}"
+    [ "$estado_edge" = "running" ] && break
+    case "$estado_edge" in *"No such object"*) break ;; esac
+    sleep 5
+done
+if [ "$estado_edge" = "running" ]; then
+    if comprobar_edge; then
+        EDGE_COMPROBADO=1
         registro "ok: el edge sirve el portfolio en ${DOMINIO}"
         apuntar "Comprobado a traves del edge: correcto."
     else
-        terminar_mal "el edge no sirve el portfolio (estaria caido para los visitantes)"
+        EDGE_FALLIDO=1
+        terminar_mal "el edge no sirve el portfolio (estaria caido para los visitantes): ${FALLO_EDGE}"
     fi
 else
     # The edge being absent is not this project's fault, so it does not trigger
     # a rollback - but it does mean nobody outside can see the site.
-    registro "AVISO: el contenedor ${EDGE} no esta corriendo"
-    alertar "El edge (${EDGE}) no estaba corriendo: el sitio no es accesible desde internet."
+    registro "AVISO: el contenedor ${EDGE} no esta corriendo (${estado_edge})"
+    alertar "El edge (${EDGE}) no estaba corriendo (${estado_edge}): el sitio no es accesible desde internet."
 fi
 
 paso "7/7  Limpieza"
+# The promotion has just been verified end to end (port and edge). From here on
+# a failure must never trigger terminar_mal's rollback of a good version, and
+# cleanup is best-effort: a failure is noted, not fatal.
+PROMOCIONADO=0
+VERIFICADO=1
 # Dangling (untagged) images only: whatever lost its tag when :candidato was
 # retagged to :actual, on this project or any other on the same host. `-a`
 # would remove every unused image regardless of tag — host-wide — which would
 # also delete other projects' `:anterior` once it passes 30 days, taking away
 # their rollback target. `:anterior` stays tagged here, so this scoped prune
 # never touches it.
-liberado="$(docker image prune -f --filter "until=720h" 2>/dev/null | awk '/Total reclaimed space/ {print $4, $5}' | xargs)"
-registro "espacio liberado: ${liberado:-nada}"
-apuntar "Limpieza de imagenes: ${liberado:-nada que borrar}."
+# stderr stays in the log (not 2>/dev/null) so a failure explains itself, e.g.
+# "a prune operation is already running" when another project cleans at once.
+salida_prune=""
+if salida_prune="$(docker image prune -f --filter "until=720h" 2>&1)"; then
+    liberado="$(awk '/Total reclaimed space/ {print $4, $5}' <<<"$salida_prune" | xargs || true)"
+    registro "espacio liberado: ${liberado:-nada}"
+    apuntar "Limpieza de imagenes: ${liberado:-nada que borrar}."
+else
+    registro "AVISO: la limpieza de imagenes ha fallado: ${salida_prune}"
+    apuntar "Limpieza de imagenes: ha fallado (no afecta a la version servida)."
+    alertar "La limpieza de imagenes ha fallado: ${salida_prune:0:200}"
+fi
 
 # ------------------------------------------------------------------------------
 paso "Informe"
@@ -415,6 +506,8 @@ paso "Informe"
 
 if [ "$SECO" -eq 1 ]; then
     titular="ENSAYO. Se ha revisado y construido, pero no se ha promocionado nada."
+elif [ -n "$AVISOS" ] && [ "$hay_cambios" -eq 0 ]; then
+    titular="TODO CORRECTO, PERO HAY COSAS QUE MIRAR."
 elif [ -n "$AVISOS" ]; then
     titular="ACTUALIZADO, PERO HAY COSAS QUE MIRAR."
 elif [ "$hay_cambios" -eq 0 ]; then
@@ -424,7 +517,7 @@ else
 fi
 
 mensaje="PORTFOLIO · mantenimiento del sabado
-Servidor: $(hostname -s) (${DOMINIO})
+Servidor: $(hostname -s 2>/dev/null || echo desconocido) (${DOMINIO})
 Fecha: ${FECHA}
 
 RESULTADO: ${titular}
@@ -445,7 +538,7 @@ mensaje+="
 ${RESUMEN}
 --- estado ---
 Sirviendo la revision: ${revision_ahora}
-Disco libre: $(df -h /var/lib/docker --output=avail 2>/dev/null | tail -1 | tr -d ' ')"
+Disco libre: $(df -h /var/lib/docker --output=avail 2>/dev/null | tail -1 | tr -d ' ' || echo desconocido)"
 
 avisar_telegram "$mensaje"
 
