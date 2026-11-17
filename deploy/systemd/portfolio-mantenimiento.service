@@ -1,6 +1,11 @@
 [Unit]
 Description=Portfolio — mantenimiento semanal
 After=network-online.target docker.service
+# Saturday chain: if an earlier maintenance is still running (or several timers
+# fire together after an outage, Persistent=true), wait for it. Ordering only
+# applies to queued jobs, so a normal Saturday is unaffected, and the wait does
+# not count against TimeoutStartSec.
+After=masanco-mantenimiento.service
 Wants=network-online.target
 Requires=docker.service
 # Red de seguridad final: el trap ERR del script no llega a ejecutarse si el
