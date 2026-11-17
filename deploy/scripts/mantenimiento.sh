@@ -29,6 +29,9 @@
 # commands that can actually fail live. Without it the trap below is dead code
 # and this script dies in silence.
 set -eEuo pipefail
+# Byte cuts (tail -c, cut) are only safe in a UTF-8 locale; iconv -c then drops
+# any half character they leave behind.
+export LC_ALL=C.UTF-8
 
 REPO_DIR="${REPO_DIR:-/opt/portfolio/repo}"
 SERVICE_USER="${SERVICE_USER:-portfolio}"
@@ -61,11 +64,21 @@ MARCADOR="Mario Sanchis Colomer"
 DOMINIO=portfolio.masanco-hub.com
 EDGE=edge-proxy
 
+# State between runs (root-only dir).
+ESTADO_DIR=/var/lib/portfolio-mantenimiento
+# One line "date<TAB>headline" per report that never reached Telegram
+# (append-only). ultimo-ok: "<ISO date> <revision> avisos=<N>" of the last good
+# REAL run whose report was delivered; the host watches it.
+PENDIENTE="${ESTADO_DIR}/aviso-pendiente"
+MARCA_OK="${ESTADO_DIR}/ultimo-ok"
+
 SECO=0
 AVISAR=1
 
+FECHA="$(date '+%Y-%m-%d %H:%M')"
 registro() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
-paso()     { printf '\n=== %s ===\n' "$*"; }
+PASO_ACTUAL=""
+paso()     { PASO_ACTUAL="$*"; printf '\n=== %s ===\n' "$*"; }
 
 [ "$(id -u)" -eq 0 ] || { echo "Este script necesita root: sudo $0" >&2; exit 1; }
 
@@ -77,6 +90,54 @@ for argumento in "$@"; do
     esac
 done
 
+# --- Reporting ----------------------------------------------------------------
+# Exit codes: 3 = "failed, and my own report was DELIVERED" (avisar-fallo.sh
+# stays silent for it); 1 or 143 = OnFailure= must warn.
+
+# Returns 1 if the message could not be sent (after notify-telegram's retries).
+avisar_telegram() {
+    [ "$AVISAR" -eq 1 ] || return 0
+    if [ ! -x "$NOTIFY" ]; then
+        registro "AVISO: no existe $NOTIFY; nadie recibira el informe"
+        return 1
+    fi
+    "$NOTIFY" "$1" || { registro "AVISO: no se ha podido enviar el aviso por Telegram"; return 1; }
+}
+
+# Appends "date<TAB>headline" to the pending file. Returns 1 if it cannot.
+anotar_pendiente() {
+    local titular="${1//[$'\t\n']/ }"
+    { install -d -m 755 "$ESTADO_DIR" && printf '%s\t%s\n' "$FECHA" "$titular" >> "$PENDIENTE"; } \
+        || { registro "AVISO: no se ha podido escribir ${PENDIENTE}"; return 1; }
+}
+
+# enviar_informe HEADLINE REPORT [ANTES]. Returns 0 only if the report was
+# DELIVERED (never with --sin-aviso). Earlier undelivered reports are listed at
+# the very top (they survive the 3900-char cut) and the pending file is deleted
+# only after a good send. A failed send is appended to it, or, with ANTES=1,
+# was appended before trying (a run that may be killed at any moment).
+enviar_informe() {
+    local titular="$1" texto="$2" antes="${3:-0}" previos="" anotado=0
+    [ "$AVISAR" -eq 1 ] || return 1
+    if [ "$antes" -eq 1 ] && anotar_pendiente "$titular"; then anotado=1; fi
+    if [ -s "$PENDIENTE" ]; then
+        # Skip the line just appended for THIS report, and only if it was appended.
+        previos="$( { if [ "$anotado" -eq 1 ]; then sed '$d' "$PENDIENTE"; else cat "$PENDIENTE"; fi; } \
+            | while IFS=$'\t' read -r f t; do
+                [ -z "$f" ] || printf 'El informe del %s no llego: %s\n' "$f" "$t"
+              done || true )"
+        [ -z "$previos" ] || texto="${previos}
+
+${texto}"
+    fi
+    if avisar_telegram "$texto"; then
+        rm -f "$PENDIENTE" || true
+        return 0
+    fi
+    if [ "$antes" -ne 1 ]; then anotar_pendiente "$titular" || true; fi
+    return 1
+}
+
 # --- One run at a time --------------------------------------------------------
 # The timer is Persistent=true: if the server was off on Saturday, systemd
 # fires this on the next boot, which could land on top of a manual update.sh.
@@ -85,13 +146,21 @@ done
 exec 9>"$LOCK_FILE"
 if ! flock -n 9; then
     registro "ya hay un mantenimiento o despliegue en curso; no se hace nada"
-    exit 0
+    [ "$AVISAR" -eq 1 ] || exit 0
+    # Exit 0 only if the notice got out; otherwise OnFailure= must warn (exit 1).
+    enviar_informe "lock ocupado: no se hizo el mantenimiento" "PORTFOLIO · mantenimiento del sabado
+Servidor: $(hostname -s 2>/dev/null || echo desconocido) (${DOMINIO})
+
+RESULTADO: no se ha hecho el mantenimiento: otro proceso tenia el lock (update.sh u otro mantenimiento).
+Esta semana no se ha actualizado nada; se puede lanzar a mano cuando acabe el otro." && exit 0
+    exit 1
 fi
 
 BITACORA="$(mktemp /tmp/portfolio-mantenimiento-XXXXXX.log)"
+# Keep the journal's stdout on fd 7: `cortado` must be able to leave the tee
+# pipe (systemd kills tee along with everything else) and still log.
+exec 7>&1
 exec > >(tee -a "$BITACORA") 2>&1
-
-FECHA="$(date '+%Y-%m-%d %H:%M')"
 
 # Once :actual has been retagged, any later failure has to be undone. Without
 # this flag terminar_mal cannot tell "failed before touching anything" from
@@ -109,16 +178,8 @@ RESUMEN=""
 apuntar() { RESUMEN+="$1"$'\n'; }
 
 AVISOS=""
-alertar() { AVISOS+="$1"$'\n'; }
-
-avisar_telegram() {
-    [ "$AVISAR" -eq 1 ] || return 0
-    if [ ! -x "$NOTIFY" ]; then
-        registro "AVISO: no existe $NOTIFY; nadie recibira el informe"
-        return 0
-    fi
-    "$NOTIFY" "$1" || registro "AVISO: no se ha podido enviar el aviso por Telegram"
-}
+N_AVISOS=0
+alertar() { AVISOS+="$1"$'\n'; N_AVISOS=$(( N_AVISOS + 1 )); }
 
 # --- Helpers ------------------------------------------------------------------
 
@@ -129,6 +190,43 @@ id_de_imagen() {
 limpiar_canario() {
     docker rm -f "$CONTENEDOR_CANARIO" >/dev/null 2>&1 || true
 }
+
+# Canary cleanup, once however the run ends.
+LIMPIO=0
+limpieza_final() {
+    [ "$LIMPIO" -eq 0 ] || return 0
+    LIMPIO=1
+    limpiar_canario
+}
+trap limpieza_final EXIT
+
+# systemd stopping the unit (TimeoutStartSec or a stop) or Ctrl+C. $1 = TERM|INT.
+# The tee pipe may already be dead: go back to the journal (fd 7) first. The
+# pending note is written BEFORE sending (the kill may come at any moment).
+# Exit 3 only if the notice was delivered; otherwise 143, so OnFailure= warns.
+CORTADO=0
+cortado() {
+    local causa entregado=0
+    set +e
+    trap '' PIPE
+    trap - TERM INT ERR
+    CORTADO=1
+    exec >&7 2>&7
+    if [ "$1" = INT ]; then causa="interrumpido a mano (Ctrl+C)"; else causa="cortado por systemd (timeout o parada)"; fi
+    registro "${causa} durante: ${PASO_ACTUAL:-el arranque}"
+    limpieza_final
+    enviar_informe "$causa durante: ${PASO_ACTUAL:-el arranque}" "PORTFOLIO · mantenimiento del sabado
+Servidor: $(hostname -s 2>/dev/null || echo desconocido) (${DOMINIO})
+Fecha: ${FECHA}
+
+RESULTADO: EL MANTENIMIENTO SE HA CORTADO (${causa}).
+Paso en curso: ${PASO_ACTUAL:-el arranque}
+Comprueba que el sitio responde: curl -sI https://${DOMINIO}" 1 && entregado=1
+    [ "$entregado" -eq 1 ] && exit 3
+    exit 143
+}
+trap 'cortado TERM' TERM
+trap 'cortado INT' INT
 
 # Root must not silently start running different code than the last time it
 # was installed: if the repo's copies of these two scripts (or anything they
@@ -192,7 +290,7 @@ revertir() {
         return 1
     fi
     docker image tag "${IMAGEN}:anterior" "${IMAGEN}:actual"
-    docker compose --project-directory "$COMPOSE_DIR" up -d --force-recreate >/dev/null 2>&1 || true
+    REVISION="${REVISION:-${revision_antes:-unknown}}" docker compose --project-directory "$COMPOSE_DIR" up -d --no-build --force-recreate >/dev/null 2>&1 || true
     esperar_url "http://127.0.0.1:${PUERTO_APP}/" "el sitio tras revertir" 45
 }
 
@@ -208,12 +306,25 @@ terminar_mal() {
 
     # A failure inside this function must not re-enter through the trap.
     trap - ERR
-    local donde="$1"
-    paso "Ha fallado: ${donde}"
+    # If systemd's TERM already killed tee, a printf to the dead pipe must not
+    # kill us before the report goes out.
+    trap '' PIPE
+    # $2 = exit status of the failing command (only the ERR trap passes it).
+    local donde="$1" rc="${2:-0}" entregado=0
+    # A command killed by the same TERM/INT that is about to run `cortado`:
+    # that is a cut, not a failure; never relaunch or roll back.
+    if [ "$CORTADO" -eq 1 ] || [ "$rc" -eq 143 ] || [ "$rc" -eq 130 ]; then
+        cortado "$([ "$rc" -eq 130 ] && echo INT || echo TERM)"
+    fi
+    printf '\n=== Ha fallado: %s ===\n' "$donde"
+    if [ "$rc" -eq 124 ]; then
+        donde+=" (tiempo agotado en ${PASO_ACTUAL:-el arranque})"
+    elif [ "$rc" -ne 0 ]; then
+        donde+=" (codigo ${rc})"
+    fi
+    limpieza_final
 
-    limpiar_canario
-
-    local estado_servicio cambio_aplicado urgencia resultado comprobado
+    local estado_servicio cambio_aplicado urgencia resultado comprobado cola
     resultado="NO SE HA PODIDO ACTUALIZAR."
 
     if [ "$VERIFICADO" -eq 1 ]; then
@@ -245,37 +356,44 @@ terminar_mal() {
         fi
         cambio_aplicado="Se habia llegado a poner la version nueva y se ha deshecho."
         urgencia="Conviene revisarlo hoy mismo."
-    elif [ "$EDGE_FALLIDO" -eq 1 ]; then
-        # Nothing was promoted, but the edge WAS checked and does not serve the
-        # site: visitors see an outage, so this is urgent, not a quiet note.
-        resultado="EL PORTFOLIO NO SE VE DESDE INTERNET."
-        estado_servicio="ATENCION: el edge NO sirve el portfolio (comprobado), aunque el contenedor responde en su puerto local (127.0.0.1:${PUERTO_APP})."
-        cambio_aplicado="No se ha cambiado la version: sigue la de siempre."
-        urgencia="Hay que mirarlo cuanto antes: los visitantes no ven el sitio."
     else
-        # Say what was actually checked: only the local port, not the edge.
-        estado_servicio="El sitio responde en su puerto local (127.0.0.1:${PUERTO_APP}) con la version de siempre; el edge no se ha comprobado."
+        # Nothing was promoted: never roll back (that would put :anterior over
+        # the good :actual). If the site is down, relaunch :actual instead.
+        cambio_aplicado="No se ha cambiado la version que sirve."
+        urgencia="No hay nada urgente, pero conviene revisarlo antes del lunes."
+        if [ "$EDGE_FALLIDO" -eq 1 ]; then
+            resultado="EL PORTFOLIO NO SE VE DESDE INTERNET."
+            urgencia="Hay que mirarlo cuanto antes: los visitantes no ven el sitio."
+            estado_servicio="ATENCION: el edge NO sirve el portfolio (comprobado), aunque el contenedor responde en su puerto local (127.0.0.1:${PUERTO_APP})."
+        else
+            estado_servicio="El sitio responde en su puerto local (127.0.0.1:${PUERTO_APP}) con la version de siempre; el edge no se ha comprobado."
+        fi
         if ! comprobar_url "http://127.0.0.1:${PUERTO_APP}/" "el sitio" >/dev/null 2>&1; then
-            registro "el sitio no responde; intentando volver a la version anterior"
-            if revertir; then
-                estado_servicio="Ha habido que volver a la version anterior, y funciona."
+            urgencia="Hay que mirarlo hoy."
+            if [ "$SECO" -eq 1 ]; then
+                registro "modo --seco: no se toca nada"
+                estado_servicio="ATENCION: el portfolio NO responde. Era un ensayo: no se ha tocado nada."
             else
-                estado_servicio="ATENCION: el portfolio NO responde. Hay que mirarlo cuanto antes."
+                registro "el sitio no responde; relanzando la version actual (:actual)"
+                REVISION="${REVISION:-${revision_antes:-unknown}}" docker compose --project-directory "$COMPOSE_DIR" up -d --no-build --force-recreate >/dev/null 2>&1 || true
+                if esperar_url "http://127.0.0.1:${PUERTO_APP}/" "el sitio tras relanzar" 45; then
+                    estado_servicio="El sitio no respondia y se ha relanzado la version actual; ahora responde."
+                else
+                    estado_servicio="ATENCION: el portfolio NO responde, ni tras relanzar la version actual. Hay que mirarlo cuanto antes."
+                fi
+                cambio_aplicado="Se ha relanzado la version actual (:actual); no se ha cambiado de version."
             fi
         fi
-        cambio_aplicado="No se ha cambiado nada: sigue sirviendo la version de siempre."
-        urgencia="No hay nada urgente, pero conviene revisarlo antes del lunes."
     fi
 
     sleep 1
-    local cola
     # A single log line can be an entire HTML dump: if the canary ever ends up
     # interrogating another app, its whole index.html lands in the log. Telegram
     # cuts at 4096 keeping the END, so without trimming here the verdict is
     # exactly what gets dropped and what arrives is somebody's page footer.
-    cola="$(tail -n 25 "$BITACORA" | cut -c1-200 | tail -c 1500)"
+    cola="$(tail -n 25 "$BITACORA" | cut -c1-200 | tail -c 1500 | iconv -c -f UTF-8 -t UTF-8 || true)"
 
-    avisar_telegram "PORTFOLIO · mantenimiento del sabado
+    enviar_informe "$resultado" "PORTFOLIO · mantenimiento del sabado
 Servidor: $(hostname -s 2>/dev/null || echo desconocido) (${DOMINIO})
 Fecha: ${FECHA}
 
@@ -286,6 +404,7 @@ ${cambio_aplicado}
 ${urgencia}
 
 Ha fallado en: ${donde}
+$( [ -n "$AVISOS" ] && printf '\n--- lo que hay que mirar ---\n%s' "$AVISOS" )
 
 --- detalle tecnico ---
 ${RESUMEN}
@@ -293,13 +412,16 @@ ${RESUMEN}
 ${cola}
 
 Registro completo:
-  sudo journalctl -u portfolio-mantenimiento --since '1 day ago'"
+  sudo journalctl -u portfolio-mantenimiento --since '1 day ago'" && entregado=1
 
     printf '\n=== Mantenimiento TERMINADO CON FALLOS ===\n'
+    # 3 = failed and the report arrived: avisar-fallo.sh stays silent for it.
+    # Anything else (not delivered, --sin-aviso): 1, so OnFailure= warns.
+    [ "$entregado" -eq 1 ] && exit 3
     exit 1
 }
 
-trap 'terminar_mal "un error inesperado (linea $LINENO)"' ERR
+trap 'terminar_mal "un error inesperado (linea $LINENO)" $?' ERR
 
 # The port comes from the host file, same as update.sh, so it stays out of
 # both the command line and the repo defaults.
@@ -325,7 +447,7 @@ registro "sirviendo la revision ${revision_antes} en el puerto ${PUERTO_APP}"
 
 paso "2/7  Codigo del repositorio"
 # --ff-only so a diverged history stops here loudly instead of opening a merge.
-sudo -u "$SERVICE_USER" -H git -C "$REPO_DIR" pull --ff-only
+timeout 120 sudo -u "$SERVICE_USER" -H git -C "$REPO_DIR" pull --ff-only
 REVISION="$(sudo -u "$SERVICE_USER" -H git -C "$REPO_DIR" rev-parse --short HEAD)"
 if [ "$REVISION" = "$revision_antes" ]; then
     registro "sin commits nuevos (${REVISION})"
@@ -340,7 +462,7 @@ paso "3/7  Construir el candidato"
 # --pull is the whole point of this job on a static site: it re-resolves
 # node:22-alpine and nginx-unprivileged, which is how base-image security
 # updates ever reach the container.
-docker build --pull \
+timeout 600 docker build --pull \
     -f "${REPO_DIR}/deploy/docker/Dockerfile" \
     --build-arg "REVISION=${REVISION}" \
     -t "${IMAGEN}:candidato" \
@@ -396,12 +518,12 @@ elif [ "$hay_cambios" -eq 0 ]; then
     registro "no hay nada nuevo que promocionar"
     apuntar "No habia nada nuevo que poner a servir."
 else
-    [ -n "$id_actual" ] && docker image tag "${IMAGEN}:actual" "${IMAGEN}:anterior"
+    [ -z "$id_actual" ] || docker image tag "${IMAGEN}:actual" "${IMAGEN}:anterior"
     # Set BEFORE promoting: from this line on, any failure leaves a state that
     # has to be undone, even if the retag itself dies halfway.
     PROMOCIONADO=1
     docker image tag "${IMAGEN}:candidato" "${IMAGEN}:actual"
-    docker compose --project-directory "$COMPOSE_DIR" up -d --force-recreate
+    REVISION="$REVISION" docker compose --project-directory "$COMPOSE_DIR" up -d --no-build --force-recreate
     registro "promocionada la revision ${REVISION}"
 fi
 
@@ -540,7 +662,20 @@ ${RESUMEN}
 Sirviendo la revision: ${revision_ahora}
 Disco libre: $(df -h /var/lib/docker --output=avail 2>/dev/null | tail -1 | tr -d ' ' || echo desconocido)"
 
-avisar_telegram "$mensaje"
+entregado=0
+enviar_informe "$titular" "$mensaje" && entregado=1
+
+# Last good REAL run whose report arrived, for the host to watch. Best-effort
+# (inside `||`, so a failure never reaches the ERR trap): atomic, tmp + mv.
+marcar_ok() {
+    install -d -m 755 "$ESTADO_DIR" \
+        && printf '%s %s avisos=%s\n' "$(TZ=Europe/Madrid date '+%Y-%m-%dT%H:%M:%S%z')" \
+            "$revision_ahora" "$N_AVISOS" > "$MARCA_OK.tmp" \
+        && mv "$MARCA_OK.tmp" "$MARCA_OK"
+}
+if [ "$SECO" -eq 0 ] && [ "$entregado" -eq 1 ]; then
+    marcar_ok || registro "AVISO: no se ha podido escribir ${MARCA_OK}"
+fi
 
 trap - ERR
 printf '\n=== Mantenimiento terminado correctamente ===\n'

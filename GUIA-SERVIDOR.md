@@ -181,6 +181,27 @@ Si el fallo llega después de promocionar, revierte sin consultar el estado de
 salud. Si el proceso muere sin llegar a su `trap` (OOM, timeout, kill -9),
 `portfolio-mantenimiento-fallo.service` (vía `OnFailure=`) avisa igualmente.
 
+Avisos fiables (PF-025):
+
+- **Código 3 = «falló y mi informe llegó»**: solo entonces `avisar-fallo.sh`
+  calla. Con cualquier otro código (1 si el informe no llegó o con
+  `--sin-aviso`, 143 de un corte, OOM, señal) avisa. Si ese aviso tampoco sale,
+  lo anota en el pendiente y termina con 1.
+- **Pendiente**: un informe que no llega se acumula en
+  `/var/lib/portfolio-mantenimiento/aviso-pendiente` (fecha + titular); el
+  siguiente informe los lista al principio y solo entonces se borra.
+- **`ultimo-ok`** (`/var/lib/portfolio-mantenimiento/ultimo-ok`): solo una
+  ejecución real (no `--seco`) cuyo informe llegó la escribe, con
+  `<fecha ISO> <revisión> avisos=<N>`. Es lo que vigila el host.
+- **Lock ocupado** (un `update.sh` o un segundo mantenimiento): avisa y sale 0
+  solo si el aviso llegó; si no, 1 y al pendiente.
+- **Sin promoción no se revierte**: si el sitio no responde, el script relanza
+  `:actual` (`compose up -d --no-build --force-recreate`), vuelve a comprobar y
+  lo cuenta; con `--seco` no toca nada. `:anterior` solo se usa tras promocionar.
+- **Cortes**: `git pull` 120 s y `docker build` 600 s llevan `timeout` (caben en
+  `TimeoutStartSec=1800`); `TimeoutStopSec=300` deja salir el aviso de un corte
+  de systemd o de Ctrl+C.
+
 Instalación en el servidor:
 
 - Las tres units están **copiadas** (no enlazadas) en `/etc/systemd/system/`,
@@ -209,6 +230,10 @@ sudo install -m 750 /opt/portfolio/repo/deploy/scripts/notify-telegram.sh /usr/l
 sudo cp /opt/portfolio/repo/deploy/systemd/portfolio-mantenimiento*.{service,timer} /etc/systemd/system/
 sudo systemctl daemon-reload
 ```
+
+Tras PF-025 hay que reinstalar los tres scripts y las dos `.service` (el último
+bloque ya lo hace todo; `/var/lib/portfolio-mantenimiento/` lo crea el propio
+script).
 
 `mantenimiento.sh` no se reinstala solo: tras su `git pull`, compara (`cmp`)
 las tres copias del repo (`mantenimiento.sh`, `avisar-fallo.sh` y

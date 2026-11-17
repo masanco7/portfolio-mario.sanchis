@@ -78,6 +78,20 @@ El vhost que está en uso es el del edge. No está en este repo: vive en
   que `mantenimiento.sh`, sin bloquearse: si el mantenimiento del sábado está
   en marcha, un despliegue manual sale con un mensaje claro en vez de pisarle
   el reetiquetado de `:actual`/`:anterior`.
+- **Avisos fiables (PF-025).** `mantenimiento.sh` sale con **código 3** solo si
+  su informe de fallo **llegó** (entonces `avisar-fallo.sh`, que exige
+  `ExecMainCode=1` y `ExecMainStatus=3`, calla); con cualquier otro código
+  (1, 143, OOM, señal) avisa. Los informes que no llegan se acumulan en
+  `/var/lib/portfolio-mantenimiento/aviso-pendiente` y el siguiente los lista
+  al principio; una ejecución real cuyo informe llegó escribe `ultimo-ok`
+  (`<fecha ISO> <revisión> avisos=<N>`). Si el `flock` está cogido, avisa y
+  sale 0 solo si el aviso llegó. Sin promoción no se revierte: se relanza
+  `:actual` (con `--seco`, nada). `git pull` (120 s) y `docker build` (600 s)
+  llevan `timeout`; `TimeoutStartSec=1800` los cubre y `TimeoutStopSec=300`
+  deja salir el aviso de un corte. `notify-telegram.sh` reintenta, esconde el
+  token del `ps` y sale distinto de 0 si no llega. Tras actualizar hay que
+  reinstalar los tres scripts y las dos `.service` (+ `daemon-reload`), como en
+  la guía.
 - **La limpieza de imágenes del sábado no lleva `-a`.** `docker image prune -f`
   solo borra imágenes sin etiqueta (colgantes); con `-a` borraría cualquier
   imagen sin contenedor de cualquier proyecto del host, incluido un
